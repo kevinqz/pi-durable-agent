@@ -88,3 +88,5 @@ Open the printed `workers.dev` URL. Access should present the application's logi
 - Record the application revision, deployed version, private configuration hash and observed results. Do not publish login codes, tokens, personal conversations or account credentials in evidence.
 
 Cloudflare accepting the deployment and displaying a login page proves provisioning and the access gate. It does not establish a successful authenticated conversation, Code Mode execution, coordinated hosted restore, abrupt-crash recovery, model quality or production readiness. Those observations remain explicit [roadmap gates](./roadmap.md).
+
+The [recorded staging run](./staging-validation.json) additionally completed the authenticated demo flow, including a pending approval preserved across an asset-only deployment, its completed output and original-source retrieval. Backend code and dependencies stayed unchanged. The run does not qualify hosted backup/restore, abrupt crashes, a second authenticated identity or a backend upgrade.

@@ -54,19 +54,29 @@ CI runs this cross-release application flow instead of repeating the same-runtim
 
 The recorded Git revision identifies the checkout base at validation time and may precede uncommitted changes; the source/configuration/dependency fingerprints and verification-script hashes identify the tested contents. This evidence covers macOS/arm64 with Node 22; CI independently exercises Linux/x64 with Node 22. It does not qualify changed dependency graphs, downgrades, external connectors or hosted deployment.
 
-## Hosted provisioning increment
+## Hosted staging increments
 
 A private staging Worker was deployed on **2026-10-09** using Workers Paid, the existing Zero Trust Free organization and a Worker-level Access application. A dedicated exact-email Allow policy uses six-hour sessions and the existing One-time PIN provider. HttpOnly and binding cookies are enabled. Preview URLs remain disabled; the application uses demo mode with no AI binding. Account-specific configuration and credentials are kept outside tracked files.
 
-The [staging evidence](./staging-validation.json) records the source and asset hashes, deployed versions, configuration hash and anonymous checks. The page, static script and identity API redirect to Access when unauthenticated; a forged assertion header does not bypass that gate. The browser displays the application's Access login and accepts a request for an email verification code.
+The [staging evidence](./staging-validation.json) records the source and asset hashes, deployed versions, configuration hash and anonymous checks. The page, static script and identity API redirect to Access when unauthenticated; a forged assertion header does not bypass that gate.
 
-These observations establish provisioning and edge authentication enforcement. They do **not** yet establish a successful authenticated session, hosted Code Mode execution, memory retrieval, recovery or another-user isolation. The [walkthrough](./staging.md) keeps those checks separate from deployment.
+After the owner completed Access login, a separate synthetic browser session exercised:
+
+- A completed conversation turn and original-source retrieval through OptChat.
+- A Code Mode note paused for approval, followed by a real staging deployment. The deployment changed only the browser script; backend code, dependencies, bindings and private configuration stayed identical.
+- The same session, conversation and pending execution after reloading. The execution ID, operation sequence, connector, method, code, arguments, contract and expiry matched the values observed before deployment.
+- One approval, a completed note result in the retained output, one visible result-delivery request and one corresponding assistant follow-up.
+- Retrieval of that saved result, a further conversation turn, and another reload without another visible delivery. Original text remained searchable.
+
+The browser review also found a display defect: a detail opened during a pause could remain visible after completion, although the stored final result was correct. The interface now exposes retained output only for completed/failed actions, invalidates a selected output when its recorded outcome changes, and ignores superseded responses. Legacy pause markers are presented as missing final output rather than as an execution error.
+
+These are **hosted demo observations through the authenticated browser**, not a model-quality study or a hosted fault-injection/concurrency test. One successful note receipt does not independently count destination rows. Destination deduplication and concurrent decisions are covered by the separate local runtime tests. A deployment with unchanged backend code is not a cross-release migration, and no forced eviction or abrupt crash was injected. See the [walkthrough](./staging.md) to repeat this bounded flow.
 
 ## Not yet established
 
-- The authenticated hosted conversation/tool/approval flow remains pending application login and execution; an Access login page is not its completion.
+- Hosted isolation using a second authenticated identity has not been exercised; the current Access policy intentionally admits only its owner. Signed-token and identity-isolation tests run locally.
 - No paid Workers AI model or arbitrary external mutation has been qualified.
-- No deployed hibernation/redeploy/abrupt-restart evidence or hosted coordinated backup/restore proof exists yet.
+- No deployed hibernation/abrupt-restart evidence or hosted coordinated backup/restore proof exists yet. The observed asset-only redeploy is narrower than either guarantee.
 - No production billing estimate, cost dashboard, hosted cross-release recovery proof or self-update path is claimed.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.
 - Demo summaries are deterministic excerpts. They do not establish model quality, prompt-cache hit rate, token savings or long-run memory accuracy.

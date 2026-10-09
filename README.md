@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Local offline backup/restore has a [dedicated workflow](./docs/local-recovery.md). A private Cloudflare staging instance has been deployed and its anonymous-access gate checked; authenticated application and recovery qualification remain open. Real model calls, hosted backup/restore and production operation are not yet qualified. See the [evidence and limits](./docs/validation.md).
+**Development preview.** The demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Local offline backup/restore has a [dedicated workflow](./docs/local-recovery.md). Private Cloudflare staging has passed an authenticated conversation, original-message retrieval and an approval preserved across a deployment with unchanged backend code. Real model calls, hosted backup/restore, abrupt-crash recovery and production operation are not yet qualified. See the [evidence and limits](./docs/validation.md).
 
 ## Try it locally
 
