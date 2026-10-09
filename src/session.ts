@@ -19,6 +19,7 @@ import { Actions } from "./actions.js";
 import type { ActionAdmission } from "./action-contracts.js";
 import { actionTools } from "./tools.js";
 import { RuntimeRecovery } from "./recovery.js";
+import { createSessionExport } from "./session-export.js";
 
 export class AgentSession extends DurableObject<Env> {
   readonly lifecycle: Lifecycle<Env>;
@@ -138,6 +139,12 @@ export class AgentSession extends DurableObject<Env> {
     this.store.bind(principal);
     if (method === "GET" && path === "state") return this.snapshot();
     if (method === "GET" && path === "history") return this.chat.history();
+    if (method === "POST" && path === "exports/session")
+      return createSessionExport(
+        () => this.snapshot(),
+        (cursor) => this.chat.history(cursor),
+        (id) => this.actions.store.readArchive(id),
+      );
     if (method === "POST" && path === "recovery/restart")
       return this.recovery.request(
         identifier(body.activationId, "activation ID"),
@@ -274,6 +281,7 @@ export class AgentSession extends DurableObject<Env> {
     return {
       mode: this.env.MODEL_MODE,
       schema: 1,
+      capabilities: { sessionDataExport: true },
       runtime: this.recovery.describe(),
       memory: state.memory,
       history: await this.chat.history(),

@@ -24,7 +24,8 @@ Open the local address printed by Wrangler, normally **http://127.0.0.1:8787**.
 3. Select **Try a demo approval**. Review the exact script and pending note in **Approvals**.
 4. Approve or reject it. A completed action gets a saved outcome and a follow-up conversation turn.
 5. Reload the page. The session URL, conversation, memory and approvals remain addressable. Stop and restart `npm run dev` to reopen the local database.
-6. To try bounded recovery, open **Session diagnostics** after active work finishes and select **Restart this test session**. A changed activation and **recovered** status confirm the process reset. This keeps saved state; it is not a backup. [Recovery controls and limits](./docs/hosted-recovery.md).
+6. Select **Export session data** to download the retained history, current memory and action records as JSON. The [offline verifier](./docs/session-export.md) checks file integrity. This readable export cannot restore a running session.
+7. To try bounded recovery, open **Session diagnostics** after active work finishes and select **Restart this test session**. A changed activation and **recovered** status confirm the process reset. This keeps saved state; it is not a backup. [Recovery controls and limits](./docs/hosted-recovery.md).
 
 Local state lives in `.wrangler/` and is ignored by Git. Keep it if you want to retain the demo. Closing a browser does not cancel work; stopping the local server pauses processing until it runs again. A pending approval can outlive the page, but expires after one hour. Simulated replies/summaries demonstrate the plumbing; they do not measure AI quality or prompt-cache savings.
 
@@ -38,7 +39,7 @@ npm run dev -- --persist-to .local-restores/demo
 
 Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
-**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.1 → 0.1.0-dev.2** route opens a separate copy and retains memory, completed actions and pending approvals. Installations on dev.0 first pass through the retained dev.1 route.
+**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.2 → 0.1.0-dev.3** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3.
 
 **Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [private staging walkthrough](./docs/staging.md) and [deployment and cost guide](./docs/deployment.md) when ready.
 
@@ -92,6 +93,7 @@ The focused tests run locally in Cloudflare's Workers runtime with synthetic mod
 | `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts` | Action identity, retained contracts, reconciliation, archives and result delivery |
 | `src/notes.ts`, `src/tools.ts`                                      | Versioned demo connector and native Pi extension                                  |
 | `src/recovery.ts`                                                   | Owner-authorized demo reset, activation identity and bounded restart receipts     |
+| `src/session-export.ts`                                             | Bounded session data archive with public history pagination and integrity checks  |
 | `src/models.ts`                                                     | Explicit model configuration and credential-free simulation                       |
 | `public/`                                                           | Small browser interface; no frontend framework or build step                      |
 | `test/`                                                             | Focused runtime and authorization checks                                          |

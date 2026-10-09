@@ -136,6 +136,10 @@ pre {
 #error {
   color: #ffb8ac;
 }
+#export-status {
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+}
 #connection {
   font-size: 0.85rem;
   color: #a3e2d1;

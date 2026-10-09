@@ -26,6 +26,19 @@
         "version": "0.1.0-dev.2",
         "buildFingerprint": "945889f83cbc63dcfb066971b8624eae15784535a70b202070db6e93695cff37"
       }
+    },
+    {
+      "id": "0.1.0-dev.2-to-0.1.0-dev.3",
+      "method": "unchanged-state-copy",
+      "from": {
+        "version": "0.1.0-dev.2",
+        "buildFingerprint": "945889f83cbc63dcfb066971b8624eae15784535a70b202070db6e93695cff37",
+        "revision": "3eb63101c0a8f222b506f771b3c5ec064f88fa53"
+      },
+      "to": {
+        "version": "0.1.0-dev.3",
+        "buildFingerprint": "e2473a7a44b4502864000042fbbdae0f485cd6d1edea3274d7cf939f3711af91"
+      }
     }
   ]
 }

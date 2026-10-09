@@ -1,6 +1,6 @@
 {
   "name": "pi-durable-agent",
-  "version": "0.1.0-dev.2",
+  "version": "0.1.0-dev.3",
   "private": true,
   "description": "An independent Cloudflare application composing Pi Durable, OptChat memory and Code Mode.",
   "type": "module",
@@ -23,9 +23,11 @@
     "build": "wrangler deploy --dry-run --env staging --outdir dist",
     "format": "prettier . --write",
     "check:format": "prettier . --check",
-    "check": "npm run check:format && npm run typecheck && npm run test:state && npm test && npm run build",
+    "check": "npm run check:format && npm run typecheck && npm run test:state && npm run test:export && npm test && npm run build",
     "deploy:staging": "wrangler deploy --env staging",
-    "test:upgrade": "node scripts/verify-local-upgrade.mjs"
+    "test:upgrade": "node scripts/verify-local-upgrade.mjs",
+    "export:verify": "node scripts/verify-session-export.mjs",
+    "test:export": "node --test test/session-export-cli.test.mjs"
   },
   "dependencies": {
     "@cloudflare/codemode": "0.5.3",

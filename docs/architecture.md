@@ -45,7 +45,11 @@ The executor archives supported JSON pass outputs before model projection. The o
 
 A terminal action has a durable `delivered` flag. Delivery admits a follow-up through OptChat with `result-<action ID>`, then acknowledges it. Interruption between those steps retries the same request ID. The original tool result remains the receipt; the final outcome arrives as a new conversation turn. Generated result text is marked as data, not authority to execute instructions.
 
-Current bounds: 16,000-byte messages, 32,000-byte HTTP bodies, 16 pending user requests, 1,000 request records and 100 actions per session, 16,000-byte code, 4,000-byte notes, one-hour approvals and 15-second sandbox timeout. The last 100 request slots are reserved for action-result delivery, which also bypasses the user backlog limit. User requests cannot use the reserved `result-` ID prefix. The transcript is not automatically deleted. UI history shows the latest 100 normalized entries; memory search can retrieve earlier sources. Polling occurs every two seconds only while the page is visible.
+Current bounds: 16,000-byte messages, 32,000-byte HTTP bodies, 16 pending user requests, 1,000 request records and 100 actions per session, 16,000-byte code, 4,000-byte notes, one-hour approvals and 15-second sandbox timeout. The last 100 request slots are reserved for action-result delivery, which also bypasses the user backlog limit. User requests cannot use the reserved `result-` ID prefix. The transcript is not automatically deleted. UI history reads the latest page of 100 Pi entries and displays their normalized messages; memory search can retrieve earlier sources. Polling occurs every two seconds only while the page is visible.
+
+## Session data export
+
+The authenticated export endpoint paginates the public OptChat history API, includes the current memory view and application request/action records, and verifies retained executor-output references. A before/after comparison rejects detected changes; explicit bounds reject an oversized archive without truncation. It does not read private Pi/Code Mode tables or provide an execution restore/import API. See [the format and coverage](./session-export.md).
 
 ## Versioning
 

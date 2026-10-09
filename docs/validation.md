@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **13 tests** covering:
+`npm test` contains **18 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -31,6 +31,8 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 - Contract-pinned durable admissions, legacy V1 jobs and unsupported contracts remaining inspectable without reopening their facets through a different implementation.
 - A real `ctx.abort()` scheduled through Lifecycle, a changed activation and recovered receipt, preserved history/memory/pending approval fingerprint, one note/result afterward and harmless retry of the previous activation.
 - Demo recovery denial for wrong owners, expired authorization, stale activations, active work and disabled/production/real-model configurations.
+
+Five session-export tests additionally cover public history pagination, owner isolation, a real pending/completed Code Mode output, data integrity, concurrent changes and bounded failure behavior. `npm run test:export` checks the separate offline verifier. See the [export scope](./session-export.md#validation-scope).
 
 The original runtime-reset tests use Cloudflare's `abortAllDurableObjects` test helper and obtains fresh stubs afterward. It resets in-memory instances while retaining storage. The effect-before-checkpoint and delivery-before-ack windows are **seeded durable states**; they are not evidence of a real external service being killed at that exact instruction. The one qualified mutation is the local notes destination.
 
@@ -56,7 +58,9 @@ CI runs this cross-release application flow instead of repeating the same-runtim
 
 The recorded Git revision identifies the checkout base at validation time and may precede uncommitted changes; the source/configuration/dependency fingerprints and verification-script hashes identify the tested contents. This evidence covers macOS/arm64 with Node 22; CI independently exercises Linux/x64 with Node 22. It does not qualify changed dependency graphs, downgrades, external connectors or hosted deployment.
 
-The [dev.1 → dev.2 evidence](./local-upgrade-dev2-validation.json) repeats this application flow from published dev.1 commit `9c3d3d1d4871de561fd477d2b5445cf24ec8bf8a` into the runtime adding bounded demo recovery. Dependencies and connector semantics remain identical. `npm run test:upgrade` now exercises this current route; the earlier route and its evidence remain retained.
+The [dev.1 → dev.2 evidence](./local-upgrade-dev2-validation.json) repeats this application flow from published dev.1 commit `9c3d3d1d4871de561fd477d2b5445cf24ec8bf8a` into the runtime adding bounded demo recovery. Dependencies and connector semantics remain identical. This route and its evidence remain retained.
+
+The [dev.2 → dev.3 evidence](./local-upgrade-dev3-validation.json) qualifies the release adding session data export, starting at published dev.2 commit `3eb63101c0a8f222b506f771b3c5ec064f88fa53`. Dependencies, schema and the connector remain unchanged. `npm run test:upgrade` now exercises this route; earlier routes and evidence remain retained.
 
 ## Hosted staging increments
 
@@ -82,12 +86,18 @@ The later [dev.2 evidence](./hosted-recovery-validation.json) records a **backen
 
 The complete dependency graph, storage schema, private deployment configuration and V1 connector stayed unchanged. No data rewind or replacement Code Mode execution was requested. The check does not independently establish every facet’s eviction, a fault during an external effect or a coordinated restore. The browser’s visible single result is distinguished from the independent row/identity assertions in local tests. See the [repeatable procedure](./hosted-recovery.md).
 
+### Session data export and dev.3 update
+
+The [dev.3 evidence](./session-export-validation.json) records the protected backend update from dev.2, preserved conversation/memory/pending operation, and browser downloads before and after approval. The files were found in Downloads and independently passed the Node verifier; a browser status message alone was not treated as proof of download. The completed archive contains eight messages, one action, one retained output and one delivery record. An empty-session download also passed. The new endpoint, page and static script redirect anonymous browser requests to Access. No model call, forced reset or coordinated restore was performed in this increment.
+
+The same evidence records a failed isolated native-checkpoint prototype: the unchanged PiHarness/Lifecycle cannot start inside a facet that lacks a physical alarm. Clone and restore were not reached. See the [composition findings](./hosted-recovery.md#native-facet-checkpoint-investigation--2026-10-09).
+
 ## Not yet established
 
 - Hosted isolation using a second authenticated identity has not been exercised; the current Access policy intentionally admits only its owner. Signed-token and identity-isolation tests run locally.
 - No paid Workers AI model or arbitrary external mutation has been qualified.
 - Hosted coordinated backup/restore, hibernation billing behavior and arbitrary abrupt-failure windows remain unqualified. The forced parent reset while a demo approval is idle is narrower than those guarantees.
-- No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. The qualified hosted release change is specifically dev.1 → dev.2.
+- No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. The qualified hosted release changes are specifically dev.1 → dev.2 and dev.2 → dev.3 with unchanged dependencies.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.
 - Demo summaries are deterministic excerpts. They do not establish model quality, prompt-cache hit rate, token savings or long-run memory accuracy.
 

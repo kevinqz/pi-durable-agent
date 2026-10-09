@@ -1,0 +1,170 @@
+{
+  "format": "pi-durable-agent/session-export-validation-v1",
+  "recordedAt": "2026-10-09T21:16:01.171Z",
+  "status": "local_and_authenticated_demo_export_verified",
+  "sourceIdentity": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.3",
+    "revision": "740ba8ae703d4e0adcf9b1a3843dbfe0d51540e4",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "30e67d7101fa447a1989780165db5bc2a49f43a498cd4a766680d1d210287e6c",
+    "buildFingerprint": "e2473a7a44b4502864000042fbbdae0f485cd6d1edea3274d7cf939f3711af91",
+    "fingerprint": "f97b5b402670df86df84c8eda0c8a75da4d2d7a10981521d40320ddaa051891d"
+  },
+  "assets": {
+    "public/app.js": "e38302878050ee436b2e30de248ec0030f19109888031f4f464468784cef8933",
+    "public/index.html": "cc23a0ea6f6fbf333b6d7db5d75530e8d586b1a2f54f8744b9a093e3c145cd40",
+    "public/style.css": "d98f788b47df377704638a10b9c85847e4fdd95ec7d8ae2a962fb5c3aef574f4"
+  },
+  "configuration": {
+    "sha256": "c4d570e76cf5f708aa96c74acce57f6f973458cde343b48734b798604ad5cbd4",
+    "changedFromDev2": false,
+    "appEnvironment": "staging",
+    "modelMode": "demo",
+    "aiBinding": false,
+    "previewUrls": false
+  },
+  "deployment": {
+    "baselineVersion": "d19d53f2-2d9e-424b-a81f-25169f5ed3a4",
+    "initialBackendVersion": "f71303e6-edbf-4a21-a205-f0dc12409b6b",
+    "assetRefinementVersion": "38edfc42-d426-4a2c-a404-4aabde5d20d6",
+    "finalVersion": "372ae68c-e2fd-4ee1-a8e9-147e239211f8",
+    "finalDeployedAt": "2026-10-09T21:13:44.867859Z",
+    "allocationPercent": 100,
+    "runtimeFrom": "0.1.0-dev.2",
+    "runtimeTo": "0.1.0-dev.3",
+    "dependencyGraphChanged": false,
+    "schemaChanged": false,
+    "connectorChanged": false,
+    "targetRuntimeObservedOnExistingSession": true,
+    "initialOldSessionNewAssetsWindowObserved": true
+  },
+  "authenticatedFlow": {
+    "method": "owner_authenticated_browser_with_downloaded_file_verification",
+    "syntheticSessionsOnly": true,
+    "existingUserSessionModified": false,
+    "messagesBeforeDeployment": 6,
+    "summarizedBeforeDeployment": 6,
+    "viewBytesBeforeDeployment": 930,
+    "messagesAfterDeploymentBeforeApproval": 6,
+    "summarizedAfterDeploymentBeforeApproval": 6,
+    "viewBytesAfterDeploymentBeforeApproval": 930,
+    "pendingApprovalPreserved": true,
+    "comparedFields": [
+      "execution ID",
+      "sequence",
+      "connector",
+      "method",
+      "code",
+      "arguments",
+      "contract",
+      "expiry"
+    ],
+    "approvalFingerprintDirectlyCompared": false,
+    "approvalDecisions": 1,
+    "finalActionStatus": "completed",
+    "resultDeliveryRecords": 1,
+    "messagesAfterCompletion": 8,
+    "summarizedAfterCompletion": 8,
+    "viewBytesAfterCompletion": 1418,
+    "activeTasksAfterCompletion": 0,
+    "scheduledWakesAfterCompletion": 0,
+    "destinationRowsIndependentlyCounted": false
+  },
+  "downloads": [
+    {
+      "scenario": "empty",
+      "fileBytes": 944,
+      "fileSha256": "07fb4c6f795feec54ad46eaee9595802c6e6ac2dac396f100ba609179daca384",
+      "payloadSha256": "da342f7c484836842060bbe62d2254571172b83f76400a026948f0e76d6bd87f",
+      "messages": 0,
+      "actions": 0,
+      "retainedOutputs": 0,
+      "downloadedFileObserved": true,
+      "offlineVerifier": "passed",
+      "restorable": false
+    },
+    {
+      "scenario": "pending",
+      "fileBytes": 4766,
+      "fileSha256": "9507afab7f3f52bc6aa992fb52dee9067f86938be3d5f151214e6041f7a92379",
+      "payloadSha256": "8d5630b74366f974aad28aeb6cb665ccd63ba54aa418cbe3ece738832dfe7dc2",
+      "messages": 6,
+      "actions": 1,
+      "retainedOutputs": 1,
+      "downloadedFileObserved": true,
+      "offlineVerifier": "passed",
+      "restorable": false
+    },
+    {
+      "scenario": "completed",
+      "fileBytes": 6567,
+      "fileSha256": "5a7ddf33f60b821284433b2cb47bbe05f9bc03a617f33c5d1d15cdbcb9d2fb4d",
+      "payloadSha256": "2013badd3dcc652465f3954b05cb69b2662efa60917be2eda6ff27670e830481",
+      "messages": 8,
+      "actions": 1,
+      "retainedOutputs": 1,
+      "downloadedFileObserved": true,
+      "offlineVerifier": "passed",
+      "restorable": false
+    }
+  ],
+  "anonymousChecks": [
+    {
+      "path": "/",
+      "status": 302,
+      "redirectsToAccess": true
+    },
+    {
+      "path": "/app.js",
+      "status": 302,
+      "redirectsToAccess": true
+    },
+    {
+      "path": "/api/sessions/anonymous-probe/exports/session",
+      "status": 302,
+      "redirectsToAccess": true
+    }
+  ],
+  "localValidation": {
+    "typecheck": "passed",
+    "format": "passed",
+    "dryRunBuild": "passed",
+    "focusedRuntimeTests": 5,
+    "focusedRuntimeTestsPassed": 5,
+    "offlineVerifierTests": 1,
+    "offlineVerifierTestsPassed": 1,
+    "multiPageMessages": 107,
+    "localCrossReleaseEvidence": "local-upgrade-dev3-validation.json",
+    "runtimeTestSha256": "faa621442f3c26e35079a4c6bede390b1a3cc914cefd7fb2b9c5e75c8921deb2",
+    "verifierSha256": "9ee92e5b0da136e74fbe7268ba021a292b41f75cb6b043e37ea02701ae2a26d3"
+  },
+  "nativeCheckpointProbe": {
+    "scope": "isolated local fixture using unchanged dev.2 AgentSession inside a supervisor facet",
+    "wrangler": "4.149.0",
+    "workerd": "1.20261006.1",
+    "result": "startup_failed",
+    "error": "Facets currently cannot set alarms.",
+    "cloneReached": false,
+    "restoreReached": false,
+    "hostedResourcesUsed": false
+  },
+  "qualified": {
+    "readableSessionDataExport": true,
+    "offlineIntegrityCheck": true,
+    "exactDev2ToDev3LocalUpgrade": true,
+    "exactDev2ToDev3HostedUpdate": true,
+    "hostedCoordinatedBackupRestore": false,
+    "otherCrashWindows": false,
+    "changedDependencies": false,
+    "realModels": false,
+    "secondHostedIdentity": false,
+    "production": false
+  },
+  "paidModelCalls": 0,
+  "privacy": "Account, owner, hostname, session/action IDs, credentials and conversation contents are excluded. Only synthetic fixture counts and integrity hashes are published."
+}
