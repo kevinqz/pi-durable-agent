@@ -9,6 +9,7 @@ let pendingKey;
 let refreshing = false;
 let renderedHistory = "";
 let renderedActions = "";
+let viewedArchive;
 async function api(path, body) {
   const response = await fetch(
     `/api/sessions/${session}/${path}`,
@@ -154,6 +155,15 @@ function renderActions(actions) {
   const key = JSON.stringify(actions);
   if (key === renderedActions) return;
   renderedActions = key;
+  // An open detail belongs to one recorded outcome, not just an action ID.
+  if (viewedArchive) {
+    const current = actions.find((a) => a.id === viewedArchive.id);
+    if (!current || archiveKey(current) !== viewedArchive.key) {
+      viewedArchive = undefined;
+      $("archive").textContent = "";
+      $("archive").parentElement.open = false;
+    }
+  }
   $("actions").replaceChildren(
     ...actions
       .slice(-10)
@@ -219,17 +229,24 @@ function renderActions(actions) {
             ),
           );
         }
-        if (a.archive) {
+        if (a.archive && ["completed", "failed"].includes(a.status)) {
           const archive = element("button", "View retained output");
           archive.onclick = async () => {
+            const selection = { id: a.id, key: archiveKey(a) };
+            viewedArchive = selection;
+            $("archive").textContent = "Loading retained output…";
+            $("archive").parentElement.open = true;
             try {
-              $("archive").textContent = JSON.stringify(
-                await api("actions/archive", { id: a.id }),
-                null,
-                2,
-              );
-              $("archive").parentElement.open = true;
+              const output = await api("actions/archive", { id: a.id });
+              if (viewedArchive !== selection) return;
+              // Older executions may only retain an intermediate pause marker.
+              $("archive").textContent =
+                output.error === "__CODEMODE_PAUSE__"
+                  ? "No final output was retained. Review the recorded outcome above."
+                  : JSON.stringify(output, null, 2);
             } catch (error) {
+              if (viewedArchive !== selection) return;
+              $("archive").textContent = "Could not load retained output.";
               showError(error);
             }
           };
@@ -239,6 +256,9 @@ function renderActions(actions) {
       }),
   );
   if (!actions.length) $("actions").textContent = "No actions yet.";
+}
+function archiveKey(action) {
+  return JSON.stringify([action.id, action.status, action.archive]);
 }
 async function start() {
   const response = await fetch("/api/me");
