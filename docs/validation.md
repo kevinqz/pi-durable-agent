@@ -86,12 +86,18 @@ The later [dev.2 evidence](./hosted-recovery-validation.json) records a **backen
 
 The complete dependency graph, storage schema, private deployment configuration and V1 connector stayed unchanged. No data rewind or replacement Code Mode execution was requested. The check does not independently establish every facet’s eviction, a fault during an external effect or a coordinated restore. The browser’s visible single result is distinguished from the independent row/identity assertions in local tests. See the [repeatable procedure](./hosted-recovery.md).
 
+### Session data export and dev.3 update
+
+The [dev.3 evidence](./session-export-validation.json) records the protected backend update from dev.2, preserved conversation/memory/pending operation, and browser downloads before and after approval. The files were found in Downloads and independently passed the Node verifier; a browser status message alone was not treated as proof of download. The completed archive contains eight messages, one action, one retained output and one delivery record. An empty-session download also passed. The new endpoint, page and static script redirect anonymous browser requests to Access. No model call, forced reset or coordinated restore was performed in this increment.
+
+The same evidence records a failed isolated native-checkpoint prototype: the unchanged PiHarness/Lifecycle cannot start inside a facet that lacks a physical alarm. Clone and restore were not reached. See the [composition findings](./hosted-recovery.md#native-facet-checkpoint-investigation--2026-10-09).
+
 ## Not yet established
 
 - Hosted isolation using a second authenticated identity has not been exercised; the current Access policy intentionally admits only its owner. Signed-token and identity-isolation tests run locally.
 - No paid Workers AI model or arbitrary external mutation has been qualified.
 - Hosted coordinated backup/restore, hibernation billing behavior and arbitrary abrupt-failure windows remain unqualified. The forced parent reset while a demo approval is idle is narrower than those guarantees.
-- No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. The qualified hosted release change is specifically dev.1 → dev.2.
+- No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. The qualified hosted release changes are specifically dev.1 → dev.2 and dev.2 → dev.3 with unchanged dependencies.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.
 - Demo summaries are deterministic excerpts. They do not establish model quality, prompt-cache hit rate, token savings or long-run memory accuracy.
 
