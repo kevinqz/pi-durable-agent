@@ -1,0 +1,45 @@
+{
+  "format": "pi-durable-agent/checkpoint-ui-local-v1",
+  "at": "2026-10-09T23:35:36.709238+00:00",
+  "sourceBase": "7fab149898c597bcd903c6cf3f60edd177a6c0b0",
+  "sourceIdentification": "Uncommitted product integration identified by file hashes; observed before the next release version bump. This is not a published-release qualification.",
+  "runtime": {
+    "format": "pi-durable-agent/checkpoint-runtime-v1",
+    "sha256": "73b92a69fd3a51b96643bad0a5eae17811d42f979106d12c844a7c32fd34dd7e"
+  },
+  "model": "demo",
+  "paidModelCalls": 0,
+  "remoteResourcesUsed": false,
+  "sessionFixture": "e7808d99-61ea-4bbc-a5aa-d2a13fe1c104",
+  "observed": [
+    "New session automatically uses the checkpoint namespace and c1 URL fragment",
+    "Completed demo conversation and pending exact Code Mode note approval",
+    "Checkpoint creation disabled ordinary controls and then reported success",
+    "Source approval completed before restoring the pre-effect checkpoint",
+    "Restore confirmation explained history, effect and consumption scope",
+    "Restored approval retained execution ID, sequence, contract, code, arguments and expiry",
+    "Restored approval completed and produced one visible follow-up",
+    "Reload retained the restored conversation and recovery counters",
+    "Original message Aurora UI checkpoint 864 was found through memory search after reload",
+    "Single demo-only model configuration does not display the new-session model selector"
+  ],
+  "checkpointCount": 1,
+  "restoreAdmissions": 1,
+  "limits": [
+    "Browser observation alone does not independently count destination rows; native integration tests cover deduplication",
+    "No hosted coordinator, paid model, second hosted identity or release installation was exercised"
+  ],
+  "sha256": {
+    "src/session-supervisor.ts": "7a227cf975a5e866ac57a21d0172896d90b19d21ac6bdc3cc82b761872c2b67d",
+    "src/checkpoint-coordinator.ts": "c17e30fe739b0ea04b615721364de5aae0923e94e20f9e27f7e33cea9e834ff6",
+    "src/facet-lifecycle.ts": "76279f1f86fce588d1a6e4ab85427d746ece299b412ae479851097b4f6cc58d4",
+    "src/notes-root.ts": "69b5f5e1200cab9734b7e100c698ff01261f286125f7c2a98044c1f3103c7587",
+    "src/notes.ts": "0310823f7e90f50da0f923e39b5842fefa7d5af502200e5c894f63e69740bc11",
+    "src/worker.ts": "dc71cf9e0628853936d68a19767544ae4d0ae27f0d801e5e3be821ca6fcb9001",
+    "src/generated/checkpoint-build.json": "1cfa968e845ac8e1ddf4cd83b5aa0baca743c51b3757106ed41894602836e7c3",
+    "public/app.js": "c18bc38e86bbf5cbae743b4bb23091faa5ac98a201f0ca534c56e4a4d4416232",
+    "public/checkpoints.js": "89e0d2c25d327a60619c56cc069bcead13f0fd9301dbf4d98c26f9a345b3d9b3",
+    "public/index.html": "4a64f86a6434914b9287493f5d45762daa64f79bf9f66db89d5aa2a164d3bc79",
+    "public/style.css": "b279cebb79e1d360a5cf9d251c39d990469b51b01d401cc71c4e24d5dbf28374"
+  }
+}

@@ -17,6 +17,7 @@ import {
 import { LIMITS, type Env } from "./env.js";
 import { digest, HttpError, identifier, textField } from "./http.js";
 import { SerialGate } from "./store.js";
+import { ROOT_NOTES_CONTRACT, type NotesDestination } from "./notes-root.js";
 
 const MAX_ARCHIVE_BYTES = 256_000;
 const terminal = new Set(["completed", "failed", "rejected", "expired"]);
@@ -31,6 +32,7 @@ export class Actions {
     private readonly env: Env,
     private readonly jobs: () => LifecycleJobs,
     private readonly deliver: (id: string, text: string) => Promise<void>,
+    private readonly destination?: NotesDestination,
   ) {
     this.store = new ActionsStore(ctx.storage);
   }
@@ -55,7 +57,11 @@ export class Actions {
         (saved.id !== id || saved.code !== code || saved.label !== label)
       )
         throw new HttpError(409, "Action admission conflict");
-      const contract = saved ? admissionContract(saved) : CURRENT_CONTRACT;
+      const contract = saved
+        ? admissionContract(saved)
+        : this.destination
+          ? ROOT_NOTES_CONTRACT
+          : CURRENT_CONTRACT;
       await this.jobs().push({
         id: `action:${id}`,
         fn: "action",
@@ -239,7 +245,12 @@ export class Actions {
       ctx: this.ctx,
       name: `action-${action.id}`,
       executor,
-      connectors: actionConnectors(this.ctx, this.store, action),
+      connectors: actionConnectors(
+        this.ctx,
+        this.store,
+        action,
+        this.destination,
+      ),
       maxExecutions: 1,
       transformResult: (value) => truncateResult(value, { maxChars: 6000 }),
     });
@@ -264,7 +275,12 @@ export class Actions {
   }
 
   private supported(action: Action): boolean {
-    if (supportsContract(action.contract)) return true;
+    if (
+      supportsContract(action.contract) &&
+      action.contract ===
+        (this.destination ? ROOT_NOTES_CONTRACT : CURRENT_CONTRACT)
+    )
+      return true;
     action.status = "unknown";
     action.error =
       "Unsupported contract; restore the matching implementation before reconciling";
@@ -344,6 +360,32 @@ export class Actions {
 
   list() {
     return this.store.list().map((a) => this.publicAction(a));
+  }
+
+  async checkpointEvidence() {
+    if (this.inFlight.size)
+      throw new HttpError(409, "Wait for action execution to finish");
+    const actions = this.store.list();
+    if (
+      actions.some(
+        (a) =>
+          a.status !== "pending" && (!terminal.has(a.status) || !a.delivered),
+      )
+    )
+      throw new HttpError(
+        409,
+        "Resolve active or unknown actions before creating a checkpoint",
+      );
+    const evidence = [];
+    for (const action of actions)
+      evidence.push({
+        action,
+        executions: await this.runtime(action).executions(2),
+        archive:
+          action.archive &&
+          (await digest(this.store.readArchive(action.id) ?? "")),
+      });
+    return evidence;
   }
   private publicAction(action: Action) {
     return {

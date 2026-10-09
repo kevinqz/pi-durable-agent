@@ -177,3 +177,61 @@ test("the official Workers AI adapter observes pre-dispatch budget and output bo
   });
   expect(dispatched).toHaveLength(2);
 });
+
+test("supervisor admission completes before either provider stream dispatches and denies without spending", async () => {
+  let dispatched = 0;
+  const ai = {
+    async run() {
+      dispatched++;
+      return Response.json({
+        choices: [
+          {
+            index: 0,
+            message: { role: "assistant", content: "fixture" },
+            finish_reason: "stop",
+          },
+        ],
+      });
+    },
+  } as unknown as Ai;
+  let release!: () => void;
+  let deny = false;
+  let reservations = 0;
+  const ready = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const { models, model: ref } = configureModels(
+    { ...bindings, MODEL_MODE: "workers-ai", AI: ai, AI_MODEL: modelId },
+    () => {},
+    async () => {
+      if (deny) throw new Error("Fixture generation is frozen");
+      reservations++;
+      await ready;
+    },
+  );
+  const model = models.getModel(ref.provider, ref.modelId)!;
+  const context = {
+    messages: [
+      { role: "user" as const, content: "hello", timestamp: Date.now() },
+    ],
+  };
+  const streams = [
+    models.stream(model, context),
+    models.streamSimple(model, context),
+  ];
+  expect(dispatched).toBe(0);
+  await expect.poll(() => reservations).toBe(2);
+  expect(dispatched).toBe(0);
+  release();
+  for (const stream of streams)
+    expect((await stream.result()).stopReason).toBe("stop");
+  expect(dispatched).toBe(2);
+  deny = true;
+  for (const method of ["stream", "streamSimple"] as const)
+    expect(await models[method](model, context).result()).toMatchObject({
+      stopReason: "error",
+      errorMessage: expect.stringContaining("frozen"),
+    });
+  expect(dispatched).toBe(2);
+  expect(reservations).toBe(2);
+});

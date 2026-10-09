@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import {writeFile,readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const evidence={at:new Date().toISOString(),version:'dbbd4e1a-4e4e-4ea8-92b2-91f226dd021f',paidModelCalls:0,requests:0,completed:[],result:'running'};
+const save=()=>writeFile('hosted-evidence.json',JSON.stringify(evidence,null,2)+'\n');
+const call=async(path,body)=>{
+  evidence.requests++;
+  const r=await fetch(`http://127.0.0.1:8794/${path}`,{
+    ...(body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}:{}),
+    signal:AbortSignal.timeout(15000)
+  });
+  const value=await r.json();
+  if(!r.ok) throw new Error(`${path}: ${r.status}: ${JSON.stringify(value)}`);
+  return value;
+};
+try {
+  evidence.sourceSha256=createHash('sha256').update(await readFile('worker.ts')).digest('hex');
+  await call('source/input',{id:'before',text:'Remember Aurora fixture 948 exactly.'});
+  let before;
+  for(let i=0;i<15;i++) {
+    before=await call('source/state');
+    if(before.memory.requests[0]?.status==='done'&&before.memory.tasks===0) break;
+    await new Promise(resolve=>setTimeout(resolve,500));
+  }
+  assert.equal(before.memory.requests[0]?.status,'done');
+  assert.equal(before.memory.tasks,0);evidence.completed.push('hosted Pi and OptChat inside facet with root alarm');
+  const action=await call('source/action',{});assert.equal(action.status,'paused');
+  before=await call('source/state');
+  await writeFile('hosted-before.json',JSON.stringify(before,null,2)+'\n');
+  evidence.completed.push('hosted Code Mode pending approval');await save();
+  await call('checkpoint',{});
+  evidence.completed.push('native subtree clone');await save();
+  const after=await call('restored/state');
+  assert.deepEqual(after.history,before.history);
+  assert.deepEqual(after.memory,before.memory);
+  assert.deepEqual(after.executions,before.executions);
+  const id=after.executions[0].id;
+  const first=await call('restored/approve',{id});assert.equal(first.status,'paused');assert.equal(first.pending[0].seq,1);
+  const paused=await call('restored/state');assert.equal(paused.notes.length,1);
+  await call('abort-restored',{});
+  const restarted=await call('restored/state');assert.deepEqual(restarted.executions,paused.executions);assert.deepEqual(restarted.notes,paused.notes);
+  const result=await call('restored/approve',{id});assert.equal(result.status,'completed');
+  const final=await call('restored/state');assert.equal(final.notes.length,1);assert.equal(final.executions.length,1);assert.equal(final.executions[0].status,'completed');
+  assert.deepEqual(final.executions[0].result[0],final.executions[0].result[1]);
+  assert.match(JSON.stringify(await call('restored/search')),/Aurora fixture 948/);
+  const original=await call('source/state');assert.deepEqual(original.executions,before.executions);assert.deepEqual(original.notes,[]);
+  evidence.completed.push('exact history, memory, request and executor identities preserved','abrupt copied subtree restart','two approval decisions, one destination note','original source untouched and original text retrieved');
+  evidence.result='passed';
+} catch(error) {
+  evidence.result='failed';evidence.error=String(error);process.exitCode=1;
+} finally {await save();console.log(JSON.stringify(evidence,null,2));}

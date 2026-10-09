@@ -1,0 +1,91 @@
+{
+  "format": "pi-durable-agent/coordinated-recovery-local-v1",
+  "at": "2026-10-09T23:19:52.142197+00:00",
+  "sourceBase": "90815ac513714a3227c4b3d82dbe06a928b2c590",
+  "sourceIdentification": "sourceBase precedes this uncommitted increment; exact tested file hashes follow",
+  "paidModelCalls": 0,
+  "remoteResourcesUsedByTheseTests": false,
+  "defaultWorkerChangedToRecoveryLayout": false,
+  "checks": {
+    "runtime": {
+      "uniqueTests": 27,
+      "result": "passed",
+      "execution": "Focused runs; the asynchronous provider fixture was corrected to wait for reservation before assertion, then its five-test file passed. Unaffected runtime files were not repeated."
+    },
+    "coordinator": {
+      "tests": 4,
+      "result": "passed",
+      "failureWindows": [
+        "lost clone reply",
+        "validation failure",
+        "lost activation reply",
+        "runtime and retention conflicts"
+      ]
+    },
+    "integration": {
+      "tests": 2,
+      "result": "passed",
+      "includes": [
+        "real Pi/OptChat/Code Mode subtree clone",
+        "pending approval identity",
+        "restored subtree abrupt restart",
+        "one destination effect after source and restored approvals",
+        "one restored delivery receipt",
+        "original retrieval",
+        "synthetic consumption counter retained outside restore",
+        "wrong owner denied",
+        "input frozen during recovery",
+        "root restart before checkpoint execution",
+        "invalid restore does not allocate a recovery job"
+      ]
+    },
+    "typecheck": "passed",
+    "format": "passed",
+    "defaultWorkerDryRunBuild": "passed"
+  },
+  "warnings": [
+    "workerd emitted a SQLite alarm rescheduling diagnostic during deliberate resets; Vitest reported no unhandled errors in the final integration run"
+  ],
+  "limits": [
+    "test-only composition, no production routing or UI",
+    "full hosted coordinator qualification pending",
+    "no paid model inference",
+    "no second authenticated hosted identity",
+    "no upgrade route for this changed source tree",
+    "same-root checkpoint, not portable backup or recovery from root deletion"
+  ],
+  "sha256": {
+    "package-lock.json": "36fe7fc5249572f2f3956e446f4246609d293d6551261048d7b833296ca92605",
+    "package.json": "9c9937d1e7e2d580633a55a92e269ceaf6e8282ab8af091224e750f4d33880a1",
+    "src/action-contracts.ts": "f059e0ea91e97342326224c255af14299e5204921702286a3c775f3e86126aea",
+    "src/actions-store.ts": "eae8fdcb2a66d8719d762f4107aa3eaaa96ccbb073b899b65a6431ca84283a19",
+    "src/actions.ts": "7ac947c245765135b63507f2462db7afc310aa3fdadf8b5664e8cb02cdc5d444",
+    "src/auth.ts": "52cacc19f1f54a62be2ebc40b5ff28cb31012947aa2792ff6a5005748673920e",
+    "src/checkpoint-coordinator.ts": "e74f4ab2c8376609f5f69b4d65dec99ece0444ee41f8d4a58d660c26f9906fe0",
+    "src/env.ts": "8eafb6c0afa8d605b4e4b0f5f6b2f86b95a9ba560c52baa2c827789e1a81d531",
+    "src/facet-lifecycle.ts": "76279f1f86fce588d1a6e4ab85427d746ece299b412ae479851097b4f6cc58d4",
+    "src/http.ts": "3f15f6492278e5bf84389ad52a37e862d420a72365c198d670ebedf37c791569",
+    "src/models.ts": "c4bf3d0aaca97aa8d9e952556b1f98ff8d0b3bcd7002b3bb306a564b92a68180",
+    "src/notes.ts": "f0e23243818da845a0d74eb5904105bd6d5afec441e0251d2d9ff797fcd7d75a",
+    "src/provider-guard.ts": "aa1d47a219fa204d6effa5656cc3fe72d9d5ffada85db61e1c951cb4f3671a8a",
+    "src/recovery.ts": "87151ca5dbd97dc5de173796ac0fc9c937310c47abf341793a791fa052c41f85",
+    "src/session-export.ts": "0d2baf0ca2cbc67e547e2e7c013f97b304d11501e645ff9bb1818e8ce7b9f2d9",
+    "src/session-model.ts": "3c2e354e3e4b443bfe16c2f3ea1e3e4f76318a1b90a7f6c1869804244c00907c",
+    "src/session-supervisor.ts": "e55c56ad60152a0fa5bd9ea94c5f035c91cb58691295773bac92c100e713b868",
+    "src/session.ts": "784e592fda62adb1bf09fcf484b5130ae06c7ff78aec8b72da6fe13f61e9eabb",
+    "src/store.ts": "32874a8881211b3ffdad439331698391b0965fb8d2e84ef2761dd7b0c2279d42",
+    "src/tools.ts": "43d82f062fd5c4f5a811506c6490e3cdcc9b92c5d364c51a144bc872de4e389f",
+    "src/worker.ts": "6df599181808df92eb699731225c6998a20e8d666326524e1c46983263ec57e3",
+    "test/actions.test.ts": "00610819e10b8adb7f1de498d9cc446e39ec5442e237937057f4864ade1055fe",
+    "test/auth.test.ts": "7e42e7a31ba892e9cea20f553f8edc1446460fb40e60543b41ae0ae347980fd9",
+    "test/checkpoint-coordinator.test.ts": "7ce37d9d385277b9c86aa48f3badb2fd4543c59724847be84875f81247a11941",
+    "test/coordinated-recovery.integration.ts": "5d3383b17fe3aac7004d3ab7302df197843f575cccbd4d10b947a09ffeaa6e69",
+    "test/fixtures/recovery-worker.ts": "6d8be22d7230526bdc0386a8cd43430e0af9cc53244503a4515847b7ce4936b3",
+    "test/fixtures/recovery.wrangler.jsonc": "613c7f57d970d7dd9449e040119c6830cb8189a2af464dc72695774603e3c719",
+    "test/models.test.ts": "eac6a8e13ec2928d0207a8e467d2c9cf09cc4fceecdf0351fa9e15a5f9303196",
+    "test/recovery.test.ts": "65e7392f90b86c1275263407045fa05187e9344db5d5bffbe8d4091b22a4d490",
+    "test/session-export.test.ts": "faa621442f3c26e35079a4c6bede390b1a3cc914cefd7fb2b9c5e75c8921deb2",
+    "test/session.test.ts": "60d591cabea89041508a6611d1020950ef8e4d1f4b28d73cfaf0531eaa89dce5",
+    "vitest.recovery.config.ts": "95d89af55a692bad3f34187515977b94af958c75c77711fd8b4aeeb770e4f16f"
+  }
+}

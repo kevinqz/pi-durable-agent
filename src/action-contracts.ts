@@ -5,6 +5,11 @@ import {
 } from "./actions-store.js";
 import { HttpError } from "./http.js";
 import { NotesV1 } from "./notes.js";
+import {
+  ROOT_NOTES_CONTRACT,
+  SupervisorNotes,
+  type NotesDestination,
+} from "./notes-root.js";
 
 export type ActionAdmission = {
   id: string;
@@ -16,10 +21,8 @@ export type ActionAdmission = {
 // Retain an implementation while any saved action can still refer to it.
 // Changing the default must never change the interpretation of an old job.
 export const CURRENT_CONTRACT = CONTRACT_V1;
-const implementations = new Map([[CONTRACT_V1, NotesV1]]);
-
 export const supportsContract = (contract: string) =>
-  implementations.has(contract);
+  contract === CONTRACT_V1 || contract === ROOT_NOTES_CONTRACT;
 
 export function admissionContract(payload: ActionAdmission): string {
   // 0.1.0-dev.0 jobs predate this field and were always admitted with V1.
@@ -30,8 +33,14 @@ export function actionConnectors(
   ctx: DurableObjectState,
   store: ActionsStore,
   action: Action,
+  destination?: NotesDestination,
 ) {
-  const Connector = implementations.get(action.contract);
-  if (!Connector) throw new HttpError(409, "Unsupported action contract");
-  return [new Connector(ctx, store, action.id)];
+  if (action.contract === CONTRACT_V1 && !destination)
+    return [new NotesV1(ctx, store, action.id)];
+  if (action.contract === ROOT_NOTES_CONTRACT && destination)
+    return [new SupervisorNotes(ctx, store, action.id, destination)];
+  throw new HttpError(
+    409,
+    "Action contract does not match this session's destination",
+  );
 }

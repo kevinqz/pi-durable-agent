@@ -2,7 +2,7 @@
 
 Aplicação independente e aberta que reúne **Pi Durable**, a memória do **OptChat Durable** e ferramentas do **Cloudflare Code Mode**.
 
-**Prévia de desenvolvimento.** A demonstração usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Há um caminho de backup e restauração local. Na Cloudflare, uma conversa e sua aprovação pendente sobreviveram à atualização dev.1 → dev.2 e a um reinício forçado do processo da sessão de demonstração. O resultado foi entregue e a conversa continuou. Backup e restauração coordenados na nuvem, outras janelas de falha, modelos reais e operação em produção ainda precisam de qualificação.
+**Prévia de desenvolvimento.** A demonstração usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Novas sessões já oferecem checkpoints e restauração, verificados localmente; a instalação local completa também tem um procedimento de backup offline. Na Cloudflare, uma conversa e sua aprovação pendente sobreviveram à atualização dev.1 → dev.2 e a um reinício forçado do processo da sessão de demonstração. O resultado foi entregue e a conversa continuou. Backup e restauração coordenados na nuvem, outras janelas de falha, modelos reais e operação em produção ainda precisam de qualificação.
 
 ## Começar do zero
 
@@ -23,7 +23,9 @@ Abra o endereço exibido, normalmente **http://127.0.0.1:8787**. Não é necess�
 4. Aprove ou rejeite. O resultado fica salvo e, quando concluído, volta para a conversa.
 5. Recarregue a página ou reinicie o servidor local. A sessão mantém seu endereço e seus registros em `.wrangler/`.
 6. Use **Export session data** para baixar as mensagens, a visão atual da memória e os registros de ações. O arquivo permite consulta e verificação local; ele não restaura a execução. [Conteúdo, limites e verificador](./docs/session-export.md).
-7. Para experimentar a recuperação, espere o trabalho ativo terminar, abra **Session diagnostics** e use **Restart this test session**. Uma nova ativação com estado **recovered** confirma o reinício. Os dados ficam salvos; isso não cria um backup. [Controles e limites](./docs/hosted-recovery.md).
+7. Espere o trabalho ativo terminar e selecione **Create checkpoint** em **Session recovery**. Aguarde **Checkpoint saved**, continue a conversa e use **Restore…** para voltar ao estado salvo. A confirmação explica o alcance: notas já criadas e consumo registrado continuam preservados. [Procedimento e limites](./docs/coordinated-recovery.md).
+
+As novas URLs começam com `#c1:`. URLs antigas continuam abrindo as sessões originais; use **New session** para experimentar checkpoints. Eles restauram a conversa dentro do mesmo Durable Object, sem cobrir exclusão desse objeto ou perda da conta. Há até três checkpoints e oito admissões de restauração por sessão, sem apagar automaticamente as cópias anteriores.
 
 Fechar a página não cancela o trabalho. Parar o servidor local pausa o processamento até a próxima inicialização. Aprovações expiram após uma hora. Um resultado **unknown** significa que houve uma interrupção sem confirmação suficiente: a interface permite inspecionar o registro, sem repetir automaticamente a ação.
 
@@ -37,7 +39,7 @@ Para conferir sua integridade sem login, servidor ou Git:
 npm run export:verify -- /caminho/absoluto/para/arquivo.json
 ```
 
-Esse arquivo serve para leitura e inspeção. A restauração local completa usa o procedimento abaixo; a restauração coordenada na nuvem continua pendente.
+Esse arquivo serve para leitura e inspeção. Os checkpoints restauram novas sessões; a cópia offline completa usa o procedimento abaixo. A qualificação hospedada dos checkpoints ainda está pendente.
 
 ## Guardar uma cópia local e restaurar
 
@@ -54,7 +56,7 @@ Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a
 
 ## Atualizar sem perder a sessão
 
-A rota revisada **0.1.0-dev.3 → 0.1.0-dev.4** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3 → dev.4.
+A rota revisada **0.1.0-dev.4 → 0.1.0-dev.5** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → dev.5.
 
 ## Quando hospedar na Cloudflare
 
@@ -82,6 +84,7 @@ O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separad
 - [Arquitetura e garantias](./docs/architecture.md)
 - [Implantação e operação](./docs/deployment.md)
 - [Exportação de dados e verificação offline](./docs/session-export.md)
+- [Checkpoints e restauração da sessão](./docs/coordinated-recovery.md)
 - [Atualização local entre versões](./docs/local-upgrades.md)
 - [Atualização hospedada e reinício da demonstração](./docs/hosted-recovery.md)
 - [Verificações e limites](./docs/validation.md)

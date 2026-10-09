@@ -3,7 +3,7 @@ import type { Env } from "./env.js";
 import { HttpError, identifier } from "./http.js";
 import { SerialGate, SessionStore } from "./store.js";
 
-export const RUNTIME_RELEASE = "0.1.0-dev.4";
+export const RUNTIME_RELEASE = "0.1.0-dev.5";
 const RESTART_LIMIT = 10;
 const JOB_PREFIX = "recovery:";
 

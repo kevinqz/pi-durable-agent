@@ -76,7 +76,7 @@ npx wrangler deploy --config wrangler.staging.local.jsonc --env staging --dry-ru
 npx wrangler deploy --config wrangler.staging.local.jsonc --env staging
 ```
 
-Use these same explicit configuration arguments for later deployments. The original `npm run deploy:staging` command still uses the closed bootstrap configuration. Review and reapply configuration changes from future releases to your private copy; it does not automatically inherit edits to `wrangler.jsonc`.
+Use these same explicit configuration arguments for later deployments. The original `npm run deploy:staging` command still uses the closed bootstrap configuration. Review and reapply configuration changes from future releases to your private copy; it does not automatically inherit edits to `wrangler.jsonc`. For dev.5, retain `SESSIONS`, add `RECOVERY_SESSIONS` → `SessionSupervisor`, append the tracked `v2` migration and keep the `build` command that generates the checkpoint runtime identity. Preserve Access values, hostname protections and the previous model default. Compare your compatibility date/flags with the tracked file used by that identity generator.
 
 ## 5. Verify the deployed application
 
@@ -85,6 +85,7 @@ Open the printed `workers.dev` URL. Access should present the application's logi
 - Without authentication, check the page, `/app.js` and `/api/me`: each must require Access, including when a forged `Cf-Access-Jwt-Assertion` header is supplied.
 - After login, send a synthetic message, retrieve its original text, and use **Try a demo approval**. Inspect the exact operation before approving or rejecting it.
 - Keep the same session URL when reloading. Separately test a redeploy while an approval is pending, then confirm that the same operation and a single result survive. A browser reload alone does not prove a Worker restart.
+- In a new `#c1:` session, follow the [checkpoint procedure](./coordinated-recovery.md). Record creation, a later source action, restore into the separate subtree and post-restore retrieval/approval. Keep completed effects and usage in the root ledger; do not infer independent destination counts from one visible message.
 - Record the application revision, deployed version, private configuration hash and observed results. Do not publish login codes, tokens, personal conversations or account credentials in evidence.
 
 Cloudflare accepting the deployment and displaying a login page proves provisioning and the access gate. It does not establish a successful authenticated conversation, Code Mode execution, coordinated hosted restore, abrupt-crash recovery, model quality or production readiness. Those observations remain explicit [roadmap gates](./roadmap.md).

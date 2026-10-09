@@ -1,33 +1,48 @@
+import { checkpointControls } from "./checkpoints.js";
 const $ = (id) => document.getElementById(id);
 let session = location.hash.slice(1);
-if (!/^[a-zA-Z0-9_-]{1,96}$/.test(session)) {
-  session = crypto.randomUUID();
-  history.replaceState(null, "", `#${session}`);
-}
+if (!/^(?:c1:)?[a-zA-Z0-9_-]{1,96}$/.test(session)) session = "";
 let pendingSend;
 let pendingKey;
 let refreshing = false;
 let renderedHistory = "";
 let renderedActions = "";
+let renderedRequests = "";
 let viewedArchive;
 let runtime;
 let exporting = false;
+let generation;
+let checkpointSessions = false;
+let recoveryLocked = false;
+const checkpoints = checkpointControls({
+  api,
+  refresh,
+  showError,
+  generation: () => generation,
+});
 async function api(path, body, targetSession = session) {
+  const coordinated = targetSession.startsWith("c1:");
+  const target = coordinated ? targetSession.slice(3) : targetSession;
+  const payload =
+    coordinated && body ? { expectedGeneration: generation, ...body } : body;
   const response = await fetch(
-    `/api/sessions/${targetSession}/${path}`,
+    `/api/${coordinated ? "checkpoint-sessions" : "sessions"}/${target}/${path}`,
     body
       ? {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          body: JSON.stringify(payload),
         }
       : {},
   );
-  if (!response.ok)
-    throw new Error(
+  if (!response.ok) {
+    const error = new Error(
       (await response.json().catch(() => ({}))).error ??
         `Request failed (${response.status})`,
     );
+    error.status = response.status;
+    throw error;
+  }
   return response.json();
 }
 function element(tag, text, className) {
@@ -41,6 +56,32 @@ async function refresh() {
   refreshing = true;
   try {
     const state = await api("state");
+    await checkpoints.render(state);
+    recoveryLocked = !!state.recovering;
+    if (state.recovering) {
+      setText("connection", "Connected · recovery in progress");
+      setSessionEnabled(false);
+      return;
+    }
+    if (state.recovery) {
+      if (
+        generation !== undefined &&
+        generation !== state.recovery.generation
+      ) {
+        pendingSend = undefined;
+        sessionStorage.removeItem(pendingKey);
+        renderedHistory = renderedActions = renderedRequests = "";
+        viewedArchive = undefined;
+        $("archive").textContent = "";
+        $("archive").parentElement.open = false;
+        $("search-results").textContent = "";
+        if ($("prompt").value)
+          $("error").textContent =
+            "Session restored. Your draft is kept; review it before sending.";
+      }
+      generation = state.recovery.generation;
+    }
+    setSessionEnabled(true);
     $("export-panel").hidden = !state.capabilities?.sessionDataExport;
     $("export-session").disabled = exporting || state.progress.activeTasks > 0;
     runtime = state.runtime;
@@ -57,7 +98,7 @@ async function refresh() {
         ["scheduled", "aborting"].includes(runtime.lastRestart?.status) ||
         state.progress.activeTasks > 0;
     }
-    $("connection").textContent = "Connected · saved state";
+    setText("connection", "Connected · saved state");
     $("mode").textContent = state.mode === "demo" ? "Demo model" : "Workers AI";
     $("demo-action").hidden = state.mode !== "demo";
     $("notice").textContent =
@@ -105,24 +146,28 @@ async function refresh() {
     $("progress").textContent =
       `${state.progress.activeTasks} active tasks · ${state.progress.durableWakes} scheduled wakes`;
     renderActions(state.actions);
-    $("requests").replaceChildren(
-      ...state.requests.slice(-8).map((r) => {
-        const row = element(
-          "div",
-          `${r.text.slice(0, 45)} — ${r.status}`,
-          "request",
-        );
-        if (!["completed", "failed", "cancelled"].includes(r.status)) {
-          const button = element("button", "Cancel");
-          button.onclick = () =>
-            api("cancel", { id: r.id }).then(refresh).catch(showError);
-          row.append(button);
-        }
-        return row;
-      }),
-    );
+    const requestKey = JSON.stringify(state.requests.slice(-8));
+    if (requestKey !== renderedRequests) {
+      renderedRequests = requestKey;
+      $("requests").replaceChildren(
+        ...state.requests.slice(-8).map((r) => {
+          const row = element(
+            "div",
+            `${r.text.slice(0, 45)} — ${r.status}`,
+            "request",
+          );
+          if (!["completed", "failed", "cancelled"].includes(r.status)) {
+            const button = element("button", "Cancel");
+            button.onclick = () =>
+              api("cancel", { id: r.id }).then(refresh).catch(showError);
+            row.append(button);
+          }
+          return row;
+        }),
+      );
+    }
   } catch (error) {
-    $("connection").textContent = "Disconnected · reconnecting";
+    setText("connection", "Disconnected · reconnecting");
     showError(error);
   } finally {
     refreshing = false;
@@ -131,12 +176,28 @@ async function refresh() {
 function showError(error) {
   $("error").textContent = error.message;
 }
+function setText(id, value) {
+  if ($(id).textContent !== value) $(id).textContent = value;
+}
+function setSessionEnabled(enabled) {
+  document
+    .querySelectorAll(
+      "#composer button, #composer textarea, #search button, #search input, #actions button, #demo-action, #export-session",
+    )
+    .forEach((control) => {
+      control.disabled = !enabled;
+    });
+}
 $("composer").onsubmit = async (event) => {
   event.preventDefault();
   const text = $("prompt").value;
   // Preserve an uncertain submission's id so a retry cannot duplicate it.
   if (!pendingSend || pendingSend.text !== text)
-    pendingSend = { id: crypto.randomUUID(), text };
+    pendingSend = {
+      id: crypto.randomUUID(),
+      text,
+      expectedGeneration: generation,
+    };
   sessionStorage.setItem(pendingKey, JSON.stringify(pendingSend));
   const button = event.currentTarget.querySelector("button");
   button.disabled = true;
@@ -150,7 +211,7 @@ $("composer").onsubmit = async (event) => {
   } catch (error) {
     showError(error);
   } finally {
-    button.disabled = false;
+    button.disabled = recoveryLocked;
   }
 };
 $("search").onsubmit = async (event) => {
@@ -168,7 +229,7 @@ $("search").onsubmit = async (event) => {
 $("new-session").onclick = async () => {
   $("new-session").disabled = true;
   try {
-    const next = crypto.randomUUID();
+    const next = `${checkpointSessions ? "c1:" : ""}${crypto.randomUUID()}`;
     if ($("model-choice").value)
       await api("configuration", { mode: $("model-choice").value }, next);
     location.hash = next;
@@ -336,7 +397,13 @@ async function start() {
   const response = await fetch("/api/me");
   if (!response.ok) throw new Error("Sign in to reconnect this session.");
   const me = await response.json();
+  checkpointSessions = !!me.checkpointSessions;
+  if (!session) {
+    session = `${checkpointSessions ? "c1:" : ""}${crypto.randomUUID()}`;
+    history.replaceState(null, "", `#${session}`);
+  }
   pendingKey = `pending:${me.scope}:${session}`;
+  checkpoints.bind(pendingKey);
   try {
     pendingSend = JSON.parse(sessionStorage.getItem(pendingKey));
   } catch {

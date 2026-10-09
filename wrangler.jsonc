@@ -4,6 +4,10 @@
   "main": "src/worker.ts",
   "compatibility_date": "2026-10-09",
   "compatibility_flags": ["nodejs_compat"],
+  "build": {
+    "command": "node scripts/checkpoint-build.mjs",
+    "watch_dir": "src",
+  },
   "workers_dev": false,
   "preview_urls": false,
   "assets": {
@@ -12,9 +16,15 @@
     "run_worker_first": true,
   },
   "durable_objects": {
-    "bindings": [{ "name": "SESSIONS", "class_name": "AgentSession" }],
+    "bindings": [
+      { "name": "SESSIONS", "class_name": "AgentSession" },
+      { "name": "RECOVERY_SESSIONS", "class_name": "SessionSupervisor" },
+    ],
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AgentSession"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["AgentSession"] },
+    { "tag": "v2", "new_sqlite_classes": ["SessionSupervisor"] },
+  ],
   "worker_loaders": [{ "binding": "LOADER" }],
   "vars": { "APP_ENV": "disabled", "MODEL_MODE": "demo" },
   "env": {
@@ -22,7 +32,10 @@
       "name": "pi-durable-agent-local",
       "vars": { "APP_ENV": "local", "MODEL_MODE": "demo" },
       "durable_objects": {
-        "bindings": [{ "name": "SESSIONS", "class_name": "AgentSession" }],
+        "bindings": [
+          { "name": "SESSIONS", "class_name": "AgentSession" },
+          { "name": "RECOVERY_SESSIONS", "class_name": "SessionSupervisor" },
+        ],
       },
       "worker_loaders": [{ "binding": "LOADER" }],
     },
@@ -35,7 +48,10 @@
         "ACCESS_AUD": "",
       },
       "durable_objects": {
-        "bindings": [{ "name": "SESSIONS", "class_name": "AgentSession" }],
+        "bindings": [
+          { "name": "SESSIONS", "class_name": "AgentSession" },
+          { "name": "RECOVERY_SESSIONS", "class_name": "SessionSupervisor" },
+        ],
       },
       "worker_loaders": [{ "binding": "LOADER" }],
     },

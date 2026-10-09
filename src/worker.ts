@@ -3,6 +3,7 @@ import { LIMITS, type Env } from "./env.js";
 import { digest, HttpError, identifier, json, readJson } from "./http.js";
 import { modelProfile } from "./session-model.js";
 export { AgentSession } from "./session.js";
+export { SessionSupervisor, SessionFacet } from "./session-supervisor.js";
 export { CodemodeRuntime } from "@cloudflare/codemode";
 
 export default {
@@ -14,6 +15,7 @@ export default {
         return json({
           mode: env.MODEL_MODE,
           local: env.APP_ENV === "local",
+          checkpointSessions: !!env.RECOVERY_SESSIONS,
           models: [
             modelProfile(env, "demo"),
             ...(env.AI && env.AI_MODEL
@@ -24,16 +26,28 @@ export default {
             JSON.stringify([principal.tenant, principal.subject]),
           ),
         });
-      const route = /^\/api\/sessions\/([^/]+)\/(.+)$/.exec(url.pathname);
+      const route =
+        /^\/api\/(sessions|checkpoint-sessions)\/([^/]+)\/(.+)$/.exec(
+          url.pathname,
+        );
       if (route) {
         sameOrigin(request);
         if (!["GET", "POST"].includes(request.method))
           throw new HttpError(405, "Method not allowed");
-        const session = identifier(route[1], "session ID");
+        const session = identifier(route[2], "session ID");
         const name = await digest(
           JSON.stringify([principal.tenant, principal.subject, session]),
         );
-        const stub = env.SESSIONS.get(env.SESSIONS.idFromName(name));
+        const namespace =
+          route[1] === "checkpoint-sessions"
+            ? env.RECOVERY_SESSIONS
+            : env.SESSIONS;
+        if (!namespace)
+          throw new HttpError(
+            503,
+            "Checkpoint sessions are not configured on this deployment",
+          );
+        const stub = namespace.get(namespace.idFromName(name));
         const body =
           request.method === "POST"
             ? await readJson(request, LIMITS.bodyBytes)
@@ -41,13 +55,13 @@ export default {
         const result = await stub.dispatch(
           principal,
           request.method,
-          route[2],
+          route[3],
           body,
         );
         if (!result.ok) return json({ error: result.error }, result.status);
         return json(
           JSON.parse(result.value),
-          request.method === "POST" && route[2] === "messages" ? 202 : 200,
+          request.method === "POST" && route[3] === "messages" ? 202 : 200,
         );
       }
       if (url.pathname.startsWith("/api/"))

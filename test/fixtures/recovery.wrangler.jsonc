@@ -1,0 +1,26 @@
+{
+  "name": "pi-durable-agent-recovery-test",
+  "main": "recovery-worker.ts",
+  "compatibility_date": "2026-10-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "durable_objects": {
+    "bindings": [
+      { "name": "SESSIONS", "class_name": "AgentSession" },
+      { "name": "RECOVERY_SESSIONS", "class_name": "SessionSupervisor" },
+      { "name": "TEST_FACET_CLASS", "class_name": "SessionFacet" },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["AgentSession", "SessionSupervisor"],
+    },
+  ],
+  "worker_loaders": [{ "binding": "LOADER" }],
+  "vars": {
+    "APP_ENV": "local",
+    "MODEL_MODE": "demo",
+  },
+}

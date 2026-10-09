@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pi Durable Agent</title>
     <link rel="stylesheet" href="/style.css" />
-    <script src="/app.js" defer></script>
+    <script src="/app.js" type="module"></script>
   </head>
   <body>
     <header>
@@ -76,6 +76,38 @@
             <pre id="archive"></pre>
           </details>
         </section>
+        <section id="checkpoint-panel" hidden>
+          <h2>Session recovery</h2>
+          <p>
+            Keep a checkpoint of this conversation, its memory and pending
+            approvals. Restoring keeps completed notes and recorded model usage.
+          </p>
+          <p id="checkpoint-status" role="status"></p>
+          <button id="checkpoint-create" type="button">
+            Create checkpoint
+          </button>
+          <button id="checkpoint-resume" type="button" hidden>
+            Resume recovery
+          </button>
+          <button id="checkpoint-cancel" type="button" hidden>
+            Cancel recovery
+          </button>
+          <button id="checkpoint-retry-request" type="button" hidden>
+            Retry unconfirmed request
+          </button>
+          <p id="checkpoint-allowance"></p>
+          <div id="checkpoint-list"></div>
+          <details>
+            <summary>What this protects</summary>
+            <p>
+              Checkpoints are stored with this session in Cloudflare, including
+              its executor state. They protect against changes to the
+              conversation; they are not downloadable backups or protection
+              against deletion of the whole session, namespace or account. Up to
+              three checkpoints are retained, with no automatic deletion.
+            </p>
+          </details>
+        </section>
         <section id="export-panel" hidden>
           <h2>Keep a copy</h2>
           <p>
@@ -105,6 +137,25 @@
         </section>
       </aside>
     </main>
+    <dialog id="checkpoint-dialog" aria-labelledby="checkpoint-dialog-title">
+      <h2 id="checkpoint-dialog-title">Restore this checkpoint?</h2>
+      <p id="checkpoint-target"></p>
+      <p>
+        The conversation, memory and approvals will return to this saved point.
+        Later notes and consumed model calls remain recorded. The current copy
+        is retained for operator recovery.
+      </p>
+      <p>
+        Pending actions still require a current approval. Other open tabs must
+        refresh before sending messages or approving actions.
+      </p>
+      <button id="checkpoint-close-dialog" type="button">
+        Keep current session
+      </button>
+      <button id="checkpoint-confirm-restore" type="button">
+        Restore checkpoint
+      </button>
+    </dialog>
     <footer>
       Powered by Pi Durable, OptChat Durable and Cloudflare.
       <a href="https://github.com/kevinqz/pi-durable-agent"

@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **22 tests** covering:
+`npm test` contains **27 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -45,6 +45,8 @@ Type checking, formatting and the staging **dry-run** bundle are the other relea
 
 ## Local backup/restore increment
 
+The new [coordinated-recovery composition](./coordinated-recovery.md) has four journal/fence checks within `npm test` and three native application integration checks in `npm run test:checkpoints`. A fifth model-control check verifies that asynchronous supervisor authorization precedes either provider stream. The [dev.5 product integration record](./product-checkpoints-local-validation.json) records the current local checks and exact source hashes. The integration suite also exercises the actual HTTP router and rejects an approval submitted from the previous generation. The [local browser record](./checkpoint-ui-local-validation.json) covers the new controls and post-restore search. These are local synthetic checks. The narrower [hosted facet probe](./hosted-facet-checkpoint-validation.json) establishes the native copying primitive only; it does not close the production recovery gate.
+
 The [recovery evidence](./local-recovery-validation.json) records a separate same-runtime local application check using `npm run test:recovery`. The launcher refuses backup while the managed server is running. After a **graceful shutdown**, the tool copies and verifies the complete persistence directory and restores it into a fresh directory. The restored app retains the history, memory view, request/task identities, exact pending approval and original retrieval. Two separately approved calls with the same note key produce one destination note and one action-result delivery receipt. The original backup remains checksum-identical after the restored app runs.
 
 `npm run test:state` contains six focused file/operation checks for complete parent/WAL/facet copying, corruption and missing/extra files, live/open-file rejection, linked/nested paths, incompatible runtimes, reviewed release routes and incomplete operations. These opaque file fixtures do not substitute for the separate application reopening proof. Normal reconciliation timestamps may advance during startup.
@@ -65,7 +67,9 @@ The [dev.1 → dev.2 evidence](./local-upgrade-dev2-validation.json) repeats thi
 
 The [dev.2 → dev.3 evidence](./local-upgrade-dev3-validation.json) qualifies the release adding session data export, starting at published dev.2 commit `3eb63101c0a8f222b506f771b3c5ec064f88fa53`. Dependencies, schema and the connector remain unchanged. This route and its evidence remain retained.
 
-The [dev.3 → dev.4 evidence](./local-upgrade-dev4-validation.json) qualifies the release adding persisted model profiles and call allowances, starting at published dev.3 commit `fe540ad25246961b9cd047eeb20696d8fc91b56e`. The existing demo conversation retains its model, memory, completed action and exact pending approval. The dependency graph, SQL schema and connector remain unchanged. `npm run test:upgrade` now exercises this route. This demo fixture does not establish a cross-release update of a legacy real-model session.
+The [dev.3 → dev.4 evidence](./local-upgrade-dev4-validation.json) qualifies the release adding persisted model profiles and call allowances, starting at published dev.3 commit `fe540ad25246961b9cd047eeb20696d8fc91b56e`. The existing demo conversation retains its model, memory, completed action and exact pending approval. The dependency graph, SQL schema and connector remain unchanged. This historical route remains retained. This demo fixture does not establish a cross-release update of a legacy real-model session.
+
+The [dev.4 → dev.5 evidence](./local-upgrade-dev5-validation.json) qualifies the release adding a separate checkpoint namespace and recovery interface, starting at published dev.4 commit `90815ac513714a3227c4b3d82dbe06a928b2c590`. Existing session URLs retain their original namespace, connector bytes and exact pending approval. The test also proves original retrieval, one destination effect, one result delivery and continued conversation after another target restart. `npm run test:upgrade` now exercises this route. New checkpoint sessions have separate native integration and browser evidence; this update fixture does not convert old sessions or qualify cross-build checkpoint restoration.
 
 ## Model selection increment
 
