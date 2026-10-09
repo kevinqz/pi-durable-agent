@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-09",
+  "kind": "local-development-preview",
+  "node": "22.23.1",
+  "optchat": {
+    "version": "0.4.0",
+    "source": "published-release-tarball",
+    "sha256": "f8aa37a61eeccd05e361e85380760ef7c14bd63d65d17be360b256a11bcb8030"
+  },
+  "lockfileSha256": "49aaa21929175b1baf96b1c0e97c7f73721531a58348b7a1d904f334ab5d4f81",
+  "checks": {
+    "format": "passed",
+    "typecheck": "passed",
+    "localWorkerTests": { "passed": 10, "failed": 0 },
+    "stagingBundleDryRun": "passed",
+    "localMarkdownLinks": "passed",
+    "browserApprovalAndResultDelivery": "observed"
+  },
+  "faultEvidence": {
+    "objectReset": "Cloudflare abortAllDurableObjects local runtime helper with retained storage and fresh stubs",
+    "effectBeforeCheckpoint": "seeded durable state, synthetic local destination",
+    "deliveryBeforeAcknowledgement": "seeded delivery flag after persisted admission"
+  },
+  "external": {
+    "cloudflareAuthentication": "absent",
+    "cloudflareDeployment": "not-run",
+    "liveModelCalls": 0,
+    "externalMutationConnectors": 0,
+    "coordinatedBackupRestore": "not-qualified",
+    "crossReleaseRecovery": "not-qualified"
+  }
+}

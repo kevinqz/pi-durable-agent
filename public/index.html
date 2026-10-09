@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pi Durable Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="eyebrow">Independent open-source application</p>
+        <h1>Pi Durable Agent</h1>
+        <p>Conversations that keep their memory.</p>
+      </div>
+      <span id="connection" role="status">Connecting…</span>
+    </header>
+    <main>
+      <section class="chat">
+        <div class="toolbar">
+          <strong id="mode">Loading session</strong
+          ><button id="new-session" type="button">New session</button>
+        </div>
+        <p id="notice">Loading…</p>
+        <div id="messages" aria-live="polite"></div>
+        <form id="composer">
+          <label for="prompt">Message</label
+          ><textarea
+            id="prompt"
+            required
+            maxlength="16000"
+            rows="3"
+            placeholder="Tell the agent something to remember"
+          ></textarea>
+          <div class="send">
+            <span>Work continues when you close this page.</span
+            ><button type="submit">Send</button>
+          </div>
+        </form>
+        <p id="error" role="alert"></p>
+      </section>
+      <aside>
+        <section>
+          <h2>Progress</h2>
+          <div id="progress"></div>
+          <div id="requests"></div>
+        </section>
+        <section>
+          <h2>Memory</h2>
+          <p id="memory-summary"></p>
+          <form id="search">
+            <label for="query">Find original messages</label
+            ><input id="query" required maxlength="512" /><button>
+              Search
+            </button>
+          </form>
+          <pre id="search-results"></pre>
+          <details>
+            <summary>Current memory view</summary>
+            <pre id="memory"></pre>
+          </details>
+        </section>
+        <section>
+          <h2>Approvals</h2>
+          <p>Review the exact code and pending operation before deciding.</p>
+          <button id="demo-action" type="button">Try a demo approval</button>
+          <div id="actions">No pending actions.</div>
+          <details>
+            <summary>Retained action output</summary>
+            <pre id="archive"></pre>
+          </details>
+        </section>
+      </aside>
+    </main>
+    <footer>
+      Powered by Pi Durable, OptChat Durable and Cloudflare.
+      <a href="https://github.com/kevinqz/pi-durable-agent"
+        >Source &amp; credits</a
+      >
+    </footer>
+  </body>
+</html>

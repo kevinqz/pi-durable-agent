@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this application, cite it and credit the upstream technologies listed below."
+title: "Pi Durable Agent"
+type: software
+authors:
+  - family-names: Saltarelli
+    given-names: Kevin
+    affiliation: Independent maintainer
+repository-code: "https://github.com/kevinqz/pi-durable-agent"
+license: MIT
+version: 0.1.0-dev.0
+references:
+  - type: software
+    title: "OptChat / UniiChat memory design"
+    authors:
+      - family-names: Taelin
+        given-names: Victor
+    url: "https://gist.github.com/VictorTaelin/91837951a5ce5b38f341ec1ba1df6449"
+  - type: software
+    title: "Pi / Pi Durable"
+    authors:
+      - family-names: Zechner
+        given-names: Mario
+      - name: Earendil Works and Pi contributors
+    repository-code: "https://github.com/earendil-works/pi"
+    version: 1.1.0
+  - type: software
+    title: "OptChat Durable"
+    authors:
+      - family-names: Saltarelli
+        given-names: Kevin
+    repository-code: "https://github.com/kevinqz/optchat-durable"
+    version: 0.4.0
+  - type: software
+    title: "Cloudflare Agents and Code Mode"
+    authors:
+      - name: Cloudflare and contributors
+    repository-code: "https://github.com/cloudflare/agents"

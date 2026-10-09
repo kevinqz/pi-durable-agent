@@ -1,0 +1,12 @@
+Pi Durable Agent is an independent application maintained by Kevin Saltarelli.
+
+OptChat/UniiChat memory design: Victor Taelin.
+Pi/Pi Durable, Pi AI and Chord: Mario Zechner, Earendil Works and contributors.
+OptChat Durable implementation: Kevin Saltarelli and contributors.
+Cloudflare Agents, PiHarness, Lifecycle, Code Mode and Workers tooling:
+Cloudflare, Inc. and contributors.
+jose: Filip Skokan and contributors.
+
+No upstream affiliation or endorsement is implied. The original OptChat gist
+is referenced, not bundled or relicensed. Preserve applicable upstream notices.
+See CREDITS.md, THIRD_PARTY_NOTICES.md and the dependency lockfile.

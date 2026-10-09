@@ -1,0 +1,44 @@
+{
+  "name": "pi-durable-agent",
+  "version": "0.1.0-dev.0",
+  "private": true,
+  "description": "An independent Cloudflare application composing Pi Durable, OptChat memory and Code Mode.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Kevin Saltarelli",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinqz/pi-durable-agent.git"
+  },
+  "scripts": {
+    "dev": "wrangler dev --env local --ip 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "wrangler deploy --dry-run --env staging --outdir dist",
+    "format": "prettier . --write",
+    "check:format": "prettier . --check",
+    "check": "npm run check:format && npm run typecheck && npm test && npm run build",
+    "deploy:staging": "wrangler deploy --env staging"
+  },
+  "dependencies": {
+    "@cloudflare/codemode": "0.5.3",
+    "@earendil-works/chord": "1.1.0",
+    "@earendil-works/pi-ai": "1.1.0",
+    "@earendil-works/pi-durable": "1.1.0",
+    "agents": "0.28.0",
+    "jose": "6.2.12",
+    "optchat-durable": "https://github.com/kevinqz/optchat-durable/releases/download/v0.4.0/optchat-durable-0.4.0.tgz"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.4.0",
+    "@cloudflare/workers-types": "5.20261009.1",
+    "@types/node": "22.18.6",
+    "prettier": "3.9.9",
+    "typescript": "5.9.3",
+    "vitest": "4.1.0",
+    "wrangler": "4.149.0"
+  }
+}
