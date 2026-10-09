@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-09T20:26:40.162Z",
+  "kind": "local-cross-release-upgrade",
+  "shutdown": "graceful",
+  "crossRelease": true,
+  "targetRuntime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.2",
+    "revision": "3c7dd0b6dcf7f22df7098350d95d7906da678bf7",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "7509178193e09ffee8507c151140358b3979dc1e3aee92a7e470558d4701ec94",
+    "buildFingerprint": "945889f83cbc63dcfb066971b8624eae15784535a70b202070db6e93695cff37",
+    "fingerprint": "b2049ebfc8148b77338e6214610e4170daa61edf355073e1663be4177bb548b9"
+  },
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.1",
+    "revision": null,
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "4982e27bfac39c862c174579ac400134c8508e5366cee36baf455d4223259890",
+    "buildFingerprint": "b200c8dfcb99021ca5741cf10ef04bc8e4c70de91205c6214e2178b4ff958db7",
+    "fingerprint": "4ee8a64c968d74c2727d79d076f8948b728137acd78efb57e4413491557f6d29"
+  },
+  "snapshot": {
+    "files": 31,
+    "bytes": 5893954,
+    "sha256": "f4b0e0e3cf17f5746a8d8a91fceecec83a9868e6690750b3cee003826e5cd5c1"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true,
+    "ordinaryRestoreRefusedRuntimeChange": true,
+    "completedActionPreserved": true,
+    "connectorV1BytesPreserved": true,
+    "restartedTargetWithoutDuplicateDelivery": true,
+    "newConversationTurnCompleted": true
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "sourceRevision": "9c3d3d1d4871de561fd477d2b5445cf24ec8bf8a",
+  "revisionNote": "Target revision identifies the pre-change checkout base. Target build fingerprints identify the tested runtime, subsequently committed as e7a1254e087523595379e5ad01c0b1f5e0cd6e3d.",
+  "verificationScriptSha256": "81e522ec70457ca65794413290b11dd254c8a771bd982d8c2ecfac5559eb36a8"
+}

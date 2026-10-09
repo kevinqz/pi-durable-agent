@@ -1,0 +1,138 @@
+{
+  "format": "pi-durable-agent/hosted-recovery-validation-v1",
+  "recordedAt": "2026-10-09T20:36:52.093975+00:00",
+  "status": "specific_backend_upgrade_and_forced_demo_parent_reset_verified",
+  "sourceIdentity": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.2",
+    "revision": "e7a1254e087523595379e5ad01c0b1f5e0cd6e3d",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "7509178193e09ffee8507c151140358b3979dc1e3aee92a7e470558d4701ec94",
+    "buildFingerprint": "945889f83cbc63dcfb066971b8624eae15784535a70b202070db6e93695cff37",
+    "fingerprint": "b2049ebfc8148b77338e6214610e4170daa61edf355073e1663be4177bb548b9"
+  },
+  "sourceIdentityNote": "Runtime/configuration/dependency fingerprints identify the tested dev.2 backend. Static assets and the private deployment configuration are hashed separately. Subsequent documentation/evidence changes do not change the runtime.",
+  "assets": {
+    "public/index.html": "ab18e2a0ac30f40955d8200ed4e6c5ead8448189ab0aa92afa354d83e5b7e69a",
+    "public/app.js": "507bb36138419ef8f95f0320df8d0abec9d569d22500a1c9e0a9a0e0041b8aa0",
+    "public/style.css": "2bbef7c0ac522e2f50d91c3b2f2e27732ec6ce79725af7f51d8058da42afb96a"
+  },
+  "configuration": {
+    "file": "wrangler.staging.local.jsonc",
+    "sha256": "c4d570e76cf5f708aa96c74acce57f6f973458cde343b48734b798604ad5cbd4",
+    "accountSpecificValuesPublished": false,
+    "appEnvironment": "staging",
+    "modelMode": "demo",
+    "aiBinding": false,
+    "workersDev": true,
+    "previewUrls": false,
+    "hostCpuLimitMs": 1000,
+    "compatibilityDate": "2026-10-09",
+    "changedFromPriorRun": false
+  },
+  "access": {
+    "changedFromPriorRun": false,
+    "previousEvidence": "staging-validation.json",
+    "method": "owner_authenticated_browser",
+    "secondIdentityTested": false
+  },
+  "deployment": {
+    "fromVersion": "0a553a4f-c3a8-4ae7-ae99-c0fd848be925",
+    "toVersion": "d19d53f2-2d9e-424b-a81f-25169f5ed3a4",
+    "createdAt": "2026-10-09T20:27:43.108Z",
+    "deployedAt": "2026-10-09T20:27:45.165Z",
+    "allocationPercent": 100,
+    "runtimeFrom": "0.1.0-dev.1",
+    "runtimeTo": "0.1.0-dev.2",
+    "backendChanged": true,
+    "dependencyGraphChanged": false,
+    "schemaChanged": false,
+    "notesV1Changed": false,
+    "targetRuntimeObservedOnExistingSession": true,
+    "initialOldSessionNewAssetWindowObserved": true
+  },
+  "fixture": {
+    "kind": "separate_synthetic_session",
+    "existingUserSessionModified": false,
+    "pendingBeforeDeployment": true,
+    "messagesBeforeReset": 6,
+    "summarizedBeforeReset": 6,
+    "viewBytesBeforeReset": 904
+  },
+  "pendingApproval": {
+    "preservedAcrossBackendDeployment": true,
+    "preservedAcrossForcedParentReset": true,
+    "comparedFields": [
+      "session URL",
+      "execution ID",
+      "operation sequence",
+      "connector",
+      "method",
+      "code",
+      "arguments",
+      "contract",
+      "expiry"
+    ],
+    "contract": "notes-v1/schema-1/policy-1/codemode-0.5.3",
+    "approvalFingerprintDirectlyCompared": false
+  },
+  "forcedReset": {
+    "mechanism": "owner-authorized Lifecycle job calls ctx.abort after durable marker and storage.sync",
+    "piGracefullyClosedBeforeAbort": false,
+    "priorActivationObserved": true,
+    "differentActivationObserved": true,
+    "recoveredReceiptObserved": true,
+    "admissionCount": 1,
+    "sessionLimit": 10,
+    "sameExecutionPendingAfterReset": true,
+    "messagesAfterResetBeforeApproval": 6,
+    "summarizedAfterResetBeforeApproval": 6,
+    "viewBytesAfterResetBeforeApproval": 904,
+    "originalRetrievedAfterReset": true,
+    "facetEvictionIndependentlyObserved": false,
+    "faultDuringEffectInjected": false,
+    "storageRewound": false,
+    "dataDeleted": false,
+    "replacementExecutionRequested": false
+  },
+  "completion": {
+    "approvalDecisions": 1,
+    "actionStatus": "completed",
+    "finalArchiveRetrieved": true,
+    "visibleResultDeliveryRequestsAfterReload": 1,
+    "visibleResultFollowupsAfterReload": 1,
+    "newConversationTurnCompleted": true,
+    "sourceMessagesAfterReload": 10,
+    "summarizedAfterReload": 10,
+    "viewBytesAfterReload": 1620,
+    "activeTasksAfterReload": 0,
+    "scheduledWakesAfterReload": 0,
+    "destinationRowsIndependentlyCounted": false,
+    "concurrentDecisionsInjected": false
+  },
+  "localValidation": {
+    "typecheck": "passed",
+    "newRecoveryTests": 2,
+    "existingRuntimeTests": 11,
+    "focusedRuntimeTestsPassed": 13,
+    "localCrossReleaseEvidence": "local-upgrade-dev2-validation.json",
+    "recoveryTestSha256": "65e7392f90b86c1275263407045fa05187e9344db5d5bffbe8d4091b22a4d490"
+  },
+  "qualified": {
+    "hostedDev1ToDev2BackendUpdate": true,
+    "forcedParentResetWhileDemoApprovalPending": true,
+    "postResetSourceRetrievalAndResultDelivery": true,
+    "allCrashWindows": false,
+    "hostedBackupRestore": false,
+    "hibernationBillingBehavior": false,
+    "changedDependencyUpgrade": false,
+    "realModel": false,
+    "production": false
+  },
+  "paidModelCalls": 0,
+  "privacy": "Owner identity, account identifiers, hostname, session/action/activation IDs, credentials and conversation contents are excluded. Deployment IDs and hashes identify the tested build."
+}
