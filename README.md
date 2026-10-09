@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The local demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Cloudflare staging, real model calls, coordinated backup/restore and production qualification remain open. See the [evidence and limits](./docs/validation.md).
+**Development preview.** The local demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Local offline backup/restore has a [dedicated workflow](./docs/local-recovery.md). Cloudflare staging, real model calls, hosted backup/restore and production qualification remain open. See the [evidence and limits](./docs/validation.md).
 
 ## Try it locally
 
@@ -26,6 +26,16 @@ Open the local address printed by Wrangler, normally **http://127.0.0.1:8787**.
 5. Reload the page. The session URL, conversation, memory and approvals remain addressable. Stop and restart `npm run dev` to reopen the local database.
 
 Local state lives in `.wrangler/` and is ignored by Git. Keep it if you want to retain the demo. Closing a browser does not cancel work; stopping the local server pauses processing until it runs again. A pending approval can outlive the page, but expires after one hour. Simulated replies/summaries demonstrate the plumbing; they do not measure AI quality or prompt-cache savings.
+
+To keep a recoverable local copy, stop the server and run:
+
+```sh
+npm run state -- backup --to .local-backups/demo
+npm run state -- restore .local-backups/demo --to .local-restores/demo
+npm run dev -- --persist-to .local-restores/demo
+```
+
+Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
 ## Already using Pi?
 
@@ -79,6 +89,7 @@ The focused tests run locally in Cloudflare's Workers runtime with synthetic mod
 | `src/models.ts`                               | Explicit model configuration and credential-free simulation           |
 | `public/`                                     | Small browser interface; no frontend framework or build step          |
 | `test/`                                       | Focused runtime and authorization checks                              |
+| `scripts/`                                    | Guarded local startup, offline snapshots and recovery qualification   |
 | `docs/`                                       | Architecture, deployment, limits, evidence and roadmap                |
 
 Dependency versions and artifact integrity are fixed by `package-lock.json`. Cloudflare's Pi adapter is beta; upgrades are reviewed explicitly. [Contributing](./CONTRIBUTING.md) explains the change policy.

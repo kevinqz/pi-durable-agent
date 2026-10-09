@@ -21,3 +21,6 @@ jobs:
       - run: npm run check
         env:
           WRANGLER_SEND_METRICS: "false"
+      - run: npm run test:recovery
+        env:
+          WRANGLER_SEND_METRICS: "false"

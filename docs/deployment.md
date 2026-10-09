@@ -41,8 +41,8 @@ The authenticated session state reports active tasks, scheduled wakes, oldest pe
 
 ## Backups and updates
 
-Copying a live local SQLite directory is not a verified backup. A transcript or output archive is not a restorable snapshot of Pi tasks, approvals and Code Mode facets. Cloudflare staging still needs a coordinated backup/restore procedure covering the parent object and runtime facets, and a proved restore in a separate destination.
+Use the [local backup/restore commands](./local-recovery.md) with Wrangler stopped. They copy the complete persistence directory, including the parent object and Code Mode facets, verify checksums and restore into a fresh destination. The managed launcher coordinates access and checks restored-runtime compatibility. A transcript or output archive is not a restorable snapshot. Cloudflare staging still needs its own coordinated backup/restore procedure and an observed restore in a separate destination.
 
-Do not rewind only Pi or only the Code Mode runtime after an effect: the other system and the destination may already have advanced. Keep the application stopped for any controlled restore and reconcile external effects separately. No restore endpoint, agent self-update, automatic rollback or destructive retention job is exposed in this preview.
+Do not rewind only Pi or only the Code Mode runtime after an effect: the other system and the destination may already have advanced. Keep the application stopped for any controlled restore and reconcile external effects separately. No hosted restore endpoint, agent self-update, automatic rollback or destructive retention job is exposed in this preview.
 
 For an update: review the lockfile diff, preserve old connector implementations, run the focused regression checks, test paused approvals and result delivery against a staging copy, then deploy. Rollback changes code; it does not undo external effects. Cross-release recovery and operational release promotion remain roadmap gates.

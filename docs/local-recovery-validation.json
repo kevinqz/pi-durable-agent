@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-09T17:57:05.878Z",
+  "kind": "local-offline-backup-restore",
+  "shutdown": "graceful",
+  "crossRelease": false,
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.0",
+    "revision": "ae43bf61ba915b2f19c95b78daa88f3bea1ee05b",
+    "lockfileSha256": "49aaa21929175b1baf96b1c0e97c7f73721531a58348b7a1d904f334ab5d4f81",
+    "fingerprint": "d2802ec04b947a62d06dc17a147a283c19758647586c69594f1c238c9393dfa5"
+  },
+  "snapshot": {
+    "files": 28,
+    "bytes": 3970067,
+    "sha256": "ee77aa771fbbb7bd1503ec10d86877a3e29adf5803b4a21453ed73d57c95392d"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "environment": {
+    "node": "22.23.1",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "focusedFileChecks": {
+    "passed": 5,
+    "failed": 0
+  },
+  "verificationTools": {
+    "scripts/dev.mjs": "a5cb60d3108cc7f025c9b7261dad8a419acb99091bef5cb8bccb21e5c102cd3c",
+    "scripts/local-state.mjs": "90b947b7da02a89e5f90bbd48c2961f3506bc43803774ac9cee0dfd191b727c3",
+    "scripts/state-files.mjs": "d2a853e9c0ad6bf217008c2344c25e864e7a35421d73dc750bd53f403635d12b",
+    "scripts/verify-local-recovery.mjs": "4dede6fe10f3075661534ad6d714d4aff2d086b264534579b8fab6e904a5d0a4",
+    "test/local-state.test.mjs": "462a04dbc251e0980f12f5f420549d499552abed0a04037cac87489c5c5889b2"
+  }
+}

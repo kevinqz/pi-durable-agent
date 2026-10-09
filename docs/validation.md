@@ -35,11 +35,19 @@ The browser flow has also been exercised against Wrangler: submit the demo comma
 
 Type checking, formatting and the staging **dry-run** bundle are the other release-preview checks. CI runs the same local checks. There is no giant benchmark suite or model-quality/cache-hit experiment in this delivery gate.
 
+## Local backup/restore increment
+
+The [recovery evidence](./local-recovery-validation.json) records a separate same-runtime local application check using `npm run test:recovery`. The launcher refuses backup while the managed server is running. After a **graceful shutdown**, the tool copies and verifies the complete persistence directory and restores it into a fresh directory. The restored app retains the history, memory view, request/task identities, exact pending approval and original retrieval. Two separately approved calls with the same note key produce one destination note and one action-result delivery receipt. The original backup remains checksum-identical after the restored app runs.
+
+`npm run test:state` adds five focused file/operation checks for complete parent/WAL/facet copying, corruption and missing/extra files, live/open-file rejection, linked/nested paths, incompatible runtimes and incomplete operations. These opaque file fixtures do not substitute for the separate application reopening proof. Normal reconciliation timestamps may advance during startup.
+
+The runtime/dependency source is unchanged from the preview. The [recovery guide](./local-recovery.md) states the supported OS/Node/runtime boundaries and interruption procedure. This is **not** an abrupt-crash experiment, cross-release qualification or Cloudflare-hosted backup.
+
 ## Not yet established
 
 - No Cloudflare account is authenticated in the development environment; no staging deployment was performed.
 - No live Access application, paid Workers AI model or arbitrary external mutation has been qualified.
-- No deployed hibernation/redeploy/abrupt-restart evidence or coordinated backup/restore proof exists yet.
+- No deployed hibernation/redeploy/abrupt-restart evidence or hosted coordinated backup/restore proof exists yet.
 - No production billing estimate, cost dashboard, cross-release recovery proof or self-update path is claimed.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.
 - Demo summaries are deterministic excerpts. They do not establish model quality, prompt-cache hit rate, token savings or long-run memory accuracy.
