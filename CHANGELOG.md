@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add complete offline local-state backup, checksum verification and restoration into a fresh directory, including Pi/OptChat memory and Code Mode facets.
+- Coordinate local startup and snapshot operations; refuse open, incompatible, linked, corrupt or incomplete state and preserve existing destinations.
+- Qualify a local restore with an exact pending approval, original retrieval, one deduplicated note and one result delivery. Hosted and cross-release recovery remain open.
+
 ## 0.1.0-dev.0 — Development preview
 
 - Compose official Cloudflare PiHarness/Lifecycle with the published OptChat Durable 0.4.0 package and Pi 1.1.0.

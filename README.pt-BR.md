@@ -2,7 +2,7 @@
 
 Aplicação independente e aberta que reúne **Pi Durable**, a memória do **OptChat Durable** e ferramentas do **Cloudflare Code Mode**.
 
-**Prévia de desenvolvimento.** A demonstração local usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Ainda falta qualificar a implantação Cloudflare, modelos reais, restauração coordenada e operação em produção.
+**Prévia de desenvolvimento.** A demonstração local usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Há um caminho de backup e restauração local. Ainda falta qualificar a implantação Cloudflare, modelos reais, restauração hospedada e operação em produção.
 
 ## Começar do zero
 
@@ -24,6 +24,19 @@ Abra o endereço exibido, normalmente **http://127.0.0.1:8787**. Não é necess�
 5. Recarregue a página ou reinicie o servidor local. A sessão mantém seu endereço e seus registros em `.wrangler/`.
 
 Fechar a página não cancela o trabalho. Parar o servidor local pausa o processamento até a próxima inicialização. Aprovações expiram após uma hora. Um resultado **unknown** significa que houve uma interrupção sem confirmação suficiente: a interface permite inspecionar o registro, sem repetir automaticamente a ação.
+
+## Guardar uma cópia e restaurar
+
+Pare o servidor com **Ctrl+C** e execute:
+
+```sh
+npm run state -- backup --to .local-backups/demo
+npm run state -- verify .local-backups/demo
+npm run state -- restore .local-backups/demo --to .local-restores/demo
+npm run dev -- --persist-to .local-restores/demo
+```
+
+Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a memória e os registros das aprovações; a restauração usa uma pasta nova e preserva os dados originais. Esse caminho local exige macOS/Linux com `lsof`, a mesma configuração e as mesmas versões do runtime. Os backups contêm dados privados e não são criptografados. [Procedimento completo e recuperação de interrupções](./docs/local-recovery.md).
 
 ## Já tenho Pi
 
