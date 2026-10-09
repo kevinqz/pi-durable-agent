@@ -197,8 +197,10 @@ $("export-session").onclick = async () => {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    const messages = data.payload.history.messageCount;
+    const actions = data.payload.actions.length;
     $("export-status").textContent =
-      `Archive prepared: ${data.payload.history.messageCount} messages, ${data.payload.actions.length} actions. Check your browser downloads. SHA-256: ${data.integrity.sha256}`;
+      `Archive prepared: ${messages} ${messages === 1 ? "message" : "messages"}, ${actions} ${actions === 1 ? "action" : "actions"}. Check your browser downloads. SHA-256: ${data.integrity.sha256}`;
     $("error").textContent = "";
   } catch (error) {
     $("export-status").textContent = "No archive created.";
