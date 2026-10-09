@@ -2,7 +2,7 @@
 
 Aplicação independente e aberta que reúne **Pi Durable**, a memória do **OptChat Durable** e ferramentas do **Cloudflare Code Mode**.
 
-**Prévia de desenvolvimento.** A demonstração local usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Há um caminho de backup e restauração local. Ainda falta qualificar a implantação Cloudflare, modelos reais, restauração hospedada e operação em produção.
+**Prévia de desenvolvimento.** A demonstração usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Há um caminho de backup e restauração local. Uma instância privada foi implantada na Cloudflare e seu bloqueio de acesso anônimo foi verificado. O fluxo autenticado, a recuperação hospedada, modelos reais e operação em produção ainda precisam de qualificação.
 
 ## Começar do zero
 
@@ -48,7 +48,7 @@ Você pode desenvolver e testar localmente antes de entrar na conta ou contratar
 
 Dynamic Workers executa o código do agente em um ambiente isolado. Durable Objects preserva o estado, e Access controla quem entra. A aplicação reúne essas peças com Pi e OptChat; a assinatura não adiciona conectores de e-mail, calendário ou outros serviços. Por enquanto, o conector qualificado cria notas locais da sessão.
 
-É possível usar sua conta Cloudflare existente e começar com um endereço `workers.dev` protegido por Access, sem comprar outro domínio. [Configuração, requisitos e preços oficiais](./docs/deployment.md).
+É possível usar sua conta Cloudflare existente e começar com um endereço `workers.dev` protegido por Access, sem comprar outro domínio. Siga o [passo a passo do ambiente privado](./docs/staging.md) e consulte os [requisitos e preços oficiais](./docs/deployment.md). O primeiro login no aplicativo é separado do login no painel administrativo da Cloudflare; na configuração demonstrada, ele usa um código enviado ao e-mail autorizado.
 
 ## Já tenho Pi
 

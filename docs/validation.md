@@ -32,7 +32,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 The runtime reset uses Cloudflare's `abortAllDurableObjects` test helper and obtains fresh stubs afterward. It resets in-memory instances while retaining storage. The effect-before-checkpoint and delivery-before-ack windows are **seeded durable states**; they are not evidence of a real external service being killed at that exact instruction. The one qualified mutation is the local notes destination.
 
-The browser flow has also been exercised against Wrangler: submit the demo command, see the pending exact code/arguments, approve the note, and observe the completed action and its follow-up message. The default UI is a local simulation, as prominently labeled.
+The browser flow has also been exercised against Wrangler locally: submit the demo command, see the pending exact code/arguments, approve the note, and observe the completed action and its follow-up message. The default UI labels the simulated model as **Demo model**, whether the real runtimes are running locally or on Cloudflare.
 
 Type checking, formatting and the staging **dry-run** bundle are the other release-preview checks. CI runs the same local checks. There is no giant benchmark suite or model-quality/cache-hit experiment in this delivery gate.
 
@@ -54,10 +54,18 @@ CI runs this cross-release application flow instead of repeating the same-runtim
 
 The recorded Git revision identifies the checkout base at validation time and may precede uncommitted changes; the source/configuration/dependency fingerprints and verification-script hashes identify the tested contents. This evidence covers macOS/arm64 with Node 22; CI independently exercises Linux/x64 with Node 22. It does not qualify changed dependency graphs, downgrades, external connectors or hosted deployment.
 
+## Hosted provisioning increment
+
+A private staging Worker was deployed on **2026-10-09** using Workers Paid, the existing Zero Trust Free organization and a Worker-level Access application. A dedicated exact-email Allow policy uses six-hour sessions and the existing One-time PIN provider. HttpOnly and binding cookies are enabled. Preview URLs remain disabled; the application uses demo mode with no AI binding. Account-specific configuration and credentials are kept outside tracked files.
+
+The [staging evidence](./staging-validation.json) records the source and asset hashes, deployed versions, configuration hash and anonymous checks. The page, static script and identity API redirect to Access when unauthenticated; a forged assertion header does not bypass that gate. The browser displays the application's Access login and accepts a request for an email verification code.
+
+These observations establish provisioning and edge authentication enforcement. They do **not** yet establish a successful authenticated session, hosted Code Mode execution, memory retrieval, recovery or another-user isolation. The [walkthrough](./staging.md) keeps those checks separate from deployment.
+
 ## Not yet established
 
-- No Cloudflare account is authenticated in the development environment; no staging deployment was performed.
-- No live Access application, paid Workers AI model or arbitrary external mutation has been qualified.
+- The authenticated hosted conversation/tool/approval flow remains pending application login and execution; an Access login page is not its completion.
+- No paid Workers AI model or arbitrary external mutation has been qualified.
 - No deployed hibernation/redeploy/abrupt-restart evidence or hosted coordinated backup/restore proof exists yet.
 - No production billing estimate, cost dashboard, hosted cross-release recovery proof or self-update path is claimed.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.

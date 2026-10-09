@@ -39,8 +39,7 @@ async function refresh() {
   try {
     const state = await api("state");
     $("connection").textContent = "Connected · saved state";
-    $("mode").textContent =
-      state.mode === "demo" ? "Local simulation" : "Workers AI";
+    $("mode").textContent = state.mode === "demo" ? "Demo model" : "Workers AI";
     $("notice").textContent =
       state.mode === "demo"
         ? "No AI model is called. Replies are simulated; storage, memory and recovery use the real runtimes."
