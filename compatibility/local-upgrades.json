@@ -1,0 +1,18 @@
+{
+  "format": "pi-durable-agent/local-upgrades-v1",
+  "routes": [
+    {
+      "id": "0.1.0-dev.0-to-0.1.0-dev.1",
+      "method": "unchanged-state-copy",
+      "from": {
+        "version": "0.1.0-dev.0",
+        "buildFingerprint": "e119398c2f7ce93d43eea8df912b17545f68632497013d7bb251aaece6879b1f",
+        "revision": "ae43bf61ba915b2f19c95b78daa88f3bea1ee05b"
+      },
+      "to": {
+        "version": "0.1.0-dev.1",
+        "buildFingerprint": "b200c8dfcb99021ca5741cf10ef04bc8e4c70de91205c6214e2178b4ff958db7"
+      }
+    }
+  ]
+}

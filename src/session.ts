@@ -16,6 +16,7 @@ import { HttpError, identifier, textField } from "./http.js";
 import { configureModels } from "./models.js";
 import { SerialGate, SessionStore } from "./store.js";
 import { Actions } from "./actions.js";
+import type { ActionAdmission } from "./action-contracts.js";
 import { actionTools } from "./tools.js";
 
 export class AgentSession extends DurableObject<Env> {
@@ -167,9 +168,7 @@ export class AgentSession extends DurableObject<Env> {
 
   async onJob({ job }: LifecycleJobContext): Promise<LifecycleJobOutcome> {
     if (job.fn === "action")
-      return this.actions.drive(
-        job.payload as { id: string; code: string; label: string },
-      );
+      return this.actions.drive(job.payload as ActionAdmission);
     if (job.fn !== "request") return;
     return this.gate.run(async () => {
       const { id, text } = job.payload as { id: string; text: string };

@@ -1,7 +1,11 @@
 import * as fs from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { execFileSync } from "node:child_process";
+import {
+  projectRoot,
+  resolveUpgrade,
+  runtimeIdentity,
+} from "./runtime-identity.mjs";
+export { projectRoot, runtimeIdentity } from "./runtime-identity.mjs";
 import {
   assertStopped,
   canonical,
@@ -17,45 +21,7 @@ import {
   writeJson,
 } from "./state-files.mjs";
 
-export const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const FORMAT = "pi-durable-agent/local-state-v1";
-
-export async function runtimeIdentity(root = projectRoot) {
-  const pkg = JSON.parse(await fs.readFile(join(root, "package.json"), "utf8"));
-  const lockBytes = await fs.readFile(join(root, "package-lock.json"));
-  const lock = JSON.parse(lockBytes);
-  // App version/tooling/docs can change without changing the stored runtime.
-  const dependencies = Object.entries(lock.packages)
-    .filter(([path]) => path)
-    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
-  const inputs = {
-    application: { name: pkg.name, type: pkg.type ?? "commonjs" },
-    platform: process.platform,
-    architecture: process.arch,
-    nodeMajor: process.versions.node.split(".")[0],
-    source: await inventory(join(root, "src")),
-    wrangler: sha256(await fs.readFile(join(root, "wrangler.jsonc"))),
-    typescript: sha256(await fs.readFile(join(root, "tsconfig.json"))),
-    dependencies,
-  };
-  let revision = null;
-  try {
-    revision = execFileSync("git", ["rev-parse", "HEAD"], {
-      cwd: root,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-  } catch {
-    /* Release archives need no Git. Content hashes remain authoritative. */
-  }
-  return {
-    application: pkg.name,
-    version: pkg.version,
-    revision,
-    lockfileSha256: sha256(lockBytes),
-    fingerprint: sha256(JSON.stringify(inputs)),
-  };
-}
 
 async function requireStateDirectory(state) {
   if (!(await fs.lstat(join(state, "v3/do")).catch(() => null))?.isDirectory())
@@ -92,7 +58,7 @@ export async function checkDevState(state, root = projectRoot) {
       );
     if (restored.fingerprint !== (await runtimeIdentity(root)).fingerprint)
       throw new Error(
-        "Restored state requires its recorded runtime/configuration. Use that revision; cross-runtime migration is not supported.",
+        "Restored state requires its recorded runtime/configuration. Use that revision or the reviewed local upgrade workflow.",
       );
   }
 }
@@ -201,6 +167,21 @@ export async function restoreBackup(
   destinationPath,
   root = projectRoot,
 ) {
+  return restore(backupPath, destinationPath, root);
+}
+
+export async function upgradeBackup(
+  backupPath,
+  destinationPath,
+  sourceRoot,
+  root = projectRoot,
+) {
+  if (!sourceRoot)
+    throw new Error("An upgrade requires the retained source release");
+  return restore(backupPath, destinationPath, root, sourceRoot);
+}
+
+async function restore(backupPath, destinationPath, root, sourceRoot) {
   const backup = await canonical(backupPath);
   const destination = await canonical(destinationPath);
   separate(backup, destination);
@@ -208,9 +189,15 @@ export async function restoreBackup(
     assertStopped(join(backup, "state"));
     const verified = await verifyBackup(backup);
     const runtime = await runtimeIdentity(root);
-    if (runtime.fingerprint !== verified.manifest.runtime.fingerprint)
+    const upgrade = sourceRoot
+      ? await resolveUpgrade(verified.manifest.runtime, sourceRoot, root)
+      : undefined;
+    if (
+      !upgrade &&
+      runtime.fingerprint !== verified.manifest.runtime.fingerprint
+    )
       throw new Error(
-        "Snapshot requires its recorded runtime/configuration. Restore with that revision; cross-runtime migration is not supported.",
+        "Snapshot requires its recorded runtime/configuration. Restore with that revision or use the reviewed local upgrade workflow.",
       );
     return lease(destination, "restore-destination", async () => {
       if (
@@ -224,6 +211,7 @@ export async function restoreBackup(
         status: "incomplete",
         fingerprint: runtime.fingerprint,
         snapshotSha256: verified.sha256,
+        ...(upgrade ? { upgrade } : {}),
       };
       await writeJson(sidecar(destination, "restore.json"), receipt);
       await fs.mkdir(destination, { mode: 0o700 });
@@ -236,6 +224,8 @@ export async function restoreBackup(
       if ((await verifyBackup(backup)).sha256 !== verified.sha256)
         throw new Error("Snapshot changed during restore");
       assertStopped(join(backup, "state"));
+      if (runtime.fingerprint !== (await runtimeIdentity(root)).fingerprint)
+        throw new Error("Target runtime changed during restore");
       await writeJson(
         sidecar(destination, "restore.json"),
         {
@@ -250,6 +240,7 @@ export async function restoreBackup(
         destination,
         files: verified.manifest.files.length,
         snapshotSha256: verified.sha256,
+        ...(upgrade ? { upgrade: upgrade.id } : {}),
       };
     });
   });

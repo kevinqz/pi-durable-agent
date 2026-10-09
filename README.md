@@ -37,6 +37,10 @@ npm run dev -- --persist-to .local-restores/demo
 
 Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
+**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed route from **0.1.0-dev.0 to 0.1.0-dev.1** opens a separate copy and retains memory, completed actions and pending approvals.
+
+**Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [deployment and cost guide](./docs/deployment.md) when ready.
+
 ## Already using Pi?
 
 Choose what you need:
@@ -80,17 +84,18 @@ npm run build
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-| Directory                                     | Responsibility                                                        |
-| --------------------------------------------- | --------------------------------------------------------------------- |
-| `src/worker.ts`, `src/auth.ts`, `src/http.ts` | Authenticated HTTP boundary, request limits and routing               |
-| `src/session.ts`, `src/store.ts`              | Native Pi/OptChat composition, durable admission and session metadata |
-| `src/actions.ts`, `src/actions-store.ts`      | Action identity, runtime reconciliation, archives and result delivery |
-| `src/notes.ts`, `src/tools.ts`                | Versioned demo connector and native Pi extension                      |
-| `src/models.ts`                               | Explicit model configuration and credential-free simulation           |
-| `public/`                                     | Small browser interface; no frontend framework or build step          |
-| `test/`                                       | Focused runtime and authorization checks                              |
-| `scripts/`                                    | Guarded local startup, offline snapshots and recovery qualification   |
-| `docs/`                                       | Architecture, deployment, limits, evidence and roadmap                |
+| Directory                                                           | Responsibility                                                                    |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/worker.ts`, `src/auth.ts`, `src/http.ts`                       | Authenticated HTTP boundary, request limits and routing                           |
+| `src/session.ts`, `src/store.ts`                                    | Native Pi/OptChat composition, durable admission and session metadata             |
+| `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts` | Action identity, retained contracts, reconciliation, archives and result delivery |
+| `src/notes.ts`, `src/tools.ts`                                      | Versioned demo connector and native Pi extension                                  |
+| `src/models.ts`                                                     | Explicit model configuration and credential-free simulation                       |
+| `public/`                                                           | Small browser interface; no frontend framework or build step                      |
+| `test/`                                                             | Focused runtime and authorization checks                                          |
+| `scripts/`                                                          | Guarded local startup, offline snapshots and recovery qualification               |
+| `compatibility/`                                                    | Exact reviewed source/target release identities for local updates                 |
+| `docs/`                                                             | Architecture, deployment, limits, evidence and roadmap                            |
 
 Dependency versions and artifact integrity are fixed by `package-lock.json`. Cloudflare's Pi adapter is beta; upgrades are reviewed explicitly. [Contributing](./CONTRIBUTING.md) explains the change policy.
 

@@ -38,6 +38,18 @@ npm run dev -- --persist-to .local-restores/demo
 
 Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a memória e os registros das aprovações; a restauração usa uma pasta nova e preserva os dados originais. Esse caminho local exige macOS/Linux com `lsof`, a mesma configuração e as mesmas versões do runtime. Os backups contêm dados privados e não são criptografados. [Procedimento completo e recuperação de interrupções](./docs/local-recovery.md).
 
+## Atualizar sem perder a sessão
+
+A rota revisada **0.1.0-dev.0 → 0.1.0-dev.1** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão.
+
+## Quando hospedar na Cloudflare
+
+Você pode desenvolver e testar localmente antes de entrar na conta ou contratar um plano. A aplicação completa hospedada exige **Workers Paid**, a partir de **US$ 5 por conta/mês**, porque o Code Mode usa Dynamic Workers. Esse valor é a base do plano, não um teto de cobrança: consumo excedente e inferência de modelos têm suas próprias regras.
+
+Dynamic Workers executa o código do agente em um ambiente isolado. Durable Objects preserva o estado, e Access controla quem entra. A aplicação reúne essas peças com Pi e OptChat; a assinatura não adiciona conectores de e-mail, calendário ou outros serviços. Por enquanto, o conector qualificado cria notas locais da sessão.
+
+É possível usar sua conta Cloudflare existente e começar com um endereço `workers.dev` protegido por Access, sem comprar outro domínio. [Configuração, requisitos e preços oficiais](./docs/deployment.md).
+
 ## Já tenho Pi
 
 Para adicionar **somente a memória** ao Pi existente:
@@ -53,6 +65,7 @@ O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separad
 - [README completo e organização](./README.md)
 - [Arquitetura e garantias](./docs/architecture.md)
 - [Implantação e operação](./docs/deployment.md)
+- [Atualização local entre versões](./docs/local-upgrades.md)
 - [Verificações e limites](./docs/validation.md)
 - [Roadmap](./docs/roadmap.md)
 
