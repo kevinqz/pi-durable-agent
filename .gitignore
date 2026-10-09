@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .wrangler/
+/wrangler.staging.local.jsonc
 .local-backups/
 .local-restores/
 .dev.vars*

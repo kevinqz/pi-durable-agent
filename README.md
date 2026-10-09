@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The local demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Local offline backup/restore has a [dedicated workflow](./docs/local-recovery.md). Cloudflare staging, real model calls, hosted backup/restore and production qualification remain open. See the [evidence and limits](./docs/validation.md).
+**Development preview.** The demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Local offline backup/restore has a [dedicated workflow](./docs/local-recovery.md). A private Cloudflare staging instance has been deployed and its anonymous-access gate checked; authenticated application and recovery qualification remain open. Real model calls, hosted backup/restore and production operation are not yet qualified. See the [evidence and limits](./docs/validation.md).
 
 ## Try it locally
 
@@ -39,7 +39,7 @@ Open the same session URL. This preserves the complete local runtime state and r
 
 **Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed route from **0.1.0-dev.0 to 0.1.0-dev.1** opens a separate copy and retains memory, completed actions and pending approvals.
 
-**Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [deployment and cost guide](./docs/deployment.md) when ready.
+**Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [private staging walkthrough](./docs/staging.md) and [deployment and cost guide](./docs/deployment.md) when ready.
 
 ## Already using Pi?
 

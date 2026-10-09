@@ -1,0 +1,110 @@
+{
+  "format": "pi-durable-agent/hosted-validation-v1",
+  "recordedAt": "2026-10-09T19:42:29.602Z",
+  "status": "provisioned_access_gate_verified",
+  "sourceIdentity": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.1",
+    "revision": "9c3d3d1d4871de561fd477d2b5445cf24ec8bf8a",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "4982e27bfac39c862c174579ac400134c8508e5366cee36baf455d4223259890",
+    "buildFingerprint": "b200c8dfcb99021ca5741cf10ef04bc8e4c70de91205c6214e2178b4ff958db7",
+    "fingerprint": "4ee8a64c968d74c2727d79d076f8948b728137acd78efb57e4413491557f6d29"
+  },
+  "sourceIdentityNote": "Identity covers the tracked runtime/configuration/dependencies. Static assets and the private deployment configuration are hashed separately; the base revision predates the UI label and documentation changes.",
+  "assets": {
+    "public/index.html": "2fb4c3c4abf7564fcdb898b9a63f044fe2498599a429975e359f4fddd76a726f",
+    "public/app.js": "702e71c8cb123ed28ec8069e504c3e6bc9bf0b59fbe37a6f05214c50966eb0f8",
+    "public/style.css": "2bbef7c0ac522e2f50d91c3b2f2e27732ec6ce79725af7f51d8058da42afb96a"
+  },
+  "configuration": {
+    "file": "wrangler.staging.local.jsonc",
+    "sha256": "c4d570e76cf5f708aa96c74acce57f6f973458cde343b48734b798604ad5cbd4",
+    "accountSpecificValuesPublished": false,
+    "appEnvironment": "staging",
+    "modelMode": "demo",
+    "aiBinding": false,
+    "workersDev": true,
+    "previewUrls": false,
+    "hostCpuLimitMs": 1000,
+    "compatibilityDate": "2026-10-09"
+  },
+  "access": {
+    "type": "worker",
+    "scope": "production_and_preview_urls",
+    "policy": "one_exact_owner_email",
+    "sessionHours": 6,
+    "identityProvider": "one_time_pin",
+    "httpOnly": true,
+    "bindingCookie": true,
+    "configurationConfirmedInDashboard": true
+  },
+  "deployments": {
+    "bootstrapVersion": "edbc477e-bbae-4d7f-bde3-0d90f6f71aad",
+    "protectedVersion": "09d9c42b-256a-4df3-9acd-2a622700243c",
+    "finalVersion": "ff582a97-38fe-40ce-a7db-93834b11fbfb"
+  },
+  "anonymousChecks": {
+    "checkedAt": "2026-10-09T19:36:18.187Z",
+    "workerVersion": "09d9c42b-256a-4df3-9acd-2a622700243c",
+    "observations": [
+      {
+        "path": "/",
+        "status": 302,
+        "accessLogin": true,
+        "passed": true
+      },
+      {
+        "path": "/app.js",
+        "status": 302,
+        "accessLogin": true,
+        "passed": true
+      },
+      {
+        "path": "/api/me",
+        "status": 302,
+        "accessLogin": true,
+        "passed": true
+      },
+      {
+        "path": "/api/me",
+        "forgedAssertion": true,
+        "status": 302,
+        "accessLogin": true,
+        "passed": true
+      }
+    ]
+  },
+  "finalDeploymentCheck": {
+    "checkedAt": "2026-10-09T19:42:29.602Z",
+    "workerVersion": "ff582a97-38fe-40ce-a7db-93834b11fbfb",
+    "path": "/api/me",
+    "status": 302,
+    "accessLogin": true,
+    "passed": true
+  },
+  "authenticatedApplication": {
+    "status": "not_run",
+    "reason": "Waiting for the owner to complete the application email-code login; the dashboard and Wrangler are already authenticated."
+  },
+  "qualified": {
+    "deployment": true,
+    "anonymousAccessGate": true,
+    "authenticatedConversation": false,
+    "hostedCodeMode": false,
+    "hostedMemoryRetrieval": false,
+    "hostedCrossUserIsolation": false,
+    "pendingApprovalAcrossRedeploy": false,
+    "hostedBackupRestore": false,
+    "abruptCrashRecovery": false,
+    "hostedCrossRelease": false,
+    "realModel": false,
+    "production": false
+  },
+  "paidModelCalls": 0,
+  "privacy": "Account identifiers, owner email, hostname, OAuth credentials, login codes and conversation contents are excluded."
+}
