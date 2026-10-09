@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.0-dev.3 — Portable session data
+
+- Add authenticated session data export with every retained normalized history page, current memory, request/action records and exact retained executor outputs.
+- Check capture consistency and output references; refuse active, changing, corrupt or oversized data without silently truncating it.
+- Add a browser download control and a Node-only offline integrity verifier. Archives are explicitly non-restorable and do not authorize or replay actions.
+- Qualify the local dev.2 → dev.3 route with unchanged dependencies, schema and connector; retain earlier sequential routes.
+- Document the native facet/alarm composition limit found in an isolated checkpoint prototype and keep hosted coordinated restore open.
+
+## 0.1.0-dev.2 — Hosted recovery qualification
+
+- Add owner-authorized, bounded demo-session process resets through Lifecycle and native `ctx.abort()`, with activation identity and restart receipts.
+- Qualify the local dev.1 → dev.2 route and observe the corresponding protected staging backend update with a paused approval.
+- Observe a forced hosted parent reset, preserved conversation and pending operation, completed approval/result and a further conversation turn.
+- Document the distinction between a process reset, release update and coordinated backup/restore. Keep the reset control disabled in real-model and production configurations.
+
 ## 0.1.0-dev.1 — Local recovery and controlled updates
 
 - Add complete offline local-state backup, checksum verification and restoration into a fresh directory, including Pi/OptChat memory and Code Mode facets.
@@ -18,4 +33,4 @@
 - Provide a credential-free local browser demo, source retrieval, progress and approval inspection.
 - Include focused runtime checks, locked dependencies, upstream attribution and a deployment guide.
 
-These are development previews. Cloudflare staging, live models, hosted coordinated restore and hosted cross-release recovery remain unqualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).
+These are development previews. Specific demo staging and release routes have evidence; live models, hosted coordinated restore and arbitrary cross-release recovery remain unqualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).

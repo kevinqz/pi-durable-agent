@@ -22,11 +22,24 @@ Abra o endereço exibido, normalmente **http://127.0.0.1:8787**. Não é necess�
 3. Clique em **Try a demo approval**. Confira o código e os argumentos exatos em **Approvals**.
 4. Aprove ou rejeite. O resultado fica salvo e, quando concluído, volta para a conversa.
 5. Recarregue a página ou reinicie o servidor local. A sessão mantém seu endereço e seus registros em `.wrangler/`.
-6. Para experimentar a recuperação, espere o trabalho ativo terminar, abra **Session diagnostics** e use **Restart this test session**. Uma nova ativação com estado **recovered** confirma o reinício. Os dados ficam salvos; isso não cria um backup. [Controles e limites](./docs/hosted-recovery.md).
+6. Use **Export session data** para baixar as mensagens, a visão atual da memória e os registros de ações. O arquivo permite consulta e verificação local; ele não restaura a execução. [Conteúdo, limites e verificador](./docs/session-export.md).
+7. Para experimentar a recuperação, espere o trabalho ativo terminar, abra **Session diagnostics** e use **Restart this test session**. Uma nova ativação com estado **recovered** confirma o reinício. Os dados ficam salvos; isso não cria um backup. [Controles e limites](./docs/hosted-recovery.md).
 
 Fechar a página não cancela o trabalho. Parar o servidor local pausa o processamento até a próxima inicialização. Aprovações expiram após uma hora. Um resultado **unknown** significa que houve uma interrupção sem confirmação suficiente: a interface permite inspecionar o registro, sem repetir automaticamente a ação.
 
-## Guardar uma cópia e restaurar
+## Exportar os dados para consulta
+
+O botão **Export session data** funciona no ambiente local e na sessão autenticada da Cloudflare. Baixa todas as páginas do histórico textual retido, a memória atual e os registros e resultados retidos das ações. Aguarde o processamento terminar; aprovações pendentes permanecem pendentes. O arquivo contém dados privados e não é criptografado.
+
+Para conferir sua integridade sem login, servidor ou Git:
+
+```sh
+npm run export:verify -- /caminho/absoluto/para/arquivo.json
+```
+
+Esse arquivo serve para leitura e inspeção. A restauração local completa usa o procedimento abaixo; a restauração coordenada na nuvem continua pendente.
+
+## Guardar uma cópia local e restaurar
 
 Pare o servidor com **Ctrl+C** e execute:
 
@@ -41,7 +54,7 @@ Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a
 
 ## Atualizar sem perder a sessão
 
-A rota revisada **0.1.0-dev.1 → 0.1.0-dev.2** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Quem está na dev.0 precisa passar primeiro pela rota preservada para dev.1.
+A rota revisada **0.1.0-dev.2 → 0.1.0-dev.3** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3.
 
 ## Quando hospedar na Cloudflare
 
@@ -66,6 +79,7 @@ O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separad
 - [README completo e organização](./README.md)
 - [Arquitetura e garantias](./docs/architecture.md)
 - [Implantação e operação](./docs/deployment.md)
+- [Exportação de dados e verificação offline](./docs/session-export.md)
 - [Atualização local entre versões](./docs/local-upgrades.md)
 - [Atualização hospedada e reinício da demonstração](./docs/hosted-recovery.md)
 - [Verificações e limites](./docs/validation.md)

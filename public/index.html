@@ -71,6 +71,17 @@
             <pre id="archive"></pre>
           </details>
         </section>
+        <section id="export-panel" hidden>
+          <h2>Keep a copy</h2>
+          <p>
+            Download the full retained message history, current memory view and
+            action records as JSON. The file contains private data and is not
+            encrypted. It is for reading and inspection; it cannot restore a
+            running session or authorize an action.
+          </p>
+          <button id="export-session" type="button">Export session data</button>
+          <p id="export-status" role="status"></p>
+        </section>
         <section>
           <details id="recovery-panel" hidden>
             <summary>Session diagnostics</summary>

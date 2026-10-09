@@ -11,6 +11,7 @@ let renderedHistory = "";
 let renderedActions = "";
 let viewedArchive;
 let runtime;
+let exporting = false;
 async function api(path, body) {
   const response = await fetch(
     `/api/sessions/${session}/${path}`,
@@ -40,6 +41,8 @@ async function refresh() {
   refreshing = true;
   try {
     const state = await api("state");
+    $("export-panel").hidden = !state.capabilities?.sessionDataExport;
+    $("export-session").disabled = exporting || state.progress.activeTasks > 0;
     runtime = state.runtime;
     $("recovery-panel").hidden = !runtime?.restartEnabled;
     if (runtime?.restartEnabled) {
@@ -176,6 +179,32 @@ $("restart-session").onclick = async () => {
     await refresh();
   } catch (error) {
     showError(error);
+    await refresh();
+  }
+};
+$("export-session").onclick = async () => {
+  exporting = true;
+  $("export-session").disabled = true;
+  $("export-status").textContent = "Preparing the session data archive…";
+  try {
+    const data = await api("exports/session", {});
+    const file = new Blob([JSON.stringify(data)], { type: "application/json" });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pi-durable-agent-session-${session}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    $("export-status").textContent =
+      `Archive prepared: ${data.payload.history.messageCount} messages, ${data.payload.actions.length} actions. Check your browser downloads. SHA-256: ${data.integrity.sha256}`;
+    $("error").textContent = "";
+  } catch (error) {
+    $("export-status").textContent = "No archive created.";
+    showError(error);
+  } finally {
+    exporting = false;
     await refresh();
   }
 };
