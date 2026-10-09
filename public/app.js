@@ -12,9 +12,9 @@ let renderedActions = "";
 let viewedArchive;
 let runtime;
 let exporting = false;
-async function api(path, body) {
+async function api(path, body, targetSession = session) {
   const response = await fetch(
-    `/api/sessions/${session}/${path}`,
+    `/api/sessions/${targetSession}/${path}`,
     body
       ? {
           method: "POST",
@@ -59,10 +59,14 @@ async function refresh() {
     }
     $("connection").textContent = "Connected · saved state";
     $("mode").textContent = state.mode === "demo" ? "Demo model" : "Workers AI";
+    $("demo-action").hidden = state.mode !== "demo";
     $("notice").textContent =
       state.mode === "demo"
         ? "No AI model is called. Replies are simulated; storage, memory and recovery use the real runtimes."
-        : "Model calls use your Cloudflare account. Each session has separate durable memory.";
+        : `${state.model?.modelId ?? "Workers AI"} · Model calls use your Cloudflare account. Memory summaries also use the model.`;
+    $("model-budget").hidden = state.mode === "demo";
+    $("model-budget").textContent =
+      `${state.progress.modelCalls}/${state.progress.modelCallLimit} model calls reserved, including summaries and failed attempts. This is a session limit, not an account billing cap.`;
     const historyKey = JSON.stringify(state.history.items);
     if (historyKey !== renderedHistory) {
       const messages = state.history.items.map((message) => {
@@ -161,9 +165,18 @@ $("search").onsubmit = async (event) => {
     showError(error);
   }
 };
-$("new-session").onclick = () => {
-  location.hash = crypto.randomUUID();
-  location.reload();
+$("new-session").onclick = async () => {
+  $("new-session").disabled = true;
+  try {
+    const next = crypto.randomUUID();
+    if ($("model-choice").value)
+      await api("configuration", { mode: $("model-choice").value }, next);
+    location.hash = next;
+    location.reload();
+  } catch (error) {
+    showError(error);
+    $("new-session").disabled = false;
+  }
 };
 $("demo-action").onclick = () => {
   $("prompt").value = "/demo-note";
@@ -330,7 +343,22 @@ async function start() {
     pendingSend = undefined;
   }
   if (pendingSend) $("prompt").value = pendingSend.text;
-  $("demo-action").hidden = me.mode !== "demo";
+  if (me.models?.length) {
+    $("model-choice").replaceChildren(
+      ...me.models.map((model) => {
+        const option = element(
+          "option",
+          model.mode === "demo"
+            ? "Demo — no model calls"
+            : `${model.modelId} — ${model.callLimit} calls per session`,
+        );
+        option.value = model.mode;
+        return option;
+      }),
+    );
+    $("model-choice").value = me.mode;
+    $("model-choice-label").hidden = me.models.length < 2;
+  }
   document.addEventListener("visibilitychange", refresh);
   setInterval(refresh, 2000);
   await refresh();

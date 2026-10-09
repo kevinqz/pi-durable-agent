@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-dev.4 — Model choice and durable inference allowances
+
+- Choose the configured Workers AI model for a new session without replacing existing demo conversations. Persist the model and allowance before opening Pi.
+- Enforce a configurable, durable call allowance across replies, summaries, failed attempts and restarts. Bound both provider streaming entry points and refuse a different model before dispatch.
+- Show the selected model and reserved calls in the interface. Keep the forced demo-reset control disabled for real-model sessions.
+- Apply identity and expiry checks before opening session work; make configuration retries idempotent and failed selections atomic.
+- Add local checks using the official Workers AI adapter with a simulated binding. Real-provider and coordinated hosted-restore qualification remain open.
+- Qualify the local dev.3 → dev.4 update with the existing demo model, retained memory and pending approvals; preserve earlier sequential routes.
+
 ## 0.1.0-dev.3 — Portable session data
 
 - Add authenticated session data export with every retained normalized history page, current memory, request/action records and exact retained executor outputs.

@@ -10,6 +10,7 @@ export interface Env {
   ACCESS_AUD?: string;
   AI?: Ai;
   AI_MODEL?: string;
+  MODEL_CALL_LIMIT?: string;
 }
 
 export type Principal = {

@@ -39,7 +39,7 @@ npm run dev -- --persist-to .local-restores/demo
 
 Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
-**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.2 → 0.1.0-dev.3** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3.
+**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.3 → 0.1.0-dev.4** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4.
 
 **Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [private staging walkthrough](./docs/staging.md) and [deployment and cost guide](./docs/deployment.md) when ready.
 
@@ -54,6 +54,8 @@ Choose what you need:
 | A separate web app with Cloudflare lifecycle and approved Code Mode actions | This repository, with `npm ci` and `npm run dev`                            |
 
 This application does not replace your Pi installation or import your local OAuth credentials. A ChatGPT/Claude login in Pi does not configure a hosted Cloudflare model. The optional hosted model path uses the official Workers AI binding, configured separately in the [deployment guide](./docs/deployment.md).
+
+**Use a real model:** once Workers AI is configured, choose it under **Model for the next session** and select **New session**. Existing demo conversations remain addressable. Each new conversation retains its selected model and a visible call allowance, including memory summaries and failed attempts. See [model setup and consumption limits](./docs/models.md).
 
 ## What runs where
 
@@ -86,20 +88,20 @@ npm run build
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-| Directory                                                           | Responsibility                                                                    |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `src/worker.ts`, `src/auth.ts`, `src/http.ts`                       | Authenticated HTTP boundary, request limits and routing                           |
-| `src/session.ts`, `src/store.ts`                                    | Native Pi/OptChat composition, durable admission and session metadata             |
-| `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts` | Action identity, retained contracts, reconciliation, archives and result delivery |
-| `src/notes.ts`, `src/tools.ts`                                      | Versioned demo connector and native Pi extension                                  |
-| `src/recovery.ts`                                                   | Owner-authorized demo reset, activation identity and bounded restart receipts     |
-| `src/session-export.ts`                                             | Bounded session data archive with public history pagination and integrity checks  |
-| `src/models.ts`                                                     | Explicit model configuration and credential-free simulation                       |
-| `public/`                                                           | Small browser interface; no frontend framework or build step                      |
-| `test/`                                                             | Focused runtime and authorization checks                                          |
-| `scripts/`                                                          | Guarded local startup, offline snapshots and recovery qualification               |
-| `compatibility/`                                                    | Exact reviewed source/target release identities for local updates                 |
-| `docs/`                                                             | Architecture, deployment, limits, evidence and roadmap                            |
+| Directory                                                           | Responsibility                                                                     |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `src/worker.ts`, `src/auth.ts`, `src/http.ts`                       | Authenticated HTTP boundary, request limits and routing                            |
+| `src/session.ts`, `src/store.ts`                                    | Native Pi/OptChat composition, durable admission and session metadata              |
+| `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts` | Action identity, retained contracts, reconciliation, archives and result delivery  |
+| `src/notes.ts`, `src/tools.ts`                                      | Versioned demo connector and native Pi extension                                   |
+| `src/recovery.ts`                                                   | Owner-authorized demo reset, activation identity and bounded restart receipts      |
+| `src/session-export.ts`                                             | Bounded session data archive with public history pagination and integrity checks   |
+| `src/models.ts`, `src/session-model.ts`                             | Model adapters, immutable session selection, durable call allowance and simulation |
+| `public/`                                                           | Small browser interface; no frontend framework or build step                       |
+| `test/`                                                             | Focused runtime and authorization checks                                           |
+| `scripts/`                                                          | Guarded local startup, offline snapshots and recovery qualification                |
+| `compatibility/`                                                    | Exact reviewed source/target release identities for local updates                  |
+| `docs/`                                                             | Architecture, deployment, limits, evidence and roadmap                             |
 
 Dependency versions and artifact integrity are fixed by `package-lock.json`. Cloudflare's Pi adapter is beta; upgrades are reviewed explicitly. [Contributing](./CONTRIBUTING.md) explains the change policy.
 

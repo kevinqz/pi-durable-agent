@@ -21,7 +21,7 @@ The staging check used an authenticated browser. It compared the visible operati
 
 ## Recovery control contract
 
-The control is enabled only for `MODEL_MODE=demo` with `APP_ENV=local` or `staging`. It is absent in real-model and production configurations. It requires the session owner's authenticated identity, same-origin request handling and the exact current activation ID.
+The control is enabled only when the session's saved model profile is `demo` and `APP_ENV` is `local` or `staging`. It is absent in real-model sessions and production configurations, including when a real-model session was selected on a deployment whose default remains demo. It requires the session owner's authenticated identity, same-origin request handling and the exact current activation ID.
 
 `POST /api/sessions/:session/recovery/restart` accepts `{ "activationId": "the-current-activation" }`. The session state reports `runtime.release`, `activationId`, `startedAt`, the restart limit/count and the last receipt. An activation identifies an in-memory parent-object instance, not a database version or an individual Code Mode facet.
 

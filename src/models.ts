@@ -1,5 +1,10 @@
 import { createModels } from "@earendil-works/pi-ai/models";
-import type { Provider } from "@earendil-works/pi-ai";
+import type {
+  Api,
+  Model,
+  Provider,
+  TranscriptContext,
+} from "@earendil-works/pi-ai";
 import {
   fauxAssistantMessage,
   fauxProvider,
@@ -15,25 +20,36 @@ export function configureModels(env: Env, reserveCall: () => void) {
     if (!env.AI || !env.AI_MODEL)
       throw new Error("Workers AI requires AI and AI_MODEL bindings");
     const ai = createAI({ binding: env.AI });
+    const admit = (
+      model: Model<Api>,
+      context: TranscriptContext,
+      requested?: number,
+    ) => {
+      if (model.id !== env.AI_MODEL || model.provider !== "cloudflare")
+        throw new Error("The session can only call its configured model");
+      const maxTokens = Math.min(requested ?? 2048, 2048, model.maxTokens);
+      if (
+        new TextEncoder().encode(JSON.stringify(context)).length >
+        model.contextWindow - maxTokens - 4096
+      )
+        throw new Error(
+          "Model context exceeds this host's conservative byte allowance",
+        );
+      reserveCall();
+      return maxTokens;
+    };
     const provider: Provider = {
       ...ai.provider,
+      stream(model, context, options) {
+        const boundedOptions = Object.assign({}, options, {
+          maxTokens: admit(model, context, options?.maxTokens),
+        });
+        return ai.provider.stream(model, context, boundedOptions);
+      },
       streamSimple(model, context, options) {
-        const maxTokens = Math.min(
-          options?.maxTokens ?? 2048,
-          2048,
-          model.maxTokens,
-        );
-        if (
-          new TextEncoder().encode(JSON.stringify(context)).length >
-          model.contextWindow - maxTokens - 4096
-        )
-          throw new Error(
-            "Model context exceeds this host's conservative byte allowance",
-          );
-        reserveCall();
         return ai.provider.streamSimple(model, context, {
           ...options,
-          maxTokens,
+          maxTokens: admit(model, context, options?.maxTokens),
         });
       },
     };

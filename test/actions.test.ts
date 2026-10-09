@@ -216,6 +216,22 @@ test("expired and changed-contract approvals cannot execute; oversized results f
       { id: action.id, decision: "approve", fingerprint: action.fingerprint },
       { ...owner, authorizedUntil: Date.now() - 1 },
     ),
+  ).rejects.toMatchObject({ status: 403 });
+  expect((await call(stub, "actions/inspect", { id: action.id })).status).toBe(
+    "pending",
+  );
+  await runInDurableObject(stub, (instance) => {
+    expect(instance.actions.store.notes()).toHaveLength(0);
+    const saved = instance.actions.store.get("expires")!;
+    saved.expiresAt = Date.now() - 1;
+    instance.actions.store.put(saved);
+  });
+  await expect(
+    call(stub, "actions/decide", {
+      id: action.id,
+      decision: "approve",
+      fingerprint: action.fingerprint,
+    }),
   ).rejects.toMatchObject({ status: 409 });
   expect((await call(stub, "actions/inspect", { id: action.id })).status).toBe(
     "expired",

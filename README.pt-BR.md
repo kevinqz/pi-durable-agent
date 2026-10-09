@@ -54,7 +54,7 @@ Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a
 
 ## Atualizar sem perder a sessão
 
-A rota revisada **0.1.0-dev.2 → 0.1.0-dev.3** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3.
+A rota revisada **0.1.0-dev.3 → 0.1.0-dev.4** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3 → dev.4.
 
 ## Quando hospedar na Cloudflare
 
@@ -73,6 +73,8 @@ pi install https://github.com/kevinqz/optchat-durable@v0.4.0
 ```
 
 O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separado e também oferece o SDK para outros hosts. Este repositório é a aplicação web complementar. Ele não substitui seu Pi nem transfere seu login de ChatGPT ou Claude para a nuvem. Modelos hospedados exigem configuração própria.
+
+**Modelo real:** depois de configurar Workers AI, escolha o modelo em **Model for the next session** e selecione **New session**. As conversas de demonstração continuam disponíveis. Cada conversa guarda seu modelo e limite de chamadas, incluindo resumos de memória e tentativas que falhem; reiniciar não repõe esse limite. Consulte a [configuração e os limites de consumo](./docs/models.md). A integração hospedada com modelo real ainda precisa de verificação funcional.
 
 ## Documentação
 

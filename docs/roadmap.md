@@ -10,19 +10,33 @@ This is the canonical roadmap for [kevinqz/pi-durable-agent](https://github.com/
 
 ## Current status — 2026-10-09
 
-| Milestone | Current delivery                                                                                                                                     | Remaining gate                                                                                    |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| A1        | Implemented and locally qualified with official PiHarness, Lifecycle and published OptChat 0.4.0                                                     | Deployed recovery is tracked under A4                                                             |
-| A2        | Local notes connector, stable admission, approvals, destination deduplication, result archive and delivery; ambiguous dispatch is explicit `unknown` | Each new external connector needs its own qualification; no generic exactly-once claim            |
-| A3        | Local authorization checks plus hosted Access login, conversation, source retrieval, approval and result delivery                                    | Hosted second-identity isolation and qualification for each future connector                      |
-| A4        | Local recovery and CI; bounded session data export; authenticated staging, updates through dev.3 and forced demo parent reset                        | Other crash windows, hibernation, coordinated hosted backup/restore and first operational release |
-| A5        | Schema checks, retained V1 contracts, sequential local dev.0 → dev.1 → dev.2 → dev.3 routes and hosted dev.1 → dev.2 → dev.3 observations            | New dependency/connector routes; any justified connector/channel expansion                        |
+| Milestone | Current delivery                                                                                                                                     | Remaining gate                                                                                        |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| A1        | Implemented and locally qualified with official PiHarness, Lifecycle and published OptChat 0.4.0                                                     | Deployed recovery is tracked under A4                                                                 |
+| A2        | Local notes connector, stable admission, approvals, destination deduplication, result archive and delivery; ambiguous dispatch is explicit `unknown` | Each new external connector needs its own qualification; no generic exactly-once claim                |
+| A3        | Local authorization checks plus hosted Access login, conversation, source retrieval, approval and result delivery                                    | Hosted second-identity isolation and qualification for each future connector                          |
+| A4        | Local recovery and CI; session export; persisted model selection and call limits; authenticated demo staging through dev.3                           | Real model flow, other crash windows, hibernation, coordinated hosted restore and operational release |
+| A5        | Schema checks, retained V1 contracts, sequential local dev.0 → dev.1 → dev.2 → dev.3 → dev.4 routes and hosted dev.1 → dev.2 → dev.3 observations    | New dependency/connector routes; any justified connector/channel expansion                            |
 
 This is a **development preview**, not completion of the entire roadmap. The hosted demo flow, exact dev.1 → dev.2 backend update and a forced parent reset while a demo approval is paused have been observed. This does not qualify arbitrary failure windows, coordinated restore, another identity or changed dependencies. No real-model evaluation or production guarantee is implied. See [validation](./validation.md) for the exact local and staging evidence and their limits.
 
 The [local recovery increment](./local-recovery.md) preserves the complete stopped Wrangler state, including Pi memory and Code Mode facets. A synthetic application flow proves original retrieval, the same pending approval and one deduplicated note/result after an isolated restore. The subsequent [local upgrade route](./local-upgrades.md) exercises the published preview against the next runtime while retaining the original connector implementation. These qualify local same-runtime and reviewed cross-release paths. The [hosted recovery increment](./hosted-recovery.md) adds exact backend-update and forced-parent-reset evidence. A4 coordinated restore/other operational gates and A5 changed-dependency routes remain open. Account login and payment are deployment prerequisites, not blockers for this local work.
 
 The [session export increment](./session-export.md) provides all retained normalized history pages, current memory and action records with an offline integrity verifier. It does not close the backup gate. A [local native-checkpoint prototype](./hosted-recovery.md#native-facet-checkpoint-investigation--2026-10-09) found that nesting the current PiHarness/Lifecycle inside a facet fails because facets cannot set physical alarms; clone/restore were not reached. The next recovery work requires a supported coordinated checkpoint and alarm boundary.
+
+## First operational release
+
+The immediate delivery is one installable application using the published OptChat package, a real Workers AI model and the existing notes connector. Completion requires a published release with verified evidence for:
+
+1. A real conversation, memory summary, original retrieval and model-directed approval/result flow on the protected deployment.
+2. Coordinated hosted backup and restore of conversation, memory, executor state, pending approvals and delivery records into an isolated recovery target.
+3. Recovery of the explicitly supported interruption windows, with uncertain external effects kept blocked for reconciliation.
+4. User isolation, exact-operation approvals, durable consumption limits and useful operational diagnostics.
+5. A reviewed update route preserving existing data, plus fresh-install, model-selection and recovery instructions verified against the release artifact.
+
+The [model controls](./models.md) now persist a session's choice and allowance and have local runtime/browser evidence. Actual provider inference is still unqualified. Existing local backup and update evidence remains valid within its stated scope; it does not replace coordinated hosted recovery.
+
+Extensive memory-quality/cache benchmarks, new connectors or channels, Executor integration and agent-initiated updates remain later work. They do not expand the first operational release's acceptance gate.
 
 ## Ownership and sequencing
 

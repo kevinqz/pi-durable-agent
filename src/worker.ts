@@ -1,6 +1,7 @@
 import { authenticate, sameOrigin } from "./auth.js";
 import { LIMITS, type Env } from "./env.js";
 import { digest, HttpError, identifier, json, readJson } from "./http.js";
+import { modelProfile } from "./session-model.js";
 export { AgentSession } from "./session.js";
 export { CodemodeRuntime } from "@cloudflare/codemode";
 
@@ -13,6 +14,12 @@ export default {
         return json({
           mode: env.MODEL_MODE,
           local: env.APP_ENV === "local",
+          models: [
+            modelProfile(env, "demo"),
+            ...(env.AI && env.AI_MODEL
+              ? [modelProfile(env, "workers-ai")]
+              : []),
+          ],
           scope: await digest(
             JSON.stringify([principal.tenant, principal.subject]),
           ),
