@@ -1,0 +1,79 @@
+{
+  "format": "pi-durable-agent/model-controls-validation-v1",
+  "recordedAt": "2026-10-09T22:32:54.281Z",
+  "status": "local_runtime_and_empty_session_browser_verified",
+  "sourceIdentity": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.4",
+    "revision": "fe540ad25246961b9cd047eeb20696d8fc91b56e",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "36fe7fc5249572f2f3956e446f4246609d293d6551261048d7b833296ca92605",
+    "buildFingerprint": "48d480f280a7b7757744b035c0e6940ba54e80bbbd18d14e56c65bf34e9a5836",
+    "fingerprint": "4c4a80d91763ec889bd29400779f765aa5db0af493951fe465e1ab304b665fa3"
+  },
+  "revisionNote": "Revision identifies the checkout base; runtime and asset hashes identify the tested uncommitted contents.",
+  "assets": {
+    "public/app.js": "fd9c212d801650385e2a5dac4bfa16743d90b73a60280101e8b91151cf9c87e4",
+    "public/index.html": "e4072502e8a6f726d9fccec3359663f6a1d34ca2dd496832a39a0744178354db",
+    "public/style.css": "d98f788b47df377704638a10b9c85847e4fdd95ec7d8ae2a962fb5c3aef574f4"
+  },
+  "localValidation": {
+    "runtimeTests": 22,
+    "runtimeTestsPassed": 22,
+    "focusedModelTests": 4,
+    "focusedModelTestsPassed": 4,
+    "typecheck": "passed",
+    "dryRunBuild": "passed",
+    "providerAdapter": "official agents/models/pi-ai with a simulated Ai.run binding",
+    "streamingEntryPoints": ["stream", "streamSimple"],
+    "simulatedResponses": 2,
+    "outputTokenCap": 2048,
+    "checked": [
+      "atomic failed configuration",
+      "owner and expiry authorization",
+      "idempotent immutable selection",
+      "profile and reservations retained after reset",
+      "changed deployment default does not change a stored profile",
+      "invalid budget and model rejected",
+      "call budget and context bounds before dispatch",
+      "demo reset disabled for real-model sessions"
+    ],
+    "tests": {
+      "test/models.test.ts": "723896ea3a07d4c5845cbbbf10579090f92512b739deed83e3635601079d2ff8",
+      "test/actions.test.ts": "00610819e10b8adb7f1de498d9cc446e39ec5442e237937057f4864ade1055fe"
+    },
+    "crossReleaseEvidence": "local-upgrade-dev4-validation.json"
+  },
+  "browser": {
+    "runtime": "local Wrangler with remote Workers AI binding",
+    "syntheticSession": true,
+    "selectedModel": "@cf/meta/llama-4-scout-17b-16e-instruct",
+    "configuredCallLimit": 12,
+    "observedCallReservations": 0,
+    "newSessionCreated": true,
+    "selectedModelShown": true,
+    "allowanceShown": true,
+    "demoActionAbsent": true,
+    "demoResetAbsent": true,
+    "messageSubmitted": false,
+    "userConversationModified": false
+  },
+  "qualified": {
+    "localModelControls": true,
+    "exactDev3ToDev4DemoUpgrade": true,
+    "liveProviderInference": false,
+    "realModelToolsAndSummaries": false,
+    "hostedDev3ToDev4Update": false,
+    "hostedCoordinatedRestore": false,
+    "operationalRelease": false
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "privacy": "No account, owner, hostname, session identifiers, credentials or conversation contents are published."
+}

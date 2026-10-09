@@ -3,7 +3,7 @@ import type { Env } from "./env.js";
 import { HttpError, identifier } from "./http.js";
 import { SerialGate, SessionStore } from "./store.js";
 
-export const RUNTIME_RELEASE = "0.1.0-dev.3";
+export const RUNTIME_RELEASE = "0.1.0-dev.4";
 const RESTART_LIMIT = 10;
 const JOB_PREFIX = "recovery:";
 
@@ -28,11 +28,12 @@ export class RuntimeRecovery {
     private readonly store: SessionStore,
     private readonly jobs: () => LifecycleJobs,
     private readonly isIdle: () => Promise<boolean>,
+    private readonly modelMode: () => Env["MODEL_MODE"] = () => env.MODEL_MODE,
   ) {}
 
   private get enabled() {
     return (
-      this.env.MODEL_MODE === "demo" &&
+      this.modelMode() === "demo" &&
       ["local", "staging"].includes(this.env.APP_ENV)
     );
   }

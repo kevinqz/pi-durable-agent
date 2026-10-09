@@ -20,6 +20,7 @@ import type { ActionAdmission } from "./action-contracts.js";
 import { actionTools } from "./tools.js";
 import { RuntimeRecovery } from "./recovery.js";
 import { createSessionExport } from "./session-export.js";
+import { SessionModel } from "./session-model.js";
 
 export class AgentSession extends DurableObject<Env> {
   readonly lifecycle: Lifecycle<Env>;
@@ -27,12 +28,14 @@ export class AgentSession extends DurableObject<Env> {
   readonly actions: Actions;
   readonly recovery: RuntimeRecovery;
   private readonly store: SessionStore;
+  private readonly sessionModel: SessionModel;
   private readonly gate = new SerialGate();
   private chat!: OptChatController;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.store = new SessionStore(ctx.storage.sql);
+    this.sessionModel = new SessionModel(this.store, env);
     this.actions = new Actions(
       ctx,
       env,
@@ -41,26 +44,25 @@ export class AgentSession extends DurableObject<Env> {
         await this.admitMessage(id, text, true);
       },
     );
-    const { models, model } = configureModels(env, () => {
-      const calls = Number(this.store.meta("modelCalls") ?? 0);
-      if (calls >= 500)
-        throw new Error("Session reached its 500 model-call limit");
-      this.store.setMeta("modelCalls", String(calls + 1));
-    });
-    const optchat = createOptChat({
-      main: model,
-      compactor: model,
-      jobs: 2,
-      viewBytes: 16_000,
-      maxInputBytes: LIMITS.inputBytes,
-      maxOutputTokens: 2048,
-    });
-    const registry = createRegistry();
-    registry.install(optchat.extension);
     const tools = actionTools(this.actions);
-    registry.install(tools);
     this.pi = new PiHarness({
       harness: async ({ storage, context }) => {
+        const profile = this.sessionModel.profile();
+        const { models, model } = configureModels(
+          { ...env, MODEL_MODE: profile.mode, AI_MODEL: profile.modelId },
+          () => this.sessionModel.reserveCall(),
+        );
+        const optchat = createOptChat({
+          main: model,
+          compactor: model,
+          jobs: 2,
+          viewBytes: 16_000,
+          maxInputBytes: LIMITS.inputBytes,
+          maxOutputTokens: 2048,
+        });
+        const registry = createRegistry();
+        registry.install(optchat.extension);
+        registry.install(tools);
         await optchat.prepare(storage, {}, context);
         const harness = await Harness.open(
           storage,
@@ -101,6 +103,7 @@ export class AgentSession extends DurableObject<Env> {
             .every((a) => a.status === "pending" || a.delivered)
         );
       },
+      () => this.sessionModel.profile().mode,
     );
   }
 
@@ -135,8 +138,19 @@ export class AgentSession extends DurableObject<Env> {
     path: string,
     body: Record<string, unknown>,
   ) {
+    if (principal.authorizedUntil <= Date.now())
+      throw new HttpError(403, "Authorization expired");
+    const existed = this.store.meta("owner") !== undefined;
+    if (method === "POST" && path === "configuration")
+      return this.ctx.storage.transactionSync(() => {
+        this.store.bind(principal);
+        return this.sessionModel.select(body.mode, existed);
+      });
+    this.ctx.storage.transactionSync(() => {
+      this.store.bind(principal);
+      this.sessionModel.profile();
+    });
     await this.lifecycle.start();
-    this.store.bind(principal);
     if (method === "GET" && path === "state") return this.snapshot();
     if (method === "GET" && path === "history") return this.chat.history();
     if (method === "POST" && path === "exports/session")
@@ -279,7 +293,8 @@ export class AgentSession extends DurableObject<Env> {
     for (const request of state.requests) await this.refreshRequest(request.id);
     const rows = this.store.list();
     return {
-      mode: this.env.MODEL_MODE,
+      mode: this.sessionModel.profile().mode,
+      model: this.sessionModel.profile(),
       schema: 1,
       capabilities: { sessionDataExport: true },
       runtime: this.recovery.describe(),
@@ -291,7 +306,7 @@ export class AgentSession extends DurableObject<Env> {
         activeTasks: state.tasks,
         durableWakes: this.lifecycle.jobs.list().length,
         modelCalls: Number(this.store.meta("modelCalls") ?? 0),
-        modelCallLimit: 500,
+        modelCallLimit: this.sessionModel.profile().callLimit,
         pendingApprovals: this.actions
           .list()
           .filter((a) => a.status === "pending").length,

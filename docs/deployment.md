@@ -27,11 +27,11 @@ The Agents Pi adapter and the Workers AI provider surface are beta. Compatibilit
 
 ## Optional real model
 
-The implementation supports the official `agents/models/pi-ai` adapter. Add an `ai` binding named `AI` in the staging environment, choose a supported `AI_MODEL` ID, and set `MODEL_MODE` to `workers-ai`. Main answers and memory summaries currently use that same model. Start a **new session** when changing the model configuration; OptChat checks its stored configuration before reopening existing work.
+The implementation supports the official `agents/models/pi-ai` adapter. Add an `ai` binding named `AI` in the staging environment, choose a supported `AI_MODEL` ID, and set a bounded `MODEL_CALL_LIMIT`. Keep `MODEL_MODE: "demo"` when upgrading an existing demo deployment. The interface then offers the real model for a **new session**; each session pins its model and allowance before Pi opens. Main answers and memory summaries use that same model. Follow the [model-selection and upgrade instructions](./models.md).
 
 No real model is enabled or called by the default development/CI configuration. Do not copy local Pi OAuth files into the app, repository or Worker secrets. This host does not accept those credentials. Configure any future provider through its own documented hosted API and explicit budget.
 
-The host caps simple-stream model output at 2,048 tokens and reserves at most 500 real model calls per session, including summary calls and failed attempts. It also checks a conservative context byte allowance before dispatch. These input/action caps and the executor timeout limit workload shape; they are not a monetary billing cap. Set account-level monitoring/limits, restrict Access membership, and review the actual model's context/output limits before enabling it. The live model path is implemented but unqualified.
+The host caps both provider streaming entry points at 2,048 output tokens and reserves a configurable 1–500 real model calls per session, including summary calls and failed attempts. New real-model sessions default to 100 calls; use a smaller allowance for the first trial. It also checks a conservative context byte allowance before dispatch. These input/action caps and the executor timeout limit workload shape; they are not a monetary billing cap. Set account-level monitoring/limits, restrict Access membership, and review the actual model's context/output limits before enabling it. The live model path is implemented but unqualified.
 
 ## Observe and recover
 
