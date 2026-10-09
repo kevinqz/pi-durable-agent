@@ -10,6 +10,7 @@ let refreshing = false;
 let renderedHistory = "";
 let renderedActions = "";
 let viewedArchive;
+let runtime;
 async function api(path, body) {
   const response = await fetch(
     `/api/sessions/${session}/${path}`,
@@ -39,6 +40,20 @@ async function refresh() {
   refreshing = true;
   try {
     const state = await api("state");
+    runtime = state.runtime;
+    $("recovery-panel").hidden = !runtime?.restartEnabled;
+    if (runtime?.restartEnabled) {
+      $("runtime-version").textContent = `Runtime ${runtime.release}`;
+      $("runtime-activation").textContent =
+        `Activation ${runtime.activationId}`;
+      $("restart-status").textContent = runtime.lastRestart
+        ? `Last restart: ${runtime.lastRestart.status} · ${runtime.restartCount}/${runtime.restartLimit} checks used`
+        : `No restart requested · ${runtime.restartLimit} checks available`;
+      $("restart-session").disabled =
+        runtime.restartCount >= runtime.restartLimit ||
+        ["scheduled", "aborting"].includes(runtime.lastRestart?.status) ||
+        state.progress.activeTasks > 0;
+    }
     $("connection").textContent = "Connected · saved state";
     $("mode").textContent = state.mode === "demo" ? "Demo model" : "Workers AI";
     $("notice").textContent =
@@ -150,6 +165,19 @@ $("new-session").onclick = () => {
 $("demo-action").onclick = () => {
   $("prompt").value = "/demo-note";
   $("composer").requestSubmit();
+};
+$("restart-session").onclick = async () => {
+  const activationId = runtime?.activationId;
+  if (!activationId) return;
+  $("restart-session").disabled = true;
+  try {
+    await api("recovery/restart", { activationId });
+    $("error").textContent = "";
+    await refresh();
+  } catch (error) {
+    showError(error);
+    await refresh();
+  }
 };
 function renderActions(actions) {
   const key = JSON.stringify(actions);

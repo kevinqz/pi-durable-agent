@@ -18,11 +18,13 @@ import { SerialGate, SessionStore } from "./store.js";
 import { Actions } from "./actions.js";
 import type { ActionAdmission } from "./action-contracts.js";
 import { actionTools } from "./tools.js";
+import { RuntimeRecovery } from "./recovery.js";
 
 export class AgentSession extends DurableObject<Env> {
   readonly lifecycle: Lifecycle<Env>;
   readonly pi: PiHarness;
   readonly actions: Actions;
+  readonly recovery: RuntimeRecovery;
   private readonly store: SessionStore;
   private readonly gate = new SerialGate();
   private chat!: OptChatController;
@@ -77,6 +79,28 @@ export class AgentSession extends DurableObject<Env> {
       },
     });
     this.lifecycle = Lifecycle.install(this).use(this.pi);
+    this.recovery = new RuntimeRecovery(
+      ctx,
+      env,
+      this.store,
+      () => this.lifecycle.jobs,
+      async () => {
+        const state = await this.chat.status();
+        for (const request of state.requests)
+          await this.refreshRequest(request.id);
+        return (
+          state.tasks === 0 &&
+          this.store
+            .list()
+            .every((r) =>
+              ["completed", "failed", "cancelled"].includes(r.status),
+            ) &&
+          this.actions
+            .list()
+            .every((a) => a.status === "pending" || a.delivered)
+        );
+      },
+    );
   }
 
   // Only the authenticated outer Worker has the namespace binding. No HTTP bypass.
@@ -114,6 +138,11 @@ export class AgentSession extends DurableObject<Env> {
     this.store.bind(principal);
     if (method === "GET" && path === "state") return this.snapshot();
     if (method === "GET" && path === "history") return this.chat.history();
+    if (method === "POST" && path === "recovery/restart")
+      return this.recovery.request(
+        identifier(body.activationId, "activation ID"),
+        principal.authorizedUntil,
+      );
     if (method === "POST" && path === "actions")
       return this.actions.submit(
         identifier(body.id),
@@ -167,6 +196,12 @@ export class AgentSession extends DurableObject<Env> {
   }
 
   async onJob({ job }: LifecycleJobContext): Promise<LifecycleJobOutcome> {
+    if (job.fn === "restart-demo-session") {
+      await this.recovery.drive(
+        job.payload as Parameters<RuntimeRecovery["drive"]>[0],
+      );
+      return;
+    }
     if (job.fn === "action")
       return this.actions.drive(job.payload as ActionAdmission);
     if (job.fn !== "request") return;
@@ -239,6 +274,7 @@ export class AgentSession extends DurableObject<Env> {
     return {
       mode: this.env.MODEL_MODE,
       schema: 1,
+      runtime: this.recovery.describe(),
       memory: state.memory,
       history: await this.chat.history(),
       requests: rows,

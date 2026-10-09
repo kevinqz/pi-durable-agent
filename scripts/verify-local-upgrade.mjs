@@ -6,8 +6,8 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { projectRoot, runtimeIdentity } from "./runtime-identity.mjs";
 
-// The baseline is the exact first public preview, never a moving branch.
-const BASELINE = "ae43bf61ba915b2f19c95b78daa88f3bea1ee05b";
+// The baseline is the exact preceding public preview, never a moving branch.
+const BASELINE = "9c3d3d1d4871de561fd477d2b5445cf24ec8bf8a";
 const { values } = parseArgs({ options: { from: { type: "string" } } });
 const directory = await fs.mkdtemp(join(tmpdir(), "pi-agent-upgrade-release-"));
 const baseline = join(directory, "baseline");
@@ -38,7 +38,7 @@ if (values.from) {
     });
   } catch {
     throw new Error(
-      "Retain/fetch v0.1.0-dev.0 first, or run npm run test:upgrade -- --from /path/to/its/extracted/source. The runner does not download code.",
+      "Retain/fetch v0.1.0-dev.1 first, or run npm run test:upgrade -- --from /path/to/its/extracted/source. The runner does not download code.",
     );
   }
   execFileSync("tar", ["-xf", "-", "-C", baseline], { input: archive });
