@@ -7,6 +7,8 @@ import {
   checkDevState,
   createBackup,
   restoreBackup,
+  runtimeIdentity,
+  upgradeBackup,
   verifyBackup,
 } from "../scripts/local-state.mjs";
 import {
@@ -14,6 +16,7 @@ import {
   inventory,
   lease,
   sidecar,
+  sha256,
   writeJson,
 } from "../scripts/state-files.mjs";
 
@@ -75,6 +78,86 @@ test("closed parent, WAL, facet map and facet bytes restore together into a fres
   await assert.rejects(
     checkDevState(join(f.backup, "state"), f.root),
     /This is a backup/,
+  );
+});
+
+test("only reviewed release contents can upgrade a complete immutable snapshot", async (t) => {
+  const f = await fixture(t);
+  const target = join(f.root, "target-release");
+  await fs.mkdir(target);
+  for (const name of [
+    "src",
+    "package.json",
+    "package-lock.json",
+    "wrangler.jsonc",
+    "tsconfig.json",
+  ])
+    await fs.cp(join(f.root, name), join(target, name), { recursive: true });
+  await fs.appendFile(join(target, "src/worker.ts"), "// next release\n");
+  const pkg = JSON.parse(
+    await fs.readFile(join(target, "package.json"), "utf8"),
+  );
+  await writeJson(
+    join(target, "package.json"),
+    { ...pkg, version: "fixture-next" },
+    "w",
+  );
+  const from = await runtimeIdentity(f.root);
+  const to = await runtimeIdentity(target);
+  const routes = [
+    { id: "fixture-upgrade", from, to, method: "unchanged-state-copy" },
+  ];
+  await fs.mkdir(join(target, "compatibility"));
+  await writeJson(join(target, "compatibility/local-upgrades.json"), {
+    format: "pi-durable-agent/local-upgrades-v1",
+    routes,
+  });
+  await createBackup(f.state, f.backup, f.root);
+  // Older v1 manifests have no buildFingerprint/environment fields.
+  const oldManifest = JSON.parse(
+    await fs.readFile(join(f.backup, "snapshot.json"), "utf8"),
+  );
+  delete oldManifest.runtime.buildFingerprint;
+  delete oldManifest.runtime.environment;
+  await writeJson(join(f.backup, "snapshot.json"), oldManifest, "w");
+  await fs.writeFile(
+    join(f.backup, "snapshot.sha256"),
+    sha256(await fs.readFile(join(f.backup, "snapshot.json"))) + "\n",
+  );
+  const saved = await verifyBackup(f.backup);
+  await assert.rejects(
+    restoreBackup(f.backup, f.restored, target),
+    /recorded runtime/,
+  );
+  assert.equal(
+    (await upgradeBackup(f.backup, f.restored, f.root, target)).upgrade,
+    "fixture-upgrade",
+  );
+  assert.deepEqual(await inventory(f.restored), await inventory(f.state));
+  await checkDevState(f.restored, target);
+  await assert.rejects(checkDevState(f.restored, f.root), /recorded runtime/);
+  await assert.rejects(
+    upgradeBackup(f.backup, f.restored, f.root, target),
+    /new destination/,
+  );
+  assert.equal((await verifyBackup(f.backup)).sha256, saved.sha256);
+  const receipt = JSON.parse(
+    await fs.readFile(sidecar(f.restored, "restore.json"), "utf8"),
+  );
+  assert.equal(receipt.upgrade.from.fingerprint, from.fingerprint);
+  assert.equal(receipt.upgrade.to.fingerprint, to.fingerprint);
+
+  await fs.appendFile(join(target, "src/worker.ts"), "// unreviewed change\n");
+  const refused = join(f.root, "refused");
+  await assert.rejects(
+    upgradeBackup(f.backup, refused, f.root, target),
+    /No reviewed local upgrade route/,
+  );
+  assert.equal(await fs.stat(refused).catch(() => null), null);
+  await fs.appendFile(join(f.root, "src/worker.ts"), "// wrong source\n");
+  await assert.rejects(
+    upgradeBackup(f.backup, refused, f.root, target),
+    /source release does not match/,
   );
 });
 

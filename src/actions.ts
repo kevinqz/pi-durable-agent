@@ -6,10 +6,16 @@ import {
   type Executor,
 } from "@cloudflare/codemode";
 import type { LifecycleJobs } from "agents/lifecycle";
-import { ActionsStore, CONTRACT_V1, type Action } from "./actions-store.js";
+import { ActionsStore, type Action } from "./actions-store.js";
+import {
+  actionConnectors,
+  admissionContract,
+  CURRENT_CONTRACT,
+  supportsContract,
+  type ActionAdmission,
+} from "./action-contracts.js";
 import { LIMITS, type Env } from "./env.js";
 import { digest, HttpError, identifier, textField } from "./http.js";
-import { NotesV1 } from "./notes.js";
 import { SerialGate } from "./store.js";
 
 const MAX_ARCHIVE_BYTES = 256_000;
@@ -43,25 +49,28 @@ export class Actions {
       if (this.store.list().length >= 100)
         throw new HttpError(429, "This session reached its 100-action limit");
       const existing = this.jobs().get(`action:${id}`);
+      const saved = existing?.payload as ActionAdmission | undefined;
       if (
-        existing &&
-        JSON.stringify(existing.payload) !== JSON.stringify({ id, code, label })
+        saved &&
+        (saved.id !== id || saved.code !== code || saved.label !== label)
       )
         throw new HttpError(409, "Action admission conflict");
+      const contract = saved ? admissionContract(saved) : CURRENT_CONTRACT;
       await this.jobs().push({
         id: `action:${id}`,
         fn: "action",
         time: Date.now(),
-        payload: { id, code, label },
+        payload: { id, code, label, contract },
         singleflight: true,
         recoveryLoop: true,
       });
-      const action = this.admit(id, code, label);
+      const action = this.admit({ id, code, label, contract });
       return this.publicAction(action);
     });
   }
 
-  private admit(id: string, code: string, label: string): Action {
+  private admit(payload: ActionAdmission): Action {
+    const { id, code, label } = payload;
     const existing = this.store.get(id);
     if (existing) return existing;
     const now = Date.now();
@@ -69,7 +78,7 @@ export class Actions {
       id,
       code,
       label,
-      contract: CONTRACT_V1,
+      contract: admissionContract(payload),
       status: "admitted",
       createdAt: now,
       updatedAt: now,
@@ -79,16 +88,10 @@ export class Actions {
     return action;
   }
 
-  async drive(payload: { id: string; code: string; label: string }) {
+  async drive(payload: ActionAdmission) {
     return this.gate.run(async () => {
-      let action = this.admit(payload.id, payload.code, payload.label);
-      if (action.contract !== CONTRACT_V1) {
-        action.status = "unknown";
-        action.error =
-          "Unsupported contract; restore the matching implementation before reconciling";
-        this.store.put(action);
-        return;
-      }
+      let action = this.admit(payload);
+      if (!this.supported(action)) return;
       if (action.status === "admitted") {
         // A committed dispatch marker is never automatically dispatched twice.
         action.status = "running";
@@ -129,7 +132,7 @@ export class Actions {
           409,
           `Action is ${action.status}; refresh its saved state`,
         );
-      if (action.fingerprint !== fingerprint || action.contract !== CONTRACT_V1)
+      if (action.fingerprint !== fingerprint)
         throw new HttpError(
           409,
           "The approval no longer matches this execution",
@@ -143,7 +146,12 @@ export class Actions {
         id: `action:${id}`,
         fn: "action",
         time: Date.now() + LIMITS.heartbeatMs,
-        payload: { id, code: action.code, label: action.label },
+        payload: {
+          id,
+          code: action.code,
+          label: action.label,
+          contract: action.contract,
+        },
         singleflight: true,
         recoveryLoop: true,
       });
@@ -181,7 +189,12 @@ export class Actions {
           id: `action:${id}`,
           fn: "action",
           time: Date.now(),
-          payload: { id, code: action.code, label: action.label },
+          payload: {
+            id,
+            code: action.code,
+            label: action.label,
+            contract: action.contract,
+          },
           singleflight: true,
         });
         await this.deliverTerminal(action);
@@ -226,13 +239,14 @@ export class Actions {
       ctx: this.ctx,
       name: `action-${action.id}`,
       executor,
-      connectors: [new NotesV1(this.ctx, this.store, action.id)],
+      connectors: actionConnectors(this.ctx, this.store, action),
       maxExecutions: 1,
       transformResult: (value) => truncateResult(value, { maxChars: 6000 }),
     });
   }
 
   private async reconcile(action: Action): Promise<Action> {
+    if (!this.supported(action)) return action;
     if (this.inFlight.has(action.id)) return action;
     const executions = await this.runtime(action).executions(2);
     if (executions.length > 1) {
@@ -247,6 +261,15 @@ export class Actions {
     }
     this.store.put(action);
     return action;
+  }
+
+  private supported(action: Action): boolean {
+    if (supportsContract(action.contract)) return true;
+    action.status = "unknown";
+    action.error =
+      "Unsupported contract; restore the matching implementation before reconciling";
+    this.store.put(action);
+    return false;
   }
 
   private async applyExecution(action: Action, execution: ExecutionState) {

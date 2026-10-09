@@ -1,6 +1,11 @@
 import { parseArgs } from "node:util";
 import { resolve } from "node:path";
-import { createBackup, restoreBackup, verifyBackup } from "./local-state.mjs";
+import {
+  createBackup,
+  restoreBackup,
+  upgradeBackup,
+  verifyBackup,
+} from "./local-state.mjs";
 
 try {
   const { positionals, values } = parseArgs({
@@ -8,23 +13,40 @@ try {
     options: {
       state: { type: "string", default: ".wrangler/state" },
       to: { type: "string" },
+      from: { type: "string" },
+      runtime: { type: "string" },
       help: { type: "boolean" },
     },
   });
   const [command, backup] = positionals;
   if (values.help || !command)
     console.log(
-      "Local state (stop Wrangler first):\n  npm run state -- backup --to .local-backups/demo\n  npm run state -- verify .local-backups/demo\n  npm run state -- restore .local-backups/demo --to .local-restores/demo\n  npm run dev -- --persist-to .local-restores/demo\n\nbackup accepts --state PATH. Snapshots are private, local, unencrypted data; see docs/local-recovery.md.",
+      "Local state (stop Wrangler first):\n  npm run state -- backup --to .local-backups/demo\n  npm run state -- verify .local-backups/demo\n  npm run state -- restore .local-backups/demo --to .local-restores/demo\n  npm run dev -- --persist-to .local-restores/demo\n\nbackup accepts --state PATH and --runtime /path/to/retained-release.\n  npm run state -- upgrade BACKUP --from /path/to/retained-release --to NEW_STATE\nSee docs/local-upgrades.md for reviewed routes. Snapshots are private, local, unencrypted data; see docs/local-recovery.md.",
     );
-  else if (command === "backup" && positionals.length === 1 && values.to)
+  else if (
+    command === "backup" &&
+    positionals.length === 1 &&
+    values.to &&
+    !values.from
+  )
     console.log(
       JSON.stringify(
-        await createBackup(resolve(values.state), resolve(values.to)),
+        await createBackup(
+          resolve(values.state),
+          resolve(values.to),
+          values.runtime ? resolve(values.runtime) : undefined,
+        ),
         null,
         2,
       ),
     );
-  else if (command === "verify" && positionals.length === 2 && !values.to) {
+  else if (
+    command === "verify" &&
+    positionals.length === 2 &&
+    !values.to &&
+    !values.from &&
+    !values.runtime
+  ) {
     const result = await verifyBackup(resolve(backup));
     console.log(
       JSON.stringify(
@@ -38,10 +60,34 @@ try {
         2,
       ),
     );
-  } else if (command === "restore" && positionals.length === 2 && values.to)
+  } else if (
+    command === "restore" &&
+    positionals.length === 2 &&
+    values.to &&
+    !values.from &&
+    !values.runtime
+  )
     console.log(
       JSON.stringify(
         await restoreBackup(resolve(backup), resolve(values.to)),
+        null,
+        2,
+      ),
+    );
+  else if (
+    command === "upgrade" &&
+    positionals.length === 2 &&
+    values.to &&
+    values.from &&
+    !values.runtime
+  )
+    console.log(
+      JSON.stringify(
+        await upgradeBackup(
+          resolve(backup),
+          resolve(values.to),
+          resolve(values.from),
+        ),
         null,
         2,
       ),

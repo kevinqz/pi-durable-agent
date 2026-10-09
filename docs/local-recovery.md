@@ -4,7 +4,7 @@
 
 Save the **complete stopped Wrangler state directory**, including Pi/OptChat data, request identities, the Code Mode facet map and every facet database. Restore into a new directory, then open the same session URL. No Pi or Cloudflare storage tables are rewritten by the backup tool.
 
-This route is for the **local demo on macOS/Linux**, with the same operating system, architecture, Node major version, runtime, configuration and locked dependencies. It is not a Cloudflare deployment backup or a cross-runtime migration. Cloudflare's [local persistence option](https://developers.cloudflare.com/workers/local-development/local-data/) selects the directory through `--persist-to`. Its hosted [point-in-time recovery API](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/#pitr-point-in-time-recovery-api) is a different facility and is not available in local development.
+Ordinary `restore` is for the **local demo on macOS/Linux**, with the same operating system, architecture, Node major version, runtime, configuration and locked dependencies. For the explicit 0.1.0-dev.0 → 0.1.0-dev.1 route, use the separate [local upgrade workflow](./local-upgrades.md). Neither path is a Cloudflare deployment backup or an arbitrary runtime migration. Cloudflare's [local persistence option](https://developers.cloudflare.com/workers/local-development/local-data/) selects the directory through `--persist-to`. Its hosted [point-in-time recovery API](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/#pitr-point-in-time-recovery-api) is a different facility and is not available in local development.
 
 ## Save and reopen a local session
 
@@ -52,4 +52,4 @@ Runtime reconciliation can update request timestamps after reopening. It must pr
 
 ## Hosted recovery remains a separate gate
 
-A4 still requires a protected Cloudflare staging environment and an observed recovery procedure covering the parent object **and** runtime facets. Restoring only one side can invalidate execution receipts. This preview exposes no hosted restore endpoint or automatic self-update. Cross-release recovery remains unqualified until the actual old/new releases are exercised.
+A4 still requires a protected Cloudflare staging environment and an observed recovery procedure covering the parent object **and** runtime facets. Restoring only one side can invalidate execution receipts. This preview exposes no hosted restore endpoint or automatic self-update. The [local cross-release route](./local-upgrades.md) has its own evidence; hosted cross-release recovery remains unqualified.

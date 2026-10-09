@@ -169,6 +169,43 @@ test("rejection is final and sandbox cannot fetch external URLs", async () => {
     .toBe("failed");
 });
 
+test("durable admissions retain their contract, including legacy jobs and unsupported versions", async () => {
+  const stub = session();
+  await stub.dispatch(owner, "GET", "state", {});
+  await runInDurableObject(stub, async (instance) => {
+    const legacy = { id: "legacy-job", code, label: "Legacy admission" };
+    await instance.actions.drive(legacy);
+    const saved = instance.actions.store.get(legacy.id)!;
+    expect(saved.contract).toBe("notes-v1/schema-1/policy-1/codemode-0.5.3");
+    expect(saved.status).toBe("pending");
+
+    const future = {
+      id: "future-job",
+      code,
+      label: "Future admission",
+      contract: "unsupported-v2",
+    };
+    await instance.lifecycle.jobs.push({
+      id: `action:${future.id}`,
+      fn: "action",
+      time: Date.now() + 3600000,
+      payload: future,
+    });
+    await instance.actions.submit(future.id, future.code, future.label);
+    await instance.actions.drive(future);
+    expect(instance.actions.store.get(future.id)).toMatchObject({
+      contract: future.contract,
+      status: "unknown",
+    });
+    expect(instance.actions.store.notes()).toHaveLength(0);
+
+    await instance.actions.submit("new-job", code, "New admission");
+    expect(
+      instance.lifecycle.jobs.get("action:new-job")?.payload,
+    ).toMatchObject({ contract: saved.contract });
+  });
+});
+
 test("expired and changed-contract approvals cannot execute; oversized results fail explicitly", async () => {
   const stub = session();
   let action = await pending(stub, "expires");
@@ -198,7 +235,16 @@ test("expired and changed-contract approvals cannot execute; oversized results f
   ).rejects.toMatchObject({ status: 409 });
   await runInDurableObject(stub, (instance) => {
     expect(instance.actions.store.notes()).toHaveLength(0);
+    const saved = instance.actions.store.get("version")!;
+    expect(saved.status).toBe("unknown");
+    expect(saved.fingerprint).toBe(action.fingerprint);
+    expect(saved.pending).toEqual(action.pending);
+    saved.contract = action.contract;
+    instance.actions.store.put(saved);
   });
+  const retained = await call(stub, "actions/inspect", { id: "version" });
+  expect(retained.status).toBe("pending");
+  expect(retained.fingerprint).toBe(action.fingerprint);
   await call(stub, "actions", {
     id: "large",
     label: "Large result",

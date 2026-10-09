@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-09T19:04:34.379Z",
+  "kind": "local-cross-release-upgrade",
+  "shutdown": "graceful",
+  "crossRelease": true,
+  "targetRuntime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.1",
+    "revision": "5d060d93b76d1cb9a57e5982763fe737c67d8408",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "4982e27bfac39c862c174579ac400134c8508e5366cee36baf455d4223259890",
+    "buildFingerprint": "b200c8dfcb99021ca5741cf10ef04bc8e4c70de91205c6214e2178b4ff958db7",
+    "fingerprint": "4ee8a64c968d74c2727d79d076f8948b728137acd78efb57e4413491557f6d29"
+  },
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.0",
+    "revision": null,
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "49aaa21929175b1baf96b1c0e97c7f73721531a58348b7a1d904f334ab5d4f81",
+    "buildFingerprint": "e119398c2f7ce93d43eea8df912b17545f68632497013d7bb251aaece6879b1f",
+    "fingerprint": "d2802ec04b947a62d06dc17a147a283c19758647586c69594f1c238c9393dfa5"
+  },
+  "snapshot": {
+    "files": 31,
+    "bytes": 5832154,
+    "sha256": "fd2cae52d477898279120e9a0fe353cc8e5459aaeeb05649aae3b5f1c2409eb6"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true,
+    "ordinaryRestoreRefusedRuntimeChange": true,
+    "completedActionPreserved": true,
+    "connectorV1BytesPreserved": true,
+    "restartedTargetWithoutDuplicateDelivery": true,
+    "newConversationTurnCompleted": true
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "baselineRelease": {
+    "tag": "v0.1.0-dev.0",
+    "revision": "ae43bf61ba915b2f19c95b78daa88f3bea1ee05b"
+  },
+  "node": "22.23.1",
+  "checks": {
+    "typecheck": "passed",
+    "actionRuntimeTests": 6,
+    "localFileTests": 6
+  },
+  "verificationScripts": {
+    "scripts/runtime-identity.mjs": "1a7bb3c7fbfe6818ae6ad3a529dedba7974a5c4bbfb7d5809bf01abef3ab4323",
+    "scripts/local-state.mjs": "418c5355a0713d447b4cf4dad5ca4fcb8eee0427f0cb1b44f898e238c4841b8d",
+    "scripts/state-files.mjs": "d2a853e9c0ad6bf217008c2344c25e864e7a35421d73dc750bd53f403635d12b",
+    "scripts/local-server.mjs": "b6477696b69a2b6b83d20c350d4746d4758f4e1f17c203c6d7d28a89f9155f18",
+    "scripts/verify-local-recovery.mjs": "9023471dbea929f16e7a78df334f063d51b87e3218a0800579196daef83e7585",
+    "scripts/verify-local-upgrade.mjs": "17229897ed3e572a143b163fe6c424dadabc1e904743ac4822c37224b2273698",
+    "test/local-state.test.mjs": "71f80fae10c893601cf84881e7aa11c55814fc2751da007a7e6be7b0f3523eb0",
+    "test/actions.test.ts": "b79cd4ec6e3f8dbc0f6d8a4f08b38b61c584b9c132aaaaa13637ababbabf1c8f"
+  }
+}
