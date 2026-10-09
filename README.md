@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The demo uses the real runtimes and simulated model replies. Only the session-local notes connector is implemented. Local offline backup/restore has a [dedicated workflow](./docs/local-recovery.md). Private Cloudflare staging has preserved a conversation and pending approval across the dev.1 → dev.2 backend update and a forced demo-session process reset. Real model calls, coordinated hosted backup/restore, arbitrary crash windows and production operation are not yet qualified. See the [evidence and limits](./docs/validation.md).
+**Development preview.** The demo uses the real runtimes and simulated model replies. Only the session notes connector is implemented. New sessions include locally verified [checkpoint and restore controls](./docs/coordinated-recovery.md); a full stopped local installation also has an [offline backup workflow](./docs/local-recovery.md). Private Cloudflare staging has preserved a conversation and pending approval across the dev.1 → dev.2 backend update and a forced demo-session process reset. Real model calls, coordinated hosted backup/restore, arbitrary crash windows and production operation are not yet qualified. See the [evidence and limits](./docs/validation.md).
 
 ## Try it locally
 
@@ -25,7 +25,9 @@ Open the local address printed by Wrangler, normally **http://127.0.0.1:8787**.
 4. Approve or reject it. A completed action gets a saved outcome and a follow-up conversation turn.
 5. Reload the page. The session URL, conversation, memory and approvals remain addressable. Stop and restart `npm run dev` to reopen the local database.
 6. Select **Export session data** to download the retained history, current memory and action records as JSON. The [offline verifier](./docs/session-export.md) checks file integrity. This readable export cannot restore a running session.
-7. To try bounded recovery, open **Session diagnostics** after active work finishes and select **Restart this test session**. A changed activation and **recovered** status confirm the process reset. This keeps saved state; it is not a backup. [Recovery controls and limits](./docs/hosted-recovery.md).
+7. After active work finishes, select **Create checkpoint** under **Session recovery**. Wait for **Checkpoint saved**. Continue the conversation, then use **Restore…** and review the confirmation to return to that saved state. Notes already created and recorded model usage remain retained. [Recovery instructions and scope](./docs/coordinated-recovery.md).
+
+New session URLs start with `#c1:`. Older URLs keep opening the original session; use **New session** to try checkpoints. A checkpoint restores the conversation within the same Durable Object. It does not protect against deleting that object or losing the account.
 
 Local state lives in `.wrangler/` and is ignored by Git. Keep it if you want to retain the demo. Closing a browser does not cancel work; stopping the local server pauses processing until it runs again. A pending approval can outlive the page, but expires after one hour. Simulated replies/summaries demonstrate the plumbing; they do not measure AI quality or prompt-cache savings.
 
@@ -39,7 +41,7 @@ npm run dev -- --persist-to .local-restores/demo
 
 Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
-**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.3 → 0.1.0-dev.4** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4.
+**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.4 → 0.1.0-dev.5** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → dev.5.
 
 **Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [private staging walkthrough](./docs/staging.md) and [deployment and cost guide](./docs/deployment.md) when ready.
 
@@ -62,19 +64,21 @@ This application does not replace your Pi installation or import your local OAut
 ```mermaid
 flowchart LR
   Browser --> Access[Access authentication / local demo]
-  Access --> Session[Session Durable Object]
-  Session --> Lifecycle[Cloudflare Lifecycle + PiHarness]
+  Access --> Root[Session supervisor: owner, effects, usage, recovery]
+  Root --> Session[Active session facet]
+  Root --> Checkpoint[Inactive subtree checkpoint]
+  Session --> Lifecycle[Root alarm bridge + PiHarness]
   Lifecycle --> Pi[Pi Durable + supplied SQLite storage]
   Pi --> Memory[Published OptChat memory extension]
   Pi --> Receipt[Durable action receipt]
   Receipt --> CodeMode[Official Code Mode runtime + sandbox]
   CodeMode --> Approval[Exact operation approval]
-  Approval --> Notes[Session-local notes with deduplication]
+  Approval --> Notes[Root-owned notes with deduplication]
   Notes --> Outbox[Retained result + delivery record]
   Outbox --> Memory
 ```
 
-Each authenticated identity and session name maps to a separate Durable Object. All conversational input, including completed-action follow-ups, goes through OptChat's controller. The application uses its published **0.4.0** package; it does not fork the memory engine or patch Pi/Cloudflare internals.
+Each authenticated identity and session name maps to a separate Durable Object. New sessions keep their conversation and nested Code Mode runtimes in a facet subtree, with consumption and destination records outside the restorable copy. Existing sessions retain their original namespace and connector contract. All conversational input, including completed-action follow-ups, goes through OptChat's controller. The application uses its published **0.4.0** package; it does not fork the memory engine or patch Pi/Cloudflare internals.
 
 Code Mode 0.5.3 does not expose an execute-or-attach idempotency key. This app records admission before dispatch, uses one named runtime per action, and never silently starts another execution after an ambiguous dispatch. **Unknown** means inspection or operator reconciliation is required. This is not an exactly-once guarantee for arbitrary external services.
 
@@ -89,16 +93,16 @@ npm run build
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-`test:checkpoints` exercises the [isolated coordinated-recovery composition](./docs/coordinated-recovery.md). It is development qualification; the published application does not yet expose hosted backup/restore controls.
+`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Hosted coordinator qualification is still pending.
 
 | Directory                                                                              | Responsibility                                                                     |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | `src/worker.ts`, `src/auth.ts`, `src/http.ts`                                          | Authenticated HTTP boundary, request limits and routing                            |
 | `src/session.ts`, `src/store.ts`                                                       | Native Pi/OptChat composition, durable admission and session metadata              |
 | `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts`                    | Action identity, retained contracts, reconciliation, archives and result delivery  |
-| `src/notes.ts`, `src/tools.ts`                                                         | Versioned demo connector and native Pi extension                                   |
+| `src/notes.ts`, `src/notes-root.ts`, `src/tools.ts`                                    | Versioned demo connector and native Pi extension                                   |
 | `src/recovery.ts`                                                                      | Owner-authorized demo reset, activation identity and bounded restart receipts      |
-| `src/session-supervisor.ts`, `src/checkpoint-coordinator.ts`, `src/facet-lifecycle.ts` | Isolated recovery composition, generation journal and root-alarm bridge            |
+| `src/session-supervisor.ts`, `src/checkpoint-coordinator.ts`, `src/facet-lifecycle.ts` | Session recovery composition, generation journal and root-alarm bridge             |
 | `src/session-export.ts`                                                                | Bounded session data archive with public history pagination and integrity checks   |
 | `src/models.ts`, `src/session-model.ts`                                                | Model adapters, immutable session selection, durable call allowance and simulation |
 | `public/`                                                                              | Small browser interface; no frontend framework or build step                       |

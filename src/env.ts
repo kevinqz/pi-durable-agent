@@ -1,7 +1,9 @@
 import type { AgentSession } from "./session.js";
+import type { SessionSupervisor } from "./session-supervisor.js";
 
 export interface Env {
   SESSIONS: DurableObjectNamespace<AgentSession>;
+  RECOVERY_SESSIONS?: DurableObjectNamespace<SessionSupervisor>;
   ASSETS: Fetcher;
   LOADER: WorkerLoader;
   APP_ENV: "local" | "staging" | "production" | "disabled";

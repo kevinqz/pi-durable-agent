@@ -1,6 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
 import { Lifecycle, type LifecycleJobContext } from "agents/lifecycle";
-import { ActionsStore, CONTRACT_V1, type Action } from "./actions-store.js";
+import { ActionsStore, type Action } from "./actions-store.js";
+import { ROOT_NOTES_CONTRACT } from "./notes-root.js";
+import build from "./generated/checkpoint-build.json";
 import {
   CheckpointCoordinator,
   type SessionGeneration,
@@ -15,9 +17,6 @@ import { SerialGate, SessionStore } from "./store.js";
 
 export interface RecoveryEnv extends Env {
   RECOVERY_SESSIONS: DurableObjectNamespace<SessionSupervisor>;
-  // The isolated recovery entrypoint requires an exact build identity. A release
-  // pipeline must supply it; a version label alone does not prove compatibility.
-  CHECKPOINT_RUNTIME: string;
 }
 type FacetProps = {
   rootId: string;
@@ -40,31 +39,27 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
     this.store = new SessionStore(ctx.storage.sql);
     this.model = new SessionModel(this.store, env);
     this.destination = new ActionsStore(ctx.storage);
-    this.checkpoints = new CheckpointCoordinator(
-      ctx.storage,
-      env.CHECKPOINT_RUNTIME,
-      {
-        quiesce: (generation) => this.child(generation).freeze(),
-        abort: (facet) =>
-          ctx.facets.abort(facet, new Error("Coordinated recovery boundary")),
-        clone: (source, target) => ctx.facets.clone(source, target),
-        validate: async (facet, proof) => {
-          const generation = {
-            facet,
-            epoch: this.checkpoints.status().active.epoch + 1,
-          };
-          if ((await this.child(generation).freeze()) !== proof)
-            throw new HttpError(
-              409,
-              "Restored state did not match the checkpoint evidence",
-            );
-        },
-        activate: async (generation) => {
-          await this.arm(generation);
-          await this.child(generation).releaseFreeze();
-        },
+    this.checkpoints = new CheckpointCoordinator(ctx.storage, build.sha256, {
+      quiesce: (generation) => this.child(generation).freeze(),
+      abort: (facet) =>
+        ctx.facets.abort(facet, new Error("Coordinated recovery boundary")),
+      clone: (source, target) => ctx.facets.clone(source, target),
+      validate: async (facet, proof) => {
+        const generation = {
+          facet,
+          epoch: this.checkpoints.status().active.epoch + 1,
+        };
+        if ((await this.child(generation).freeze()) !== proof)
+          throw new HttpError(
+            409,
+            "Restored state did not match the checkpoint evidence",
+          );
       },
-    );
+      activate: async (generation) => {
+        await this.arm(generation);
+        await this.child(generation).releaseFreeze();
+      },
+    });
   }
 
   onRequest() {
@@ -124,7 +119,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
     return this.ctx.storage.transactionSync(() => {
       this.checkpoints.assertActive(generation);
       if (
-        action.contract !== CONTRACT_V1 ||
+        action.contract !== ROOT_NOTES_CONTRACT ||
         action.status !== "running" ||
         !action.approvedFingerprint ||
         action.approvedFingerprint !== action.fingerprint ||
@@ -213,6 +208,29 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
             if (method === "GET" && path === "checkpoints")
               return this.recoveryState();
             if (
+              method === "GET" &&
+              path.startsWith("checkpoints/operations/")
+            ) {
+              const operation = this.checkpoints.operation(
+                identifier(path.slice("checkpoints/operations/".length)),
+              );
+              if (!operation)
+                throw new HttpError(404, "Unknown recovery operation");
+              return operation;
+            }
+            if (
+              method === "GET" &&
+              path === "state" &&
+              this.checkpoints.status().busy
+            )
+              return {
+                recovering: true,
+                capabilities: { coordinatedCheckpoint: true },
+                recovery: this.recoveryState(),
+                model: this.model.profile(),
+                mode: this.model.profile().mode,
+              };
+            if (
               method === "POST" &&
               [
                 "checkpoints/create",
@@ -236,6 +254,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
                   checkpointId,
                 );
                 if (!existing) {
+                  this.checkExpectedGeneration(body.expectedGeneration);
                   const generation = this.checkpoints.status().active;
                   await this.arm(generation);
                   const prepared =
@@ -279,6 +298,8 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
               return operation;
             }
             const generation = this.checkpoints.status().active;
+            if (method === "POST")
+              this.checkExpectedGeneration(body.expectedGeneration);
             this.checkpoints.assertActive(generation);
             await this.arm(generation);
             const result = await this.child(generation).dispatch(
@@ -317,13 +338,36 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
     return {
       generation: catalog.active.epoch,
       busy: catalog.busy ? this.checkpoints.operation(catalog.busy) : undefined,
+      latest: catalog.lastOperation
+        ? this.checkpoints.operation(catalog.lastOperation)
+        : undefined,
+      nextAttemptAt: catalog.busy
+        ? this.lifecycle.jobs.get(`checkpoint:${catalog.busy}`)?.time
+        : undefined,
       checkpoints: this.checkpoints
         .checkpoints()
-        .map(({ id, createdAt, runtime }) => ({ id, createdAt, runtime })),
+        .map(({ id, createdAt, runtime }) => ({
+          id,
+          createdAt,
+          runtime,
+          compatible: runtime === build.sha256,
+        })),
       operations: catalog.operations,
       restores: catalog.restores,
       scope: "same-object-facet-subtree",
+      limits: { checkpoints: 3, restores: 8, operations: 24 },
     };
+  }
+
+  private checkExpectedGeneration(expected: unknown) {
+    if (
+      !Number.isSafeInteger(expected) ||
+      expected !== this.checkpoints.status().active.epoch
+    )
+      throw new HttpError(
+        409,
+        "The session changed or was restored. Refresh and review before trying again.",
+      );
   }
 
   async onJob({ job, attempt }: LifecycleJobContext) {

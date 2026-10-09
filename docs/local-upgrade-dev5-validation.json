@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-09T23:38:50.451Z",
+  "kind": "local-cross-release-upgrade",
+  "shutdown": "graceful",
+  "crossRelease": true,
+  "targetRuntime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.5",
+    "revision": "7fab149898c597bcd903c6cf3f60edd177a6c0b0",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "4977aba13d8061f6ea7f5acb781a034f0fa40ed471194bb96ec7f6bb9bed3437",
+    "buildFingerprint": "148e7b7bb6b068a4c7c9ac297c6f06908ea41f812808468c34d0ed996d4ab70f",
+    "fingerprint": "d69353daf316f5ca4105ea2321ecef0838ee5de2139c0f39a453f41fe57b95c7"
+  },
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.4",
+    "revision": null,
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "36fe7fc5249572f2f3956e446f4246609d293d6551261048d7b833296ca92605",
+    "buildFingerprint": "48d480f280a7b7757744b035c0e6940ba54e80bbbd18d14e56c65bf34e9a5836",
+    "fingerprint": "4c4a80d91763ec889bd29400779f765aa5db0af493951fe465e1ab304b665fa3"
+  },
+  "snapshot": {
+    "files": 31,
+    "bytes": 5955754,
+    "sha256": "beffcb1b6ce590cf069e78c81b91f12181546c144f67664de3a2e0927ad336fb"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true,
+    "ordinaryRestoreRefusedRuntimeChange": true,
+    "completedActionPreserved": true,
+    "connectorV1BytesPreserved": true,
+    "restartedTargetWithoutDuplicateDelivery": true,
+    "newConversationTurnCompleted": true
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "baselineCommit": "90815ac513714a3227c4b3d82dbe06a928b2c590",
+  "sourceIdentification": "targetRuntime.revision is the checkout base; build fingerprints identify the exact tested uncommitted target.",
+  "verificationScriptsSha256": {
+    "scripts/verify-local-upgrade.mjs": "8a947a406333dc534a52f6ff9f09061ba80a6791a22e98bac7e6421dc02a4c17",
+    "scripts/verify-local-recovery.mjs": "9023471dbea929f16e7a78df334f063d51b87e3218a0800579196daef83e7585",
+    "scripts/local-server.mjs": "b6477696b69a2b6b83d20c350d4746d4758f4e1f17c203c6d7d28a89f9155f18",
+    "scripts/checkpoint-build.mjs": "c1ca011c0672d8b3aaf8805a8f750da9561b153ed602534de12c9ec79b7b1049"
+  },
+  "limits": [
+    "Legacy demo session namespace only; new checkpoint namespace is separately covered by native integration tests",
+    "Graceful local update; no hosted deployment or arbitrary dependency change"
+  ]
+}

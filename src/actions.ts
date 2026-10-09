@@ -17,7 +17,7 @@ import {
 import { LIMITS, type Env } from "./env.js";
 import { digest, HttpError, identifier, textField } from "./http.js";
 import { SerialGate } from "./store.js";
-import type { NotesDestination } from "./notes.js";
+import { ROOT_NOTES_CONTRACT, type NotesDestination } from "./notes-root.js";
 
 const MAX_ARCHIVE_BYTES = 256_000;
 const terminal = new Set(["completed", "failed", "rejected", "expired"]);
@@ -57,7 +57,11 @@ export class Actions {
         (saved.id !== id || saved.code !== code || saved.label !== label)
       )
         throw new HttpError(409, "Action admission conflict");
-      const contract = saved ? admissionContract(saved) : CURRENT_CONTRACT;
+      const contract = saved
+        ? admissionContract(saved)
+        : this.destination
+          ? ROOT_NOTES_CONTRACT
+          : CURRENT_CONTRACT;
       await this.jobs().push({
         id: `action:${id}`,
         fn: "action",
@@ -271,7 +275,12 @@ export class Actions {
   }
 
   private supported(action: Action): boolean {
-    if (supportsContract(action.contract)) return true;
+    if (
+      supportsContract(action.contract) &&
+      action.contract ===
+        (this.destination ? ROOT_NOTES_CONTRACT : CURRENT_CONTRACT)
+    )
+      return true;
     action.status = "unknown";
     action.error =
       "Unsupported contract; restore the matching implementation before reconciling";

@@ -4,6 +4,7 @@ import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { canonical, lease } from "./state-files.mjs";
 import { checkDevState, projectRoot } from "./local-state.mjs";
+import { checkpointBuild } from "./checkpoint-build.mjs";
 
 try {
   const { values } = parseArgs({
@@ -18,6 +19,7 @@ try {
       "npm run dev -- [--port 8787] [--persist-to .wrangler/state]\nRuns the local demo on loopback; state is locked while Wrangler runs.",
     );
   else {
+    await checkpointBuild();
     if (
       !/^\d+$/.test(values.port) ||
       Number(values.port) < 1 ||

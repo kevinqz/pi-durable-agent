@@ -8,7 +8,9 @@ This qualifies that specific backend change with unchanged dependencies, storage
 
 ## Repeat the bounded check
 
-Use a separate synthetic session in your Access-protected **demo** staging environment.
+This historical reset procedure applies to legacy session URLs (`#<id>`). New `#c1:<id>` sessions use the separate [checkpoint interface](./coordinated-recovery.md), whose full hosted qualification remains pending.
+
+Use a separate synthetic legacy session in your Access-protected **demo** staging environment.
 
 1. Send a distinctive message and retrieve it with **Find original messages**. Select **Try a demo approval** and leave the operation pending. Record its execution ID, sequence, code, arguments, connector contract and expiry.
 2. Deploy the reviewed target using your private staging configuration. Keep the same session URL. Cloudflare rolls out Worker and Durable Object code with [eventual consistency](https://developers.cloudflare.com/durable-objects/platform/known-issues/#code-updates): a successful deployment can temporarily coexist with a session running the preceding version.
@@ -38,7 +40,7 @@ This reset retains storage. It neither deletes nor rewinds data, and it does not
 
 The application has state in the parent Durable Object and in Code Mode facets. Cloudflare documents [SQLite point-in-time recovery](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/#point-in-time-recovery-api) for an individual database, while [facets have their own isolated databases](https://developers.cloudflare.com/dynamic-workers/usage/durable-object-facets/). Restoring only one side after an effect can leave approvals, execution history and delivery receipts at different points.
 
-The published root-session layout has no qualified application-wide restore path. The `snapshot()` and snapshot-object restore methods in the reviewed [workerd source](https://github.com/cloudflare/workerd/blob/main/src/workerd/api/actor-state.h) are gated by `workerdExperimental`; they are not part of this pinned stable storage interface. A separate native-facet composition has now demonstrated a supported platform copy primitive, described below. The application does not enable that experimental flag, reach into Code Mode's private facet internals or present a transcript export as a restorable backup.
+The legacy root-session layout has no qualified application-wide restore path. The `snapshot()` and snapshot-object restore methods in the reviewed [workerd source](https://github.com/cloudflare/workerd/blob/main/src/workerd/api/actor-state.h) are gated by `workerdExperimental`; they are not part of this pinned stable storage interface. A separate native-facet composition has now demonstrated a supported platform copy primitive, described below. The application does not enable that experimental flag, reach into Code Mode's private facet internals or present a transcript export as a restorable backup.
 
 The remaining gate is a supported coordinated checkpoint/export for the parent and every owned facet, a restore into a separate destination, and an observed approval/result flow after restoration. It must preserve authorization and reconcile external effects without replaying them blindly. Until that is demonstrated, use the qualified [offline local backup](./local-recovery.md) for local installations and treat hosted deployment as a development preview. A code rollback is not a data restore.
 

@@ -56,7 +56,7 @@ refill it; create a new session deliberately when another allowance is wanted.
 
 Both provider streaming entry points reserve a call in durable storage before
 dispatch and cap requested output at 2,048 tokens. Replies, summaries and
-failed attempts share the same allowance. An interrupted call whose outcome
+failed attempts share the same allowance. In checkpoint sessions the counter lives in the supervisor, outside the restored subtree; restoring a checkpoint does not refund it. An interrupted call whose outcome
 is uncertain keeps its reservation. Input is checked against a conservative
 byte allowance before dispatch. The interface shows calls reserved and the
 session limit, including when the limit has been reached.
@@ -74,7 +74,7 @@ there is no model allowance left for its conversational follow-up.
 
 ## API and qualification
 
-`POST /api/sessions/:newSession/configuration` accepts
+`POST /api/checkpoint-sessions/:newSession/configuration` (or the retained legacy `/api/sessions/:newSession/configuration`) accepts
 `{ "mode": "demo" }` or `{ "mode": "workers-ai" }`. The ordinary
 authentication, identity isolation and same-origin checks apply. The mode can
 only be selected before the session is initialized. An identical retry returns

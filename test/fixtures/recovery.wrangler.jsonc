@@ -22,6 +22,5 @@
   "vars": {
     "APP_ENV": "local",
     "MODEL_MODE": "demo",
-    "CHECKPOINT_RUNTIME": "local-recovery-fixture-v1",
   },
 }

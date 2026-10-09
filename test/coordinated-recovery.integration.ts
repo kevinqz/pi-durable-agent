@@ -8,6 +8,7 @@ import { expect, test } from "vitest";
 import type { RecoveryEnv } from "../src/session-supervisor.js";
 import type { Principal } from "../src/env.js";
 import { SessionStore } from "../src/store.js";
+import worker from "../src/worker.js";
 
 const bindings = env as unknown as RecoveryEnv;
 const session = () => bindings.RECOVERY_SESSIONS.getByName(crypto.randomUUID());
@@ -17,6 +18,7 @@ const owner: Principal = {
   authorizedUntil: Date.now() + 3600_000,
 };
 type Stub = ReturnType<typeof session>;
+const generations = new Map<string, number>();
 async function call(
   stub: Stub,
   method: string,
@@ -24,10 +26,16 @@ async function call(
   body = {},
   principal = owner,
 ): Promise<any> {
-  const result = await stub.dispatch(principal, method, path, body);
+  const result = await stub.dispatch(principal, method, path, {
+    expectedGeneration: generations.get(stub.id.toString()) ?? 0,
+    ...body,
+  });
   if (!result.ok)
     throw Object.assign(new Error(result.error), { status: result.status });
-  return JSON.parse(result.value);
+  const value = JSON.parse(result.value);
+  const generation = value.recovery?.generation ?? value.generation;
+  if (generation !== undefined) generations.set(stub.id.toString(), generation);
+  return value;
 }
 async function drive(stub: Stub) {
   await runInDurableObject(stub, async (object) => {
@@ -107,6 +115,14 @@ test("full session checkpoint restores native Pi and Code Mode while destination
   expect(after.memory).toEqual(before.memory);
   expect(after.actions[0]).toEqual(before.actions[0]);
   expect(after.progress.modelCalls).toBe(7);
+  await expect(
+    call(stub, "POST", "actions/decide", {
+      id: "note",
+      decision: "approve",
+      fingerprint: before.actions[0].fingerprint,
+      expectedGeneration: 0,
+    }),
+  ).rejects.toMatchObject({ status: 409 });
   expect(
     await stub.isGenerationActive({ facet: "session:initial", epoch: 0 }),
   ).toBe(false);
@@ -169,4 +185,52 @@ test("checkpoint admission freezes input and enforces the same authenticated own
   await drive(stub);
   expect((await call(stub, "GET", "checkpoints")).checkpoints).toHaveLength(1);
   expect((await call(stub, "GET", "state")).requests).toHaveLength(0);
+});
+
+test("HTTP routing keeps legacy URLs separate from checkpoint sessions and requires the visible generation", async () => {
+  const id = crypto.randomUUID();
+  const request = (area: string, path: string, body?: object) =>
+    worker.fetch(
+      new Request(
+        `http://localhost/api/${area}/${id}/${path}`,
+        body
+          ? {
+              method: "POST",
+              headers: {
+                "content-type": "application/json",
+                origin: "http://localhost",
+              },
+              body: JSON.stringify(body),
+            }
+          : undefined,
+      ),
+      bindings,
+    );
+  const legacy = (await (await request("sessions", "state")).json()) as any;
+  const current = (await (
+    await request("checkpoint-sessions", "state")
+  ).json()) as any;
+  expect(legacy.capabilities.coordinatedCheckpoint).toBeUndefined();
+  expect(current.capabilities.coordinatedCheckpoint).toBe(true);
+  expect(current.recovery.generation).toBe(0);
+  expect(
+    (
+      await request("checkpoint-sessions", "messages", {
+        id: "stale",
+        text: "Refuse unseen state",
+      })
+    ).status,
+  ).toBe(409);
+  expect(
+    (
+      await request("checkpoint-sessions", "messages", {
+        id: "current",
+        text: "Saved on the new session only",
+        expectedGeneration: 0,
+      })
+    ).status,
+  ).toBe(202);
+  expect(
+    ((await (await request("sessions", "state")).json()) as any).requests,
+  ).toHaveLength(0);
 });

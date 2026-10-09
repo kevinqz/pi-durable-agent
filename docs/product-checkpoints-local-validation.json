@@ -1,0 +1,66 @@
+{
+  "format": "pi-durable-agent/product-checkpoints-local-v1",
+  "at": "2026-10-09T23:46:14.881611+00:00",
+  "version": "0.1.0-dev.5",
+  "sourceBase": "7fab149898c597bcd903c6cf3f60edd177a6c0b0",
+  "sourceIdentification": "sourceBase precedes the product integration commit; file hashes and runtime identities describe the checked contents.",
+  "backendRuntime": {
+    "format": "pi-durable-agent/checkpoint-runtime-v1",
+    "sha256": "a5f5cdb1461452fecc05db7ec40569511054b006eeedd734f082b78c103c2a3e"
+  },
+  "checks": {
+    "npmRunCheck": "passed",
+    "format": "passed",
+    "typecheck": "passed",
+    "offlineStateTests": 6,
+    "offlineExportTests": 1,
+    "workerTests": 27,
+    "nativeCheckpointIntegrationTests": 3,
+    "stagingBundleDryRun": "passed",
+    "dev4ToDev5LocalUpgrade": "passed",
+    "browserFlow": "see checkpoint-ui-local-validation.json for its exact earlier source hashes",
+    "finalUiRefusalHandling": "syntax checked; a definite 4xx refusal clears uncertain operation state, while network/server failure retains the request ID"
+  },
+  "observations": [
+    "Actual authenticated router separates legacy and new namespaces",
+    "New POST admissions reject a missing/stale generation",
+    "Original NotesV1 source bytes remain identical to the released dev.4 implementation",
+    "New root-owned note contract is distinct from the legacy contract",
+    "Native restore retains exact approval, deduplicates effects and preserves the root usage counter"
+  ],
+  "warnings": [
+    "workerd emitted alarm rescheduling diagnostics during reset tests; final suites reported no unhandled errors"
+  ],
+  "external": {
+    "paidModelCalls": 0,
+    "cloudflareDeployment": false
+  },
+  "limits": [
+    "Full hosted application coordinator qualification pending",
+    "Real provider inference and second authenticated hosted identity not exercised",
+    "Local cross-release proof uses the legacy demo namespace",
+    "Same-root subtree recovery does not cover root deletion or account loss"
+  ],
+  "sha256": {
+    "src/worker.ts": "dc71cf9e0628853936d68a19767544ae4d0ae27f0d801e5e3be821ca6fcb9001",
+    "src/session-supervisor.ts": "7a227cf975a5e866ac57a21d0172896d90b19d21ac6bdc3cc82b761872c2b67d",
+    "src/checkpoint-coordinator.ts": "c17e30fe739b0ea04b615721364de5aae0923e94e20f9e27f7e33cea9e834ff6",
+    "src/facet-lifecycle.ts": "76279f1f86fce588d1a6e4ab85427d746ece299b412ae479851097b4f6cc58d4",
+    "src/provider-guard.ts": "aa1d47a219fa204d6effa5656cc3fe72d9d5ffada85db61e1c951cb4f3671a8a",
+    "src/action-contracts.ts": "881307d166fe0f6373ae7e185abb0b1539ad34c7089a781a40a742eaf524e413",
+    "src/actions.ts": "153f3d38b721e4a77b5c3cf4f1b6cc69f6b7283ff8e20593986a3d3f3d780404",
+    "src/notes.ts": "0310823f7e90f50da0f923e39b5842fefa7d5af502200e5c894f63e69740bc11",
+    "src/notes-root.ts": "69b5f5e1200cab9734b7e100c698ff01261f286125f7c2a98044c1f3103c7587",
+    "src/session.ts": "74511118ea7a2852a7aaebfc371f638cc58f62382fba1986068ba84f60459c01",
+    "src/generated/checkpoint-build.json": "04e3640bf780a0336e8c0be3febfa47ea5293c88fb3ca12a4ae0899b4a0f3f40",
+    "wrangler.jsonc": "01ce6d2d010c4abc4de812e7489429ecad0775494a52fa76041b3d894115e482",
+    "package.json": "5e76712389fb81a9bec9df1806efa54183d09ad24c48d06bb95c11a849e644b8",
+    "package-lock.json": "4977aba13d8061f6ea7f5acb781a034f0fa40ed471194bb96ec7f6bb9bed3437",
+    "public/app.js": "916a2de6d3347885e7eb7292e6a787439727cdc9b7c75ee84322aa1de6f61415",
+    "public/checkpoints.js": "63c4583b8bc5957e7b8e7f9425fc8af9914178da40855b33a9c8dc2e0f071ed2",
+    "public/index.html": "4a64f86a6434914b9287493f5d45762daa64f79bf9f66db89d5aa2a164d3bc79",
+    "public/style.css": "b279cebb79e1d360a5cf9d251c39d990469b51b01d401cc71c4e24d5dbf28374",
+    "test/coordinated-recovery.integration.ts": "b49d5967d622aaa9206505c02806be5bf542908e50cd10f1737d68a6f541f9fc",
+    "scripts/checkpoint-build.mjs": "c1ca011c0672d8b3aaf8805a8f750da9561b153ed602534de12c9ec79b7b1049"
+  }
+}

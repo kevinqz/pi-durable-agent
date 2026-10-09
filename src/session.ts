@@ -21,7 +21,7 @@ import { actionTools } from "./tools.js";
 import { RuntimeRecovery } from "./recovery.js";
 import { createSessionExport } from "./session-export.js";
 import { SessionModel } from "./session-model.js";
-import type { NotesDestination } from "./notes.js";
+import type { NotesDestination } from "./notes-root.js";
 
 type SessionLifecycle = Pick<Lifecycle<Env>, "jobs" | "start" | "isStarted">;
 export type SessionHost = {

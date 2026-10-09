@@ -1,13 +1,22 @@
 import { CodemodeConnector } from "@cloudflare/codemode";
-import { ActionsStore, CONTRACT_V1 } from "./actions-store.js";
+import { ActionsStore, type Action } from "./actions-store.js";
 import { identifier, textField } from "./http.js";
 
-/** A synthetic, session-local destination. No external service credentials. */
-export class NotesV1 extends CodemodeConnector {
+export interface NotesDestination {
+  list(): unknown;
+  create(action: Action, key: string, text: string): unknown;
+}
+
+export const ROOT_NOTES_CONTRACT =
+  "supervisor-notes-v1/schema-1/policy-1/codemode-0.5.3";
+
+/** Approval-gated notes whose destination and receipts stay outside session checkpoints. */
+export class SupervisorNotes extends CodemodeConnector {
   constructor(
     ctx: DurableObjectState,
     private readonly store: ActionsStore,
     private readonly actionId: string,
+    private readonly destination: NotesDestination,
   ) {
     super(ctx, {});
   }
@@ -28,7 +37,9 @@ export class NotesV1 extends CodemodeConnector {
         },
         execute: (args: unknown) => {
           this.object(args, []);
-          return this.store.notes();
+          return this.destination
+            ? this.destination.list()
+            : this.store.notes();
         },
       },
       create: {
@@ -51,7 +62,7 @@ export class NotesV1 extends CodemodeConnector {
           const action = this.store.get(this.actionId);
           if (
             !action ||
-            action.contract !== CONTRACT_V1 ||
+            action.contract !== ROOT_NOTES_CONTRACT ||
             action.status !== "running" ||
             !action.approvedUntil ||
             action.approvedUntil <= Date.now()
@@ -59,7 +70,7 @@ export class NotesV1 extends CodemodeConnector {
             throw new Error("Action has no current execution authorization");
           // The runtime also checks its recorded method and exact arguments on
           // replay. This destination supplies the separate effect deduplication.
-          return this.store.createNote(this.actionId, key, text);
+          return this.destination.create(action, key, text);
         },
       },
     };

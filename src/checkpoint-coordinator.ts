@@ -31,6 +31,7 @@ type Catalog = {
   version: 1;
   active: SessionGeneration;
   busy?: string;
+  lastOperation?: string;
   operations: number;
   restores: number;
 };
@@ -179,6 +180,7 @@ export class CheckpointCoordinator {
       };
       catalog.operations++;
       catalog.busy = id;
+      catalog.lastOperation = id;
       this.storage.kv.put(CATALOG, catalog);
       this.save(operation);
       return operation;
