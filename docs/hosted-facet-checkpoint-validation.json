@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-09T22:48:46.527Z",
+  "version": "dbbd4e1a-4e4e-4ea8-92b2-91f226dd021f",
+  "paidModelCalls": 0,
+  "requests": 14,
+  "completed": [
+    "hosted Pi and OptChat inside facet with root alarm",
+    "hosted Code Mode pending approval",
+    "native subtree clone",
+    "exact history, memory, request and executor identities preserved",
+    "abrupt copied subtree restart",
+    "two approval decisions, one destination note",
+    "original source untouched and original text retrieved"
+  ],
+  "result": "passed",
+  "sourceSha256": "53a9e81fae86efb966fcc5d7804a4442255a7ba85adfdaf074050972a22682ba",
+  "format": "pi-durable-agent/native-facet-probe-v1",
+  "resource": {
+    "worker": "pi-durable-agent-recovery-probe",
+    "ingress": "private service binding only",
+    "workersDev": false,
+    "previewUrls": false,
+    "routes": []
+  },
+  "dependencies": {
+    "agents": "0.28.0",
+    "piDurable": "1.1.0",
+    "optchatDurable": "0.4.0",
+    "codemode": "0.5.3",
+    "wrangler": "4.149.0"
+  },
+  "lockfileSha256": "36fe7fc5249572f2f3956e446f4246609d293d6551261048d7b833296ca92605",
+  "artifacts": {
+    "worker.ts.txt": "53a9e81fae86efb966fcc5d7804a4442255a7ba85adfdaf074050972a22682ba",
+    "verify-hosted.mjs.txt": "b2db389648f8263a389f7e73f666aed097fc45f000281e3be22964a452d5acbc",
+    "models.ts.txt": "37b5ea5497835629b1f4ea95b14ab6f9effa886d9daed31270725a201871a1e2"
+  },
+  "warnings": [
+    "The remote client logged two request-stream cleanup warnings for successful POSTs whose fixture endpoint did not consume the empty JSON body. All state assertions completed."
+  ],
+  "limits": [
+    "Bounded synthetic feasibility probe, not the application coordinator",
+    "Same-root subtree cloning; not portable backup or root-deletion recovery",
+    "No real-model inference, public ingress, second-identity proof or production release",
+    "Prototype has no generation fencing, restore journal or non-rewinding destination ledger"
+  ]
+}

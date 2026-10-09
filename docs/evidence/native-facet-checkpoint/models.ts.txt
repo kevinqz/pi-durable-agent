@@ -13,21 +13,13 @@ import {
 } from "@earendil-works/pi-ai/providers/faux";
 import { createAI } from "agents/models/pi-ai";
 import type { Env } from "./env.js";
-import { guardProvider } from "./provider-guard.js";
 
-export function configureModels(
-  env: Env,
-  reserveCall: () => void,
-  beforeCall?: () => Promise<void>,
-) {
+export function configureModels(env: Env, reserveCall: () => void) {
   const models = createModels();
   if (env.MODEL_MODE === "workers-ai") {
     if (!env.AI || !env.AI_MODEL)
       throw new Error("Workers AI requires AI and AI_MODEL bindings");
     const ai = createAI({ binding: env.AI });
-    const transport = beforeCall
-      ? guardProvider(ai.provider, beforeCall)
-      : ai.provider;
     const admit = (
       model: Model<Api>,
       context: TranscriptContext,
@@ -52,10 +44,10 @@ export function configureModels(
         const boundedOptions = Object.assign({}, options, {
           maxTokens: admit(model, context, options?.maxTokens),
         });
-        return transport.stream(model, context, boundedOptions);
+        return ai.provider.stream(model, context, boundedOptions);
       },
       streamSimple(model, context, options) {
-        return transport.streamSimple(model, context, {
+        return ai.provider.streamSimple(model, context, {
           ...options,
           maxTokens: admit(model, context, options?.maxTokens),
         });
@@ -116,8 +108,6 @@ export function configureModels(
     );
   };
   faux.setResponses([respond]);
-  models.setProvider(
-    beforeCall ? guardProvider(faux.provider, beforeCall) : faux.provider,
-  );
+  models.setProvider(faux.provider);
   return { models, model: { provider: "faux", modelId: "local-demo" } };
 }

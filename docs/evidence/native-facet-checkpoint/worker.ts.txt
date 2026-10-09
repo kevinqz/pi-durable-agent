@@ -1,0 +1,148 @@
+import { DurableObject } from 'cloudflare:workers';
+import { Lifecycle, type LifecycleServices, type LifecycleJobContext, type LifecycleJobPushOptions } from 'agents/lifecycle';
+import { PiHarness, type PiHarnessOptions } from 'agents/harness/pi';
+import { createRegistry, Harness } from '@earendil-works/pi-durable';
+import { createOptChat, type OptChatController } from 'optchat-durable/extension';
+import { configureModels } from '/private/tmp/pi-durable-agent-20261009/src/models.ts';
+import { CodemodeConnector, createCodemodeRuntime, DynamicWorkerExecutor } from '@cloudflare/codemode';
+export { CodemodeRuntime } from '@cloudflare/codemode';
+
+declare global { namespace Cloudflare { interface GlobalProps { mainModule:typeof import('./worker'); durableNamespaces:'Probe'; } } }
+
+// Isolated feasibility probe, not an application adapter or hosted backup API.
+// The SDK's protected service getter is overridden; no SDK source is patched.
+class FacetPi extends PiHarness {
+  constructor(options:PiHarnessOptions, private readonly services:LifecycleServices) { super(options); }
+  protected override get lifecycle():LifecycleServices { return this.services; }
+  protected override get lifecycleServices():LifecycleServices { return this.services; }
+}
+
+class ProbeNotes extends CodemodeConnector {
+  constructor(private readonly storageContext:DurableObjectState) { super(storageContext, {}); }
+  name() { return 'notes'; }
+  protected tools() {
+    return {
+      create: {
+        description:'Synthetic, approval-gated fixture note',
+        requiresApproval:true,
+        inputSchema:{type:'object' as const, properties:{key:{type:'string' as const},text:{type:'string' as const}}, required:['key','text'],additionalProperties:false},
+        execute:(value:unknown)=>{
+          const args=value as {key:string,text:string};
+          if(!args || typeof args.key!=='string' || typeof args.text!=='string' || args.key.length>96 || args.text.length>4000) throw new Error('Invalid synthetic note');
+          const old=this.storageContext.storage.kv.get<{key:string,text:string}>(`note:${args.key}`);
+          if(old && old.text!==args.text) throw new Error('Conflicting fixture effect');
+          if(!old) this.storageContext.storage.kv.put(`note:${args.key}`,args);
+          return old??args;
+        }
+      }
+    };
+  }
+}
+
+export class MemoryFacet extends DurableObject<any> {
+  private name?:string;
+  private starting?:Promise<void>;
+  private started=false;
+  private chat!:OptChatController;
+  private background=new Set<Promise<unknown>>();
+  private pi:FacetPi;
+  constructor(ctx:DurableObjectState,env:any) {
+    super(ctx,env);
+    const unused=()=>{ throw new Error('Service outside the bounded probe'); };
+    const services:LifecycleServices={
+      name:'probe',className:'MemoryFacet',storage:ctx.storage,
+      ready:async()=>{}, status:()=>this.started?'started':'starting',
+      jobs:{
+        push:(job)=>this.root().push(this.name!,job),
+        cancel:unused,reschedule:unused,get:unused,list:unused,rearm:unused
+      },
+      sockets:{accept:unused,get:unused},
+      runInHostContext:async(fn)=>fn(),
+      events:{emit:()=>{}},routes:{source:undefined,to:unused,toRoot:unused},
+      trackAlarmWork:(work)=>{ this.background.add(work); work.finally(()=>this.background.delete(work)); return true; }
+    };
+    this.pi=new FacetPi({harness:async({storage,context})=>{
+      const {models,model}=configureModels({MODEL_MODE:'demo'} as any,()=>{throw new Error('No paid model');});
+      const memory=createOptChat({main:model,compactor:model,jobs:2,viewBytes:16000,maxInputBytes:16000,maxOutputTokens:2048});
+      const registry=createRegistry();registry.install(memory.extension);
+      await memory.prepare(storage,{},context);
+      const harness=await Harness.open(storage,{models,registry,settings:memory.settings},context);
+      const conversation=await harness.root(context,{agent:{model,extensions:[memory.extension]}});
+      this.chat=memory.attach(harness,conversation,context);
+      return harness;
+    }},services);
+  }
+  private root() { return this.env.PROBES.getByName('facet-services-proof'); }
+  private runtime() { return createCodemodeRuntime({ctx:this.ctx,connectors:[new ProbeNotes(this.ctx)],executor:new DynamicWorkerExecutor({loader:this.env.LOADER}),name:'checkpoint-fixture'}); }
+  async initialize(name:string) {
+    if(this.name&&this.name!==name) throw new Error('Wrong facet address');
+    this.name=name;
+    if(!this.starting) this.starting=this.ctx.blockConcurrencyWhile(async()=>{await this.pi.onStart({props:undefined});this.started=true;});
+    await this.starting;
+  }
+  async enqueue(id:string,text:string) { await this.chat.enqueue(text,id); }
+  async wake(context:LifecycleJobContext) { return this.pi.onJob(context); }
+  async waitBackground() { await Promise.all([...this.background]); }
+  async state():Promise<string> {return JSON.stringify({history:await this.chat.history(),memory:await this.chat.status(),executions:await this.runtime().executions(),notes:[...this.ctx.storage.kv.list({prefix:'note:'})].map(([,value])=>value)}); }
+  async search() {return this.chat.search('Aurora fixture 948');}
+  async action() { return this.runtime().execute({code:'async () => { const a = await notes.create({key:"same",text:"Aurora fixture 948"}); const b = await notes.create({key:"same",text:"Aurora fixture 948"}); return [a,b]; }'}); }
+  async approve(id:string) {return this.runtime().approve({executionId:id});}
+}
+
+export class Probe extends DurableObject<any> {
+  lifecycle=Lifecycle.install(this);
+  private child(name:string) { return this.ctx.facets.get<MemoryFacet>(name,()=>({class:this.ctx.exports.MemoryFacet})); }
+  private check(name:string) { if(!['source','restored'].includes(name)) throw new Error('Invalid destination'); }
+  async push(name:string,job:LifecycleJobPushOptions) {
+    this.check(name); await this.lifecycle.start();
+    return this.lifecycle.jobs.push({...job,id:`${name}:${job.id}`,fn:'pi-wake',payload:{name,job}});
+  }
+  async onJob(context:LifecycleJobContext) {
+    const payload=context.job.payload as any;
+    const child=this.child(payload.name); await child.initialize(payload.name);
+    if(context.job.fn==='input') {
+      await child.enqueue(payload.id,payload.text);
+      if(JSON.parse(await child.state()).memory.tasks) return {rescheduleAt:Date.now()+1000};
+      return;
+    }
+    const outcome=await child.wake({...context,job:{...context.job,...payload.job}});
+    this.lifecycle.trackAlarmWork(child.waitBackground());
+    return outcome;
+  }
+  async dispatch(name:string,operation:string,body:any) {
+    this.check(name);await this.lifecycle.start();
+    const child=this.child(name);await child.initialize(name);
+    if(operation==='input') {
+      await this.lifecycle.jobs.push({id:`${name}:input:${body.id}`,fn:'input',time:Date.now(),payload:{name,id:body.id,text:body.text},singleflight:true,recoveryLoop:true});
+      return {accepted:true};
+    }
+    if(operation==='state') return JSON.parse(await child.state());
+    if(operation==='search') return child.search();
+    if(operation==='action') return child.action();
+    if(operation==='approve') return child.approve(body.id);
+    throw new Error('Unknown fixture operation');
+  }
+  async checkpoint() {
+    await this.lifecycle.start();
+    const source=this.child('source');await source.initialize('source');
+    const state=JSON.parse(await source.state());
+    if(state.memory.tasks) throw new Error('Wait for idle memory');
+    for(const job of this.lifecycle.jobs.list()) if(job.id.startsWith('source:')) await this.lifecycle.jobs.cancel(job.id);
+    this.ctx.facets.abort('source',new Error('Quiescent fixture checkpoint'));
+    this.ctx.facets.clone('source','checkpoint');
+    this.ctx.facets.clone('checkpoint','restored');
+    return {cloned:true};
+  }
+  abortRestored() {
+    this.ctx.facets.abort('restored',new Error('Abrupt synthetic subtree reset'));
+    return {aborted:true};
+  }
+}
+
+export default {async fetch(request:Request,env:any){
+  try {
+    const [name,operation]=new URL(request.url).pathname.slice(1).split('/');
+    const root=env.PROBES.getByName('facet-services-proof');
+    return Response.json(name==='checkpoint'?await root.checkpoint():name==='abort-restored'?await root.abortRestored():await root.dispatch(name,operation,request.method==='POST'?await request.json():{}));
+  } catch(error){return Response.json({error:String(error)},{status:500});}
+}};

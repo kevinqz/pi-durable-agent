@@ -4,7 +4,7 @@ import {
   type ActionsStore,
 } from "./actions-store.js";
 import { HttpError } from "./http.js";
-import { NotesV1 } from "./notes.js";
+import { NotesV1, type NotesDestination } from "./notes.js";
 
 export type ActionAdmission = {
   id: string;
@@ -30,8 +30,9 @@ export function actionConnectors(
   ctx: DurableObjectState,
   store: ActionsStore,
   action: Action,
+  destination?: NotesDestination,
 ) {
   const Connector = implementations.get(action.contract);
   if (!Connector) throw new HttpError(409, "Unsupported action contract");
-  return [new Connector(ctx, store, action.id)];
+  return [new Connector(ctx, store, action.id, destination)];
 }

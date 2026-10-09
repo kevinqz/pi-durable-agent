@@ -53,6 +53,8 @@ The authenticated export endpoint paginates the public OptChat history API, incl
 
 ## Versioning
 
+The separate [coordinated checkpoint composition](./coordinated-recovery.md) uses `SessionHost` to reuse this application inside a facet while moving alarms, recovery ownership, budgets and destination receipts into its supervisor. It is currently exposed only by the test entrypoint; the Worker and existing namespace layout described above are unchanged.
+
 Application schema `1` and connector contract `notes-v1/schema-1/policy-1/codemode-0.5.3` are explicit. Unsupported application schemas fail before opening Pi; unsupported action contracts block execution. Preserve `NotesV1` and its implementation for existing approvals when introducing a new version. Do not change approval semantics under the same contract string. An application rollback cannot undo a saved external effect.
 
 This is one application, not another SDK or memory engine. Generic OptChat defects belong in its independent repository and a new published dependency release. Cloudflare-specific routing, actions, authentication and UI belong here.

@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **22 tests** covering:
+`npm test` contains **27 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -44,6 +44,8 @@ The browser flow has also been exercised against Wrangler locally: submit the de
 Type checking, formatting and the staging **dry-run** bundle are the other release-preview checks. CI runs the same local checks. There is no giant benchmark suite or model-quality/cache-hit experiment in this delivery gate.
 
 ## Local backup/restore increment
+
+The new [coordinated-recovery composition](./coordinated-recovery.md) has four journal/fence checks within `npm test` and two native application integration checks in `npm run test:checkpoints`. A fifth model-control check verifies that asynchronous supervisor authorization precedes either provider stream. These are local synthetic checks. The narrower [hosted facet probe](./hosted-facet-checkpoint-validation.json) establishes the native copying primitive only; it does not close the production recovery gate.
 
 The [recovery evidence](./local-recovery-validation.json) records a separate same-runtime local application check using `npm run test:recovery`. The launcher refuses backup while the managed server is running. After a **graceful shutdown**, the tool copies and verifies the complete persistence directory and restores it into a fresh directory. The restored app retains the history, memory view, request/task identities, exact pending approval and original retrieval. Two separately approved calls with the same note key produce one destination note and one action-result delivery receipt. The original backup remains checksum-identical after the restored app runs.
 

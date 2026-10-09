@@ -1,7 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { BACKGROUND_CONTEXT as BG } from "@earendil-works/chord/context";
 import { createRegistry, Harness } from "@earendil-works/pi-durable";
-import { PiHarness } from "agents/harness/pi";
+import { PiHarness, type PiHarnessOptions } from "agents/harness/pi";
 import {
   Lifecycle,
   type LifecycleJobContext,
@@ -12,7 +12,7 @@ import {
   type OptChatController,
 } from "optchat-durable/extension";
 import { LIMITS, type Env, type Principal } from "./env.js";
-import { HttpError, identifier, textField } from "./http.js";
+import { digest, HttpError, identifier, textField } from "./http.js";
 import { configureModels } from "./models.js";
 import { SerialGate, SessionStore } from "./store.js";
 import { Actions } from "./actions.js";
@@ -21,9 +21,19 @@ import { actionTools } from "./tools.js";
 import { RuntimeRecovery } from "./recovery.js";
 import { createSessionExport } from "./session-export.js";
 import { SessionModel } from "./session-model.js";
+import type { NotesDestination } from "./notes.js";
+
+type SessionLifecycle = Pick<Lifecycle<Env>, "jobs" | "start" | "isStarted">;
+export type SessionHost = {
+  harness(options: PiHarnessOptions): PiHarness;
+  install(session: AgentSession): SessionLifecycle;
+  beforeCall(): Promise<void>;
+  guard(): Promise<void>;
+  destination: NotesDestination;
+};
 
 export class AgentSession extends DurableObject<Env> {
-  readonly lifecycle: Lifecycle<Env>;
+  readonly lifecycle: SessionLifecycle;
   readonly pi: PiHarness;
   readonly actions: Actions;
   readonly recovery: RuntimeRecovery;
@@ -32,7 +42,11 @@ export class AgentSession extends DurableObject<Env> {
   private readonly gate = new SerialGate();
   private chat!: OptChatController;
 
-  constructor(ctx: DurableObjectState, env: Env) {
+  constructor(
+    ctx: DurableObjectState,
+    env: Env,
+    private readonly host?: SessionHost,
+  ) {
     super(ctx, env);
     this.store = new SessionStore(ctx.storage.sql);
     this.sessionModel = new SessionModel(this.store, env);
@@ -43,14 +57,18 @@ export class AgentSession extends DurableObject<Env> {
       async (id, text) => {
         await this.admitMessage(id, text, true);
       },
+      host?.destination,
     );
     const tools = actionTools(this.actions);
-    this.pi = new PiHarness({
+    const options: PiHarnessOptions = {
       harness: async ({ storage, context }) => {
         const profile = this.sessionModel.profile();
         const { models, model } = configureModels(
           { ...env, MODEL_MODE: profile.mode, AI_MODEL: profile.modelId },
-          () => this.sessionModel.reserveCall(),
+          () => {
+            if (!host) this.sessionModel.reserveCall();
+          },
+          host && (() => host.beforeCall()),
         );
         const optchat = createOptChat({
           main: model,
@@ -80,8 +98,11 @@ export class AgentSession extends DurableObject<Env> {
         this.chat = optchat.attach(harness, conversation, context);
         return harness;
       },
-    });
-    this.lifecycle = Lifecycle.install(this).use(this.pi);
+    };
+    this.pi = host ? host.harness(options) : new PiHarness(options);
+    this.lifecycle = host
+      ? host.install(this)
+      : Lifecycle.install(this).use(this.pi);
     this.recovery = new RuntimeRecovery(
       ctx,
       env,
@@ -140,6 +161,7 @@ export class AgentSession extends DurableObject<Env> {
   ) {
     if (principal.authorizedUntil <= Date.now())
       throw new HttpError(403, "Authorization expired");
+    await this.host?.guard();
     const existed = this.store.meta("owner") !== undefined;
     if (method === "POST" && path === "configuration")
       return this.ctx.storage.transactionSync(() => {
@@ -159,11 +181,14 @@ export class AgentSession extends DurableObject<Env> {
         (cursor) => this.chat.history(cursor),
         (id) => this.actions.store.readArchive(id),
       );
-    if (method === "POST" && path === "recovery/restart")
+    if (method === "POST" && path === "recovery/restart") {
+      if (this.host)
+        throw new HttpError(404, "Use the supervisor recovery controls");
       return this.recovery.request(
         identifier(body.activationId, "activation ID"),
         principal.authorizedUntil,
       );
+    }
     if (method === "POST" && path === "actions")
       return this.actions.submit(
         identifier(body.id),
@@ -217,6 +242,7 @@ export class AgentSession extends DurableObject<Env> {
   }
 
   async onJob({ job }: LifecycleJobContext): Promise<LifecycleJobOutcome> {
+    await this.host?.guard();
     if (job.fn === "restart-demo-session") {
       await this.recovery.drive(
         job.payload as Parameters<RuntimeRecovery["drive"]>[0],
@@ -324,5 +350,32 @@ export class AgentSession extends DurableObject<Env> {
       },
       usage: state.usage,
     };
+  }
+
+  /** Maintenance-only evidence. The caller must fence admission before entering. */
+  async checkpointProof(): Promise<string> {
+    await this.lifecycle.start();
+    const state = await this.chat.status();
+    for (const request of state.requests) await this.refreshRequest(request.id);
+    if (
+      state.tasks ||
+      this.store
+        .list()
+        .some((r) => !["completed", "failed", "cancelled"].includes(r.status))
+    )
+      throw new HttpError(409, "Wait for messages and summaries to finish");
+    const { payload } = await createSessionExport(
+      () => this.snapshot(),
+      (cursor) => this.chat.history(cursor),
+      (id) => this.actions.store.readArchive(id),
+    );
+    const { startedAt: _start, completedAt: _end, ...retained } = payload;
+    return digest(
+      JSON.stringify({
+        retained,
+        memory: state,
+        executions: await this.actions.checkpointEvidence(),
+      }),
+    );
   }
 }

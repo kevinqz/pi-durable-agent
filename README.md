@@ -83,25 +83,29 @@ Code Mode 0.5.3 does not expose an execute-or-attach idempotency key. This app r
 ```sh
 npm run typecheck
 npm test
+npm run test:checkpoints
 npm run build
 ```
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-| Directory                                                           | Responsibility                                                                     |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `src/worker.ts`, `src/auth.ts`, `src/http.ts`                       | Authenticated HTTP boundary, request limits and routing                            |
-| `src/session.ts`, `src/store.ts`                                    | Native Pi/OptChat composition, durable admission and session metadata              |
-| `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts` | Action identity, retained contracts, reconciliation, archives and result delivery  |
-| `src/notes.ts`, `src/tools.ts`                                      | Versioned demo connector and native Pi extension                                   |
-| `src/recovery.ts`                                                   | Owner-authorized demo reset, activation identity and bounded restart receipts      |
-| `src/session-export.ts`                                             | Bounded session data archive with public history pagination and integrity checks   |
-| `src/models.ts`, `src/session-model.ts`                             | Model adapters, immutable session selection, durable call allowance and simulation |
-| `public/`                                                           | Small browser interface; no frontend framework or build step                       |
-| `test/`                                                             | Focused runtime and authorization checks                                           |
-| `scripts/`                                                          | Guarded local startup, offline snapshots and recovery qualification                |
-| `compatibility/`                                                    | Exact reviewed source/target release identities for local updates                  |
-| `docs/`                                                             | Architecture, deployment, limits, evidence and roadmap                             |
+`test:checkpoints` exercises the [isolated coordinated-recovery composition](./docs/coordinated-recovery.md). It is development qualification; the published application does not yet expose hosted backup/restore controls.
+
+| Directory                                                                              | Responsibility                                                                     |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `src/worker.ts`, `src/auth.ts`, `src/http.ts`                                          | Authenticated HTTP boundary, request limits and routing                            |
+| `src/session.ts`, `src/store.ts`                                                       | Native Pi/OptChat composition, durable admission and session metadata              |
+| `src/actions.ts`, `src/actions-store.ts`, `src/action-contracts.ts`                    | Action identity, retained contracts, reconciliation, archives and result delivery  |
+| `src/notes.ts`, `src/tools.ts`                                                         | Versioned demo connector and native Pi extension                                   |
+| `src/recovery.ts`                                                                      | Owner-authorized demo reset, activation identity and bounded restart receipts      |
+| `src/session-supervisor.ts`, `src/checkpoint-coordinator.ts`, `src/facet-lifecycle.ts` | Isolated recovery composition, generation journal and root-alarm bridge            |
+| `src/session-export.ts`                                                                | Bounded session data archive with public history pagination and integrity checks   |
+| `src/models.ts`, `src/session-model.ts`                                                | Model adapters, immutable session selection, durable call allowance and simulation |
+| `public/`                                                                              | Small browser interface; no frontend framework or build step                       |
+| `test/`                                                                                | Focused runtime and authorization checks                                           |
+| `scripts/`                                                                             | Guarded local startup, offline snapshots and recovery qualification                |
+| `compatibility/`                                                                       | Exact reviewed source/target release identities for local updates                  |
+| `docs/`                                                                                | Architecture, deployment, limits, evidence and roadmap                             |
 
 Dependency versions and artifact integrity are fixed by `package-lock.json`. Cloudflare's Pi adapter is beta; upgrades are reviewed explicitly. [Contributing](./CONTRIBUTING.md) explains the change policy.
 
