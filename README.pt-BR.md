@@ -2,7 +2,7 @@
 
 Aplicação independente e aberta que reúne **Pi Durable**, a memória do **OptChat Durable** e ferramentas do **Cloudflare Code Mode**.
 
-**Prévia de desenvolvimento.** A demonstração usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Há um caminho de backup e restauração local. Na Cloudflare, foram verificados o acesso autenticado, a conversa, a busca das mensagens originais e uma aprovação preservada durante nova publicação, sem alteração do código do servidor. Backup e restauração hospedados, recuperação de falhas abruptas, modelos reais e operação em produção ainda precisam de qualificação.
+**Prévia de desenvolvimento.** A demonstração usa os runtimes reais com respostas de modelo simuladas. O único conector implementado cria notas locais da sessão. Há um caminho de backup e restauração local. Na Cloudflare, uma conversa e sua aprovação pendente sobreviveram à atualização dev.1 → dev.2 e a um reinício forçado do processo da sessão de demonstração. O resultado foi entregue e a conversa continuou. Backup e restauração coordenados na nuvem, outras janelas de falha, modelos reais e operação em produção ainda precisam de qualificação.
 
 ## Começar do zero
 
@@ -22,6 +22,7 @@ Abra o endereço exibido, normalmente **http://127.0.0.1:8787**. Não é necess�
 3. Clique em **Try a demo approval**. Confira o código e os argumentos exatos em **Approvals**.
 4. Aprove ou rejeite. O resultado fica salvo e, quando concluído, volta para a conversa.
 5. Recarregue a página ou reinicie o servidor local. A sessão mantém seu endereço e seus registros em `.wrangler/`.
+6. Para experimentar a recuperação, espere o trabalho ativo terminar, abra **Session diagnostics** e use **Restart this test session**. Uma nova ativação com estado **recovered** confirma o reinício. Os dados ficam salvos; isso não cria um backup. [Controles e limites](./docs/hosted-recovery.md).
 
 Fechar a página não cancela o trabalho. Parar o servidor local pausa o processamento até a próxima inicialização. Aprovações expiram após uma hora. Um resultado **unknown** significa que houve uma interrupção sem confirmação suficiente: a interface permite inspecionar o registro, sem repetir automaticamente a ação.
 
@@ -40,7 +41,7 @@ Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a
 
 ## Atualizar sem perder a sessão
 
-A rota revisada **0.1.0-dev.0 → 0.1.0-dev.1** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão.
+A rota revisada **0.1.0-dev.1 → 0.1.0-dev.2** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Quem está na dev.0 precisa passar primeiro pela rota preservada para dev.1.
 
 ## Quando hospedar na Cloudflare
 
@@ -66,6 +67,7 @@ O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separad
 - [Arquitetura e garantias](./docs/architecture.md)
 - [Implantação e operação](./docs/deployment.md)
 - [Atualização local entre versões](./docs/local-upgrades.md)
+- [Atualização hospedada e reinício da demonstração](./docs/hosted-recovery.md)
 - [Verificações e limites](./docs/validation.md)
 - [Roadmap](./docs/roadmap.md)
 

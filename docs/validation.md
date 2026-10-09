@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **11 tests** covering:
+`npm test` contains **13 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -29,8 +29,10 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 - Expired authorization, changed connector contract, oversized output and denied sandbox network access.
 - The complete Pi tool → Code Mode → approval → OptChat follow-up → source-retrieval path.
 - Contract-pinned durable admissions, legacy V1 jobs and unsupported contracts remaining inspectable without reopening their facets through a different implementation.
+- A real `ctx.abort()` scheduled through Lifecycle, a changed activation and recovered receipt, preserved history/memory/pending approval fingerprint, one note/result afterward and harmless retry of the previous activation.
+- Demo recovery denial for wrong owners, expired authorization, stale activations, active work and disabled/production/real-model configurations.
 
-The runtime reset uses Cloudflare's `abortAllDurableObjects` test helper and obtains fresh stubs afterward. It resets in-memory instances while retaining storage. The effect-before-checkpoint and delivery-before-ack windows are **seeded durable states**; they are not evidence of a real external service being killed at that exact instruction. The one qualified mutation is the local notes destination.
+The original runtime-reset tests use Cloudflare's `abortAllDurableObjects` test helper and obtains fresh stubs afterward. It resets in-memory instances while retaining storage. The effect-before-checkpoint and delivery-before-ack windows are **seeded durable states**; they are not evidence of a real external service being killed at that exact instruction. The one qualified mutation is the local notes destination.
 
 The browser flow has also been exercised against Wrangler locally: submit the demo command, see the pending exact code/arguments, approve the note, and observe the completed action and its follow-up message. The default UI labels the simulated model as **Demo model**, whether the real runtimes are running locally or on Cloudflare.
 
@@ -54,6 +56,8 @@ CI runs this cross-release application flow instead of repeating the same-runtim
 
 The recorded Git revision identifies the checkout base at validation time and may precede uncommitted changes; the source/configuration/dependency fingerprints and verification-script hashes identify the tested contents. This evidence covers macOS/arm64 with Node 22; CI independently exercises Linux/x64 with Node 22. It does not qualify changed dependency graphs, downgrades, external connectors or hosted deployment.
 
+The [dev.1 → dev.2 evidence](./local-upgrade-dev2-validation.json) repeats this application flow from published dev.1 commit `9c3d3d1d4871de561fd477d2b5445cf24ec8bf8a` into the runtime adding bounded demo recovery. Dependencies and connector semantics remain identical. `npm run test:upgrade` now exercises this current route; the earlier route and its evidence remain retained.
+
 ## Hosted staging increments
 
 A private staging Worker was deployed on **2026-10-09** using Workers Paid, the existing Zero Trust Free organization and a Worker-level Access application. A dedicated exact-email Allow policy uses six-hour sessions and the existing One-time PIN provider. HttpOnly and binding cookies are enabled. Preview URLs remain disabled; the application uses demo mode with no AI binding. Account-specific configuration and credentials are kept outside tracked files.
@@ -72,12 +76,18 @@ The browser review also found a display defect: a detail opened during a pause c
 
 These are **hosted demo observations through the authenticated browser**, not a model-quality study or a hosted fault-injection/concurrency test. One successful note receipt does not independently count destination rows. Destination deduplication and concurrent decisions are covered by the separate local runtime tests. A deployment with unchanged backend code is not a cross-release migration, and no forced eviction or abrupt crash was injected. See the [walkthrough](./staging.md) to repeat this bounded flow.
 
+### Backend update and forced demo reset
+
+The later [dev.2 evidence](./hosted-recovery-validation.json) records a **backend** update from dev.1, followed by a forced parent-process reset through native `ctx.abort()` while the same synthetic approval remained pending. The browser observed the target runtime, a new activation with a recovered reset receipt, the same pending operation fields, original-source retrieval, a completed approval/result and continued conversation. The recorded reset is not a graceful Pi shutdown.
+
+The complete dependency graph, storage schema, private deployment configuration and V1 connector stayed unchanged. No data rewind or replacement Code Mode execution was requested. The check does not independently establish every facet’s eviction, a fault during an external effect or a coordinated restore. The browser’s visible single result is distinguished from the independent row/identity assertions in local tests. See the [repeatable procedure](./hosted-recovery.md).
+
 ## Not yet established
 
 - Hosted isolation using a second authenticated identity has not been exercised; the current Access policy intentionally admits only its owner. Signed-token and identity-isolation tests run locally.
 - No paid Workers AI model or arbitrary external mutation has been qualified.
-- No deployed hibernation/abrupt-restart evidence or hosted coordinated backup/restore proof exists yet. The observed asset-only redeploy is narrower than either guarantee.
-- No production billing estimate, cost dashboard, hosted cross-release recovery proof or self-update path is claimed.
+- Hosted coordinated backup/restore, hibernation billing behavior and arbitrary abrupt-failure windows remain unqualified. The forced parent reset while a demo approval is idle is narrower than those guarantees.
+- No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. The qualified hosted release change is specifically dev.1 → dev.2.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.
 - Demo summaries are deterministic excerpts. They do not establish model quality, prompt-cache hit rate, token savings or long-run memory accuracy.
 
