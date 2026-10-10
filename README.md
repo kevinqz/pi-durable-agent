@@ -10,6 +10,10 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 You need **Node.js 22.19+** and npm. You do **not** need Pi installed, a customized Pi distribution, a Cloudflare account or an AI subscription.
 
+**Without Git:** open [Releases](https://github.com/kevinqz/pi-durable-agent/releases), download the named `pi-durable-agent-<version>.tgz` asset, and extract it into a new folder. Open a terminal in the extracted folder containing `package.json`, then run `npm ci` and `npm run dev`. Follow the README included in that archive: a published preview may have fewer features than the current development branch. Each release includes `SHA256SUMS` and `release-validation.json` to identify its exact contents and verified scope. See [installing and checking an archive](./docs/installation.md).
+
+**From the current development branch:**
+
 ```sh
 git clone https://github.com/kevinqz/pi-durable-agent.git
 cd pi-durable-agent

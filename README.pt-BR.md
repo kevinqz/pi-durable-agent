@@ -6,7 +6,11 @@ Aplicação independente e aberta que reúne **Pi Durable**, a memória do **Opt
 
 ## Começar do zero
 
-Instale Node.js **22.19 ou superior** e use:
+Instale Node.js **22.19 ou superior**, que inclui npm. Não é necessário ter Pi instalado.
+
+**Sem Git:** abra [Releases](https://github.com/kevinqz/pi-durable-agent/releases), baixe o arquivo `pi-durable-agent-<versão>.tgz` e extraia em uma pasta nova. Abra o terminal na pasta extraída que contém `package.json` e execute `npm ci` e `npm run dev`. Siga o README incluído no arquivo: uma prévia publicada pode ter menos recursos que a versão em desenvolvimento. Cada versão inclui `SHA256SUMS` e `release-validation.json` para identificar o conteúdo e o alcance das verificações. [Instalação e conferência do arquivo](./docs/installation.md).
+
+**Pelo Git, usando a versão atual em desenvolvimento:**
 
 ```sh
 git clone https://github.com/kevinqz/pi-durable-agent.git
@@ -39,7 +43,7 @@ Para conferir sua integridade sem login, servidor ou Git:
 npm run export:verify -- /caminho/absoluto/para/arquivo.json
 ```
 
-Esse arquivo serve para leitura e inspeção. Os checkpoints restauram novas sessões; a cópia offline completa usa o procedimento abaixo. A qualificação hospedada dos checkpoints ainda está pendente.
+Esse arquivo serve para leitura e inspeção. Os checkpoints restauram sessões criadas com o novo formato de URL; a cópia offline completa usa o procedimento abaixo. A restauração hospedada e três interrupções controladas têm [evidência própria](./docs/coordinated-recovery.md#hosted-evidence-and-remaining-work), dentro do alcance documentado.
 
 ## Guardar uma cópia local e restaurar
 
