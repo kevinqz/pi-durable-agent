@@ -1,6 +1,11 @@
 import { checkpointAvailability } from "./checkpoint-availability.js";
 
 const $ = (id) => document.getElementById(id);
+function setText(id, value) {
+  const node = $(id);
+  // Repeated polling must not reannounce an unchanged live-region message.
+  if (node.textContent !== value) node.textContent = value;
+}
 const phases = {
   quiescing: "Checking saved work",
   copying: "Copying the session",
@@ -127,17 +132,24 @@ export function checkpointControls({ api, refresh, showError, generation }) {
       const { createReason, restoreReason } = checkpointAvailability(state);
       $("checkpoint-create").disabled =
         submitting || !!pending || !!createReason;
-      $("checkpoint-create-reason").textContent = createReason ?? "";
-      $("checkpoint-restore-reason").textContent =
-        restoreReason === createReason ? "" : (restoreReason ?? "");
-      $("checkpoint-allowance").textContent =
-        `${recovery.checkpoints.length}/${recovery.limits.checkpoints} checkpoints retained · ${recovery.restores}/${recovery.limits.restores} restore admissions used · ${recovery.operations}/${recovery.limits.operations} create/restore admissions used`;
+      setText("checkpoint-create-reason", createReason ?? "");
+      setText(
+        "checkpoint-restore-reason",
+        restoreReason === createReason ? "" : (restoreReason ?? ""),
+      );
+      setText(
+        "checkpoint-allowance",
+        `${recovery.checkpoints.length}/${recovery.limits.checkpoints} checkpoints retained · ${recovery.restores}/${recovery.limits.restores} restore admissions used · ${recovery.operations}/${recovery.limits.operations} create/restore admissions used`,
+      );
       const incompatible = recovery.checkpoints.filter(
         (checkpoint) => !checkpoint.compatible,
       ).length;
-      $("checkpoint-compatibility").textContent = incompatible
-        ? `${incompatible} saved checkpoint(s) require their original server version. They remain stored and occupy a checkpoint slot. Updating the app does not convert them. When a slot is available, create a new checkpoint for the current version. A session-data export cannot restore checkpoints.`
-        : "";
+      setText(
+        "checkpoint-compatibility",
+        incompatible
+          ? `${incompatible} saved checkpoint(s) require their original server version. They remain stored and occupy a checkpoint slot. Updating the app does not convert them. When a slot is available, create a new checkpoint for the current version. A session-data export cannot restore checkpoints.`
+          : "",
+      );
       const listKey = JSON.stringify([
         recovery.checkpoints,
         submitting,
