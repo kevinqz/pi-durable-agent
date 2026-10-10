@@ -1,0 +1,59 @@
+import original from '/private/tmp/pi-agent-clone-semantics-20261009/worker.ts';
+export { Probe, MemoryFacet, CodemodeRuntime, CloneProbe, CloneFacet, CloneLeaf } from '/private/tmp/pi-agent-clone-semantics-20261009/worker.ts';
+import {SessionSupervisor} from '/private/tmp/pi-durable-agent-20261009/src/session-supervisor.ts';
+export {SessionFacet} from '/private/tmp/pi-durable-agent-20261009/src/session-supervisor.ts';
+import {ActionsStore} from '/private/tmp/pi-durable-agent-20261009/src/actions-store.ts';
+import type {CheckpointDriver} from '/private/tmp/pi-durable-agent-20261009/src/checkpoint-coordinator.ts';
+
+type Point='after-quiesce'|'after-validate'|'after-activate';
+type Fault={point:Point;operation:string;fired?:boolean;phase?:string;epoch?:number};
+const FAULT='fixture:interrupt';
+
+/** Private synthetic fixture only. Production exports and routes are unchanged. */
+export class InterruptedSession extends SessionSupervisor {
+  constructor(ctx:DurableObjectState,env:any) {
+    super(ctx,env);
+    // This deliberately instruments the application's own host boundary in a
+    // test subclass. No Pi/Agents/Code Mode private storage or SDK method is read.
+    const driver=(this.checkpoints as unknown as {driver:CheckpointDriver}).driver;
+    const quiesce=driver.quiesce;
+    driver.quiesce=async generation=>{const proof=await quiesce(generation);await this.trip('after-quiesce');return proof;};
+    const validate=driver.validate;
+    driver.validate=async(candidate,proof)=>{await validate(candidate,proof);await this.trip('after-validate');};
+    const activate=driver.activate;
+    driver.activate=async generation=>{await activate(generation);await this.trip('after-activate');};
+  }
+  private async trip(point:Point) {
+    const fault=this.ctx.storage.kv.get<Fault>(FAULT);
+    const catalog=this.checkpoints.status();
+    if(!fault||fault.fired||fault.point!==point||catalog.busy!==fault.operation)return;
+    const operation=this.checkpoints.operation(fault.operation)!;
+    this.ctx.storage.kv.put(FAULT,{...fault,fired:true,phase:operation.phase,epoch:catalog.active.epoch});
+    // Commit the one-shot observation before the real native process abort.
+    await this.ctx.storage.sync();
+    this.ctx.abort('Synthetic hosted journal interruption');
+  }
+  armFault(fault:Fault) {
+    if(!['after-quiesce','after-validate','after-activate'].includes(fault.point)||!/^[a-z0-9-]+$/.test(fault.operation))throw new Error('Invalid fixture fault');
+    if(this.checkpoints.status().busy)throw new Error('Finish the earlier operation first');
+    this.ctx.storage.kv.put(FAULT,{point:fault.point,operation:fault.operation});
+    return {armed:true};
+  }
+  fixtureState() {
+    return {fault:this.ctx.storage.kv.get(FAULT),catalog:this.checkpoints.status(),notes:new ActionsStore(this.ctx.storage).notes()};
+  }
+}
+
+export default {async fetch(request:Request,env:any) {
+  const match=/^\/journal\/([a-z0-9-]{1,80})\/(.+)$/.exec(new URL(request.url).pathname);
+  if(!match)return original.fetch(request,env);
+  const root=env.RECOVERY_SESSIONS.getByName(match[1]);
+  const body=request.method==='POST'?await request.json():{};
+  try {
+    if(match[2]==='arm'&&request.method==='POST')return Response.json(await root.armFault(body));
+    if(match[2]==='inspect'&&request.method==='GET')return Response.json(await root.fixtureState());
+    const principal={tenant:'private-hosted-qualification',subject:'synthetic-owner',authorizedUntil:Date.now()+3600_000};
+    const result=await root.dispatch(principal,request.method,match[2],body);
+    return result.ok?new Response(result.value,{headers:{'content-type':'application/json'}}):Response.json({error:result.error},{status:result.status});
+  } catch {return Response.json({error:'Transient synthetic interruption'},{status:503});}
+}};

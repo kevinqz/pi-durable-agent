@@ -1,0 +1,65 @@
+import assert from 'node:assert/strict';
+import {randomUUID,createHash} from 'node:crypto';
+import {readFile,writeFile} from 'node:fs/promises';
+const id=randomUUID(), base=`http://127.0.0.1:8798/journal/${id}`;
+const evidence={at:new Date().toISOString(),fixture:id,paidModelCalls:0,requests:0,sourceCommit:'ee8e6b48d3c3fceb2d32e9885e9eb61a1fb5b4f7',sourceSha256:createHash('sha256').update(await readFile('worker.ts')).digest('hex'),completed:[],faults:[]};
+let generation=0;
+async function call(path,body) {
+ if(++evidence.requests>160)throw new Error('Bounded private request allowance exhausted');
+ const response=await fetch(base+'/'+path,body?{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({expectedGeneration:generation,...body}),signal:AbortSignal.timeout(15000)}:{signal:AbortSignal.timeout(15000)});
+ const value=await response.json();
+ if(!response.ok)throw Object.assign(new Error(`Fixture ${path}: ${response.status} ${value.error??''}`),{status:response.status});
+ return value;
+}
+async function poll(path,ready) {
+ const deadline=Date.now()+90000;
+ do {
+  try {const state=await call(path);if(ready(state))return state;}catch(error){if(error.status!==503)throw error;}
+  await new Promise(resolve=>setTimeout(resolve,1500));
+ }while(Date.now()<deadline);
+ throw new Error('Bounded wait expired: '+path);
+}
+async function recover(kind,operation,point) {
+ await call('arm',{point,operation});
+ await call('checkpoints/'+kind,{id:operation,...(kind==='restore'?{checkpointId:'checkpoint'}:{})});
+ const result=await poll('checkpoints',state=>!state.busy&&state.latest?.id===operation&&state.latest.phase==='done');
+ const state=await call('inspect');
+ assert.equal(state.fault.fired,true);
+ evidence.faults.push(state.fault);
+ generation=result.generation;
+ return state;
+}
+try {
+ await call('configuration',{mode:'demo'});
+ await call('messages',{id:'message',text:'Remember Aurora native interruption 936.'});
+ await poll('state',s=>!s.recovering&&s.progress.activeTasks===0&&s.requests[0]?.status==='completed');
+ await call('actions',{id:'note',label:'Native recovery note',code:'async () => await notes.create({key:"aurora",text:"Aurora native interruption 936"})'});
+ const before=await poll('state',s=>!s.recovering&&s.progress.activeTasks===0&&s.actions[0]?.status==='pending');
+ evidence.pending=before.actions[0];
+ const backup=await recover('create','checkpoint','after-quiesce');
+ assert.equal(backup.catalog.active.epoch,0);assert.equal(backup.notes.length,0);assert.equal(backup.fault.phase,'quiescing');
+ evidence.completed.push('real root abort after source freeze; native alarm resumed backup and published one validated checkpoint');
+ await call('actions/decide',{id:'note',decision:'approve',fingerprint:before.actions[0].fingerprint});
+ await poll('state',s=>!s.recovering&&s.progress.activeTasks===0&&s.actions[0]?.status==='completed'&&s.actions[0].delivered);
+ assert.equal((await call('inspect')).notes.length,1);
+ for(const [operation,point,expectedPhase,expectedEpoch] of [['restore-validated','after-validate','validating',0],['restore-promoted','after-activate','activating',2]]) {
+  const restored=await recover('restore',operation,point);
+  assert.equal(restored.fault.phase,expectedPhase);assert.equal(restored.fault.epoch,expectedEpoch);
+  const after=await call('state');
+  assert.deepEqual(after.history,before.history);
+  assert.deepEqual(after.memory,before.memory);
+  assert.deepEqual(after.actions[0],before.actions[0]);
+  assert.equal(restored.notes.length,1);
+  await call('actions/decide',{id:'note',decision:'approve',fingerprint:before.actions[0].fingerprint});
+  const completed=await poll('state',s=>!s.recovering&&s.progress.activeTasks===0&&s.actions[0]?.status==='completed'&&s.actions[0].delivered);
+  assert.equal(completed.requests.filter(r=>r.id==='result-note').length,1);
+  assert.equal((await call('inspect')).notes.length,1);
+  evidence.completed.push(`real root abort ${point}; native alarm resumed the same journal operation, exact state retained, one destination note and one delivery`);
+ }
+ assert.ok(JSON.stringify(await call('memory/search',{query:'Aurora'})).includes('936'));
+ evidence.completed.push('original message retrieved after both interrupted restores');
+ evidence.final=await call('inspect');
+ evidence.result='passed';
+}catch(error){evidence.result='failed';evidence.error=String(error);process.exitCode=1;}
+await writeFile('evidence.json',JSON.stringify(evidence,null,2)+'\n');
+console.log(JSON.stringify(evidence,null,2));

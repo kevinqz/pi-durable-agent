@@ -1,0 +1,121 @@
+{
+  "at": "2026-10-10T00:36:30.626Z",
+  "fixture": "0eff34c4-a544-4647-b7d3-365bf012d8d4",
+  "paidModelCalls": 0,
+  "requests": 89,
+  "sourceCommit": "ee8e6b48d3c3fceb2d32e9885e9eb61a1fb5b4f7",
+  "sourceSha256": "34d4aa2401103672cde0f8594de97a8bfd085b37e74e5a1a8cc211efe36f1a19",
+  "completed": [
+    "real root abort after source freeze; native alarm resumed backup and published one validated checkpoint",
+    "real root abort after-validate; native alarm resumed the same journal operation, exact state retained, one destination note and one delivery",
+    "real root abort after-activate; native alarm resumed the same journal operation, exact state retained, one destination note and one delivery",
+    "original message retrieved after both interrupted restores"
+  ],
+  "faults": [
+    {
+      "point": "after-quiesce",
+      "operation": "checkpoint",
+      "fired": true,
+      "phase": "quiescing",
+      "epoch": 0
+    },
+    {
+      "point": "after-validate",
+      "operation": "restore-validated",
+      "fired": true,
+      "phase": "validating",
+      "epoch": 0
+    },
+    {
+      "point": "after-activate",
+      "operation": "restore-promoted",
+      "fired": true,
+      "phase": "activating",
+      "epoch": 2
+    }
+  ],
+  "pending": {
+    "id": "note",
+    "label": "Native recovery note",
+    "code": "async () => await notes.create({key:\"aurora\",text:\"Aurora native interruption 936\"})",
+    "status": "pending",
+    "contract": "supervisor-notes-v1/schema-1/policy-1/codemode-0.5.3",
+    "fingerprint": "2ccd3ae08c1be3c4e39ee891ae92d2ef5038284598c18684489a2c90eaf89f9b",
+    "pending": [
+      {
+        "executionId": "exec_0001791592592642_26273293-8122-4528-8ca2-7271d7d7ac19",
+        "seq": 0,
+        "connector": "notes",
+        "method": "create",
+        "args": {
+          "key": "aurora",
+          "text": "Aurora native interruption 936"
+        }
+      }
+    ],
+    "createdAt": 1791592592595,
+    "expiresAt": 1791596192595,
+    "delivered": false,
+    "archive": {
+      "bytes": 40,
+      "sha256": "d9623fbf0320351569855feca513defaf466dcd49ee88c93256c4cfb8f6ff464"
+    }
+  },
+  "final": {
+    "fault": {
+      "point": "after-activate",
+      "operation": "restore-promoted",
+      "fired": true,
+      "phase": "activating",
+      "epoch": 2
+    },
+    "catalog": {
+      "version": 1,
+      "active": {
+        "facet": "session-restored-restore-promoted",
+        "epoch": 2
+      },
+      "operations": 3,
+      "restores": 2,
+      "lastOperation": "restore-promoted"
+    },
+    "notes": [
+      {
+        "action_id": "note",
+        "key": "aurora",
+        "text": "Aurora native interruption 936"
+      }
+    ]
+  },
+  "result": "passed",
+  "format": "pi-durable-agent/hosted-journal-interruptions-v1",
+  "cloudflareVersion": "c019fc0c-6376-4e10-be50-4808ba387959",
+  "backendRuntime": {
+    "format": "pi-durable-agent/checkpoint-runtime-v1",
+    "sha256": "ba056fb305cac2ef897d0a6a7951893b571928d7f33c18bf031bc8048fc481ea"
+  },
+  "transport": "Local Wrangler client with a remote private service binding; no workers.dev, preview URL or route",
+  "instrumentation": "A private test subclass wraps the application-owned CheckpointDriver callbacks, commits a one-shot marker, then calls native ctx.abort(). Application source and SDK code are unchanged.",
+  "artifacts": {
+    "worker.ts.txt": "34d4aa2401103672cde0f8594de97a8bfd085b37e74e5a1a8cc211efe36f1a19",
+    "verify.mjs.txt": "d8f7bf708efd7229b5b037100ef58ea605b6618a9f54b0b07531291ad1dd1876"
+  },
+  "applicationSha256": {
+    "src/session-supervisor.ts": "17a0c55fcdb8c5b0688f629cefd24e2806362622e82915d29daa3a9f48e74e5f",
+    "src/checkpoint-coordinator.ts": "608b3490d87c06ef41287081d07be68d147e71f946830df4948ed03895228097",
+    "src/checkpoint-proof.ts": "bef7e3f312bf93af3e4df3558cf274fd9d89b638b842532a687c936df578f83a",
+    "src/facet-lifecycle.ts": "76279f1f86fce588d1a6e4ab85427d746ece299b412ae479851097b4f6cc58d4",
+    "src/actions-store.ts": "eae8fdcb2a66d8719d762f4107aa3eaaa96ccbb073b899b65a6431ca84283a19",
+    "src/notes-root.ts": "69b5f5e1200cab9734b7e100c698ff01261f286125f7c2a98044c1f3103c7587",
+    "src/session.ts": "5b802eb944ea7eefa2c35b39b0494aac38e7b6da59a9ff288ea7f3ff48422a12",
+    "src/generated/checkpoint-build.json": "705e597bb69facc0680f765075756a7b34c17c8f8e0ea0a3887d192c263de04b",
+    "package-lock.json": "4977aba13d8061f6ea7f5acb781a034f0fa40ed471194bb96ec7f6bb9bed3437"
+  },
+  "limits": [
+    "Separate private synthetic namespace, not the public staging browser or its Access authentication",
+    "Only after-quiesce, after-validate and after-activate boundaries; no arbitrary process instruction, OOM or platform-outage claim",
+    "Native ctx.abort was invoked by the one-shot hooks; no separate process activation UUID was instrumented",
+    "No real model, second authenticated Access identity, external connector or cross-build checkpoint conversion",
+    "Same-parent subtree recovery only; no root deletion, namespace/account loss or portable archive"
+  ]
+}
