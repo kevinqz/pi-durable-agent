@@ -33,6 +33,8 @@ Open the local address printed by Wrangler, normally **http://127.0.0.1:8787**.
 
 New session URLs start with `#c1:`. Older URLs keep opening the original session; use **New session** to try checkpoints. A checkpoint restores the conversation within the same Durable Object. It does not protect against deleting that object or losing the account.
 
+Each session has **3 retained checkpoint slots, 8 restore admissions and 24 total create/restore admissions**. A server update preserves old checkpoints but may make them incompatible; they still occupy a slot. There is no automatic deletion or cross-build migration. A new session starts a separate history, and the readable JSON export cannot restore a checkpoint. See [update and capacity guidance](./docs/coordinated-recovery.md#after-an-update-or-when-a-limit-is-reached).
+
 Local state lives in `.wrangler/` and is ignored by Git. Keep it if you want to retain the demo. Closing a browser does not cancel work; stopping the local server pauses processing until it runs again. A pending approval can outlive the page, but expires after one hour. Simulated replies/summaries demonstrate the plumbing; they do not measure AI quality or prompt-cache savings.
 
 To keep a recoverable local copy, stop the server and run:

@@ -26,11 +26,12 @@
     "build": "wrangler deploy --dry-run --env staging --outdir dist",
     "format": "prettier . --write",
     "check:format": "prettier . --check",
-    "check": "npm run runtime:check && npm run check:format && npm run typecheck && npm run test:state && npm run test:export && npm test && npm run test:checkpoints && npm run build",
+    "check": "npm run runtime:check && npm run check:format && npm run typecheck && npm run test:state && npm run test:export && npm run test:ui && npm test && npm run test:checkpoints && npm run build",
     "deploy:staging": "wrangler deploy --env staging",
     "test:upgrade": "node scripts/verify-local-upgrade.mjs",
     "export:verify": "node scripts/verify-session-export.mjs",
-    "test:export": "node --test test/session-export-cli.test.mjs"
+    "test:export": "node --test test/session-export-cli.test.mjs",
+    "test:ui": "node --test test/checkpoint-availability.test.mjs"
   },
   "dependencies": {
     "@cloudflare/codemode": "0.5.3",

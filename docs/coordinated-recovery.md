@@ -16,9 +16,23 @@ New sessions use this composition through the authenticated API and browser inte
 
 If the connection is lost, reopen the same URL. The browser retains the operation ID in identity-scoped session storage and looks up its saved receipt; retrying the same request cannot allocate a second checkpoint. An interrupted operation remains visible. **Resume recovery** retries that operation after inspection; **Cancel recovery** is available before activation and retains both copies. Once activation starts, resume it to finish. Other tabs must refresh before submitting decisions from the old generation.
 
-Each session retains up to three checkpoints and admits up to eight restores. These bounds are not renewed by restoration. No automatic cleanup is performed; when an allowance is exhausted, retain the old session and start a new one. Checkpoints are compatible only with the exact backend build that created them. An incompatible entry remains visible but cannot be restored by a different build.
+Each session retains up to three checkpoints and admits up to eight restores, within a lifetime allowance of 24 create/restore admissions. A cancelled or failed admission still consumes its allowance; resuming the same operation does not allocate a new admission. These bounds are not renewed by restoration. No automatic cleanup is performed. Checkpoints are compatible only with the exact backend build that created them. An incompatible entry remains visible but cannot be restored by a different build.
 
 Legacy addresses such as `#<id>` still open their original conversations. They retain the earlier diagnostics and local offline backup path; select **New session** to use the checkpoint interface. The [local update guide](./local-upgrades.md) explains how to preserve the full existing installation.
+
+## After an update or when a limit is reached
+
+The current interface explains disabled controls and displays retained checkpoints, restore admissions and total create/restore admissions separately. Published 0.1.1 archives predate these additional explanations; their backend enforces the same bounds.
+
+| What you see                              | Meaning and supported next step                                                                                                                                                                |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Original version required                 | The checkpoint is retained, but this backend cannot restore it. It still occupies one of three slots. If space remains, create a fresh checkpoint after the updated conversation becomes idle. |
+| All checkpoint slots occupied             | No further checkpoint can be created in this session. Existing compatible checkpoints can still be restored within the other allowances. There is currently no deletion endpoint.              |
+| Restore allowance used                    | The eight restore admissions are used. A new backup may still be possible if a checkpoint slot and a total admission remain.                                                                   |
+| Create/restore allowance used             | All 24 admissions are used, including cancelled or failed operations. Retained copies stay present; no new backup or restore is admitted. An already admitted operation can still be resumed.  |
+| Work or an unknown action blocks recovery | Finish active work or inspect the uncertain action. A pending human approval alone does not prevent checkpoint creation.                                                                       |
+
+Reaching a checkpoint limit does not itself stop ordinary conversation or change model-call allowances. Keep the existing session URL for its history. **New session** starts a separate, empty conversation; it does not transfer old memory or approvals. A JSON session export is useful for inspection but cannot recreate an executable checkpoint. Do not roll back code over newly written state to attempt an old-build restore; use only the [qualified update/backup routes](./local-upgrades.md).
 
 ## Ownership
 

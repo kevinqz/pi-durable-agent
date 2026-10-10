@@ -29,7 +29,9 @@ Abra o endereço exibido, normalmente **http://127.0.0.1:8787**. Não é necess�
 6. Use **Export session data** para baixar as mensagens, a visão atual da memória e os registros de ações. O arquivo permite consulta e verificação local; ele não restaura a execução. [Conteúdo, limites e verificador](./docs/session-export.md).
 7. Espere o trabalho ativo terminar e selecione **Create checkpoint** em **Session recovery**. Aguarde **Checkpoint saved**, continue a conversa e use **Restore…** para voltar ao estado salvo. A confirmação explica o alcance: notas já criadas e consumo registrado continuam preservados. [Procedimento e limites](./docs/coordinated-recovery.md).
 
-As novas URLs começam com `#c1:`. URLs antigas continuam abrindo as sessões originais; use **New session** para experimentar checkpoints. Eles restauram a conversa dentro do mesmo Durable Object, sem cobrir exclusão desse objeto ou perda da conta. Há até três checkpoints e oito admissões de restauração por sessão, sem apagar automaticamente as cópias anteriores.
+As novas URLs começam com `#c1:`. URLs antigas continuam abrindo as sessões originais; use **New session** para experimentar checkpoints. Eles restauram a conversa dentro do mesmo Durable Object, sem cobrir exclusão desse objeto ou perda da conta.
+
+Cada sessão tem **3 espaços para checkpoints, 8 admissões de restauração e 24 admissões totais de criação/restauração**. Atualizações do servidor preservam os checkpoints antigos, mas podem torná-los incompatíveis; eles continuam ocupando espaço. Não há exclusão automática nem migração entre versões do servidor. Uma nova sessão começa um histórico separado, e a exportação JSON para consulta não restaura checkpoints. Veja [como lidar com atualizações e limites](./docs/coordinated-recovery.md#after-an-update-or-when-a-limit-is-reached).
 
 Fechar a página não cancela o trabalho. Parar o servidor local pausa o processamento até a próxima inicialização. Aprovações expiram após uma hora. Um resultado **unknown** significa que houve uma interrupção sem confirmação suficiente: a interface permite inspecionar o registro, sem repetir automaticamente a ação.
 
