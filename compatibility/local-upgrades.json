@@ -104,6 +104,19 @@
         "version": "0.1.0",
         "buildFingerprint": "6750f09601d2809756a8df67c831b2597968c6aa8b3b306d22ee0737901d589e"
       }
+    },
+    {
+      "id": "0.1.0-to-0.1.1",
+      "method": "unchanged-state-copy",
+      "from": {
+        "version": "0.1.0",
+        "buildFingerprint": "6750f09601d2809756a8df67c831b2597968c6aa8b3b306d22ee0737901d589e",
+        "revision": "4d37077154cb2d43bc5874082de93d78eb1a6cea"
+      },
+      "to": {
+        "version": "0.1.1",
+        "buildFingerprint": "fd850923ba3b955550e76ec62c40ce773b6d0f65f579b470993e1b3e410063fe"
+      }
     }
   ]
 }

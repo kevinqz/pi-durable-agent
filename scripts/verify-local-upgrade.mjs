@@ -3,11 +3,11 @@ import { execFileSync, spawn } from "node:child_process";
 import * as fs from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { parseArgs } from "node:util";
+import { isDeepStrictEqual, parseArgs } from "node:util";
 import { projectRoot, runtimeIdentity } from "./runtime-identity.mjs";
 
-// The baseline is the exact preceding public preview, never a moving branch.
-const BASELINE = "90815ac513714a3227c4b3d82dbe06a928b2c590";
+// The baseline is the exact preceding public release, never a moving branch.
+const BASELINE = "4d37077154cb2d43bc5874082de93d78eb1a6cea";
 const { values } = parseArgs({ options: { from: { type: "string" } } });
 const directory = await fs.mkdtemp(join(tmpdir(), "pi-agent-upgrade-release-"));
 const baseline = join(directory, "baseline");
@@ -39,7 +39,7 @@ if (values.from) {
     });
   } catch {
     throw new Error(
-      "Retain/fetch v0.1.0-dev.4 first, or run npm run test:upgrade -- --from /path/to/its/extracted/source. The runner does not download code.",
+      "Retain/fetch v0.1.0 first, or run npm run test:upgrade -- --from /path/to/its/extracted/source. The runner does not download baseline source.",
     );
   }
   execFileSync("tar", ["-xf", "-", "-C", baseline], { input: archive });
@@ -67,16 +67,25 @@ const dependencies = async (root) =>
     JSON.parse(await fs.readFile(join(root, "package-lock.json"), "utf8"))
       .packages,
   ).filter(([path]) => path);
-assert.deepEqual(
+const sameDependencies = isDeepStrictEqual(
   await dependencies(baseline),
   await dependencies(projectRoot),
-  "This fixture reuses installed dependencies only for an identical lockfile dependency graph",
 );
-// Reuse the unchanged dependencies without a second install or network access.
-await fs.symlink(
-  join(projectRoot, "node_modules"),
-  join(baseline, "node_modules"),
-);
+if (sameDependencies) {
+  await fs.symlink(
+    join(projectRoot, "node_modules"),
+    join(baseline, "node_modules"),
+  );
+  console.log("Baseline reuses the identical locked dependency graph.");
+} else {
+  // Running old source with new dependencies is not an upgrade qualification.
+  // npm_config_offline=true requires cached packages and forbids a download fallback.
+  execFileSync("npm", ["ci", "--no-audit", "--no-fund"], {
+    cwd: baseline,
+    stdio: "inherit",
+  });
+  console.log("Baseline installed its own locked dependency graph separately.");
+}
 const child = spawn(
   process.execPath,
   ["scripts/verify-local-recovery.mjs", "--from", baseline],

@@ -62,6 +62,40 @@ async function frozen(stub: ReturnType<typeof session>, id: string) {
 }
 
 describe("official PiHarness + published OptChat in workerd", () => {
+  test("uses the public OptChat failure projection across native task faults and resets", async () => {
+    let stub = session();
+    await call(stub, "GET", "state");
+    await runInDurableObject(stub, async (instance) => {
+      const pi = await instance.pi.pi();
+      await (await pi.root(BG)).configure({ tools: [] }, BG);
+    });
+    await call(stub, "POST", "messages", {
+      id: "blocked-tools",
+      text: "Memory preparation must respect the host tool policy.",
+    });
+    await runDurableObjectAlarm(stub);
+    await expect
+      .poll(async () =>
+        (await call(stub, "GET", "state")).requests.find(
+          (request: any) => request.id === "blocked-tools",
+        ),
+      )
+      .toMatchObject({
+        status: "failed",
+        error: expect.stringContaining("requires zoom, date and search"),
+      });
+    await abortAllDurableObjects();
+    stub = bindings.SESSIONS.get(stub.id);
+    const restored = await call(stub, "GET", "state");
+    expect(restored.requests[0]).toMatchObject({
+      id: "blocked-tools",
+      status: "failed",
+      error: expect.stringContaining("requires zoom, date and search"),
+    });
+    expect(restored.history.items).toHaveLength(0);
+    expect(restored.progress.modelCalls).toBe(0);
+  });
+
   test("persists duplicate admission, original source and memory across abrupt runtime reset", async () => {
     let stub = session();
     const input = {

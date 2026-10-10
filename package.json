@@ -1,6 +1,6 @@
 {
   "name": "pi-durable-agent",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "An independent Cloudflare application composing Pi Durable, OptChat memory and Code Mode.",
   "type": "module",
@@ -39,7 +39,7 @@
     "@earendil-works/pi-durable": "1.1.0",
     "agents": "0.28.0",
     "jose": "6.2.12",
-    "optchat-durable": "https://github.com/kevinqz/optchat-durable/releases/download/v0.4.0/optchat-durable-0.4.0.tgz"
+    "optchat-durable": "https://github.com/kevinqz/optchat-durable/releases/download/v0.4.1/optchat-durable-0.4.1.tgz"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.4.0",

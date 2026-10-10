@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 — Shared request outcomes
+
+- Consume the published OptChat 0.4.1 package. Use its canonical native task outcome instead of duplicating Pi task inspection; reuse returned request records during polling.
+- Preserve failed memory-preparation status across an object reset without starting inference or replaying work.
+- Qualify the exact 0.1.0 → 0.1.1 local update with separately installed old/new dependency graphs and a preserved state copy. No storage schema or connector contract changes.
+- Document native ownership and the remaining reasons for the wake bridge, admission ledger and action outbox across the two independent repositories.
+
 ## 0.1.0 — First operational release
 
 - Verify the running facet's backend before admitting new work or checkpoints. Reload idle old code through native facet APIs while preserving stored state and pending approvals; let already-admitted work drain.

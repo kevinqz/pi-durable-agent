@@ -6,7 +6,7 @@ Local validation through **2026-10-10** uses the installed release artifact of O
 
 | Component                | Pinned version                                     |
 | ------------------------ | -------------------------------------------------- |
-| OptChat Durable          | 0.4.0 release tarball; lockfile integrity recorded |
+| OptChat Durable          | 0.4.1 release tarball; lockfile integrity recorded |
 | Pi Durable, Pi AI, Chord | 1.1.0                                              |
 | Cloudflare Agents        | 0.28.0                                             |
 | Cloudflare Code Mode     | 0.5.3                                              |
@@ -15,11 +15,20 @@ Local validation through **2026-10-10** uses the installed release artifact of O
 | Vitest                   | 4.1.0                                              |
 | Local Node               | 22.23.1                                            |
 
+## Maintenance update 0.1.1
+
+The [exact 0.1.0 → 0.1.1 update](./local-upgrade-v011-validation.json) changes only the OptChat package in the locked dependency graph, from 0.4.0 to 0.4.1. The old source runs with its own independently installed dependencies; the target uses its own lockfile. The application consumes OptChat's canonical task outcome and reuses request records during polling, reset readiness and checkpoint inspection.
+
+The local check passed 35 Workers tests, five native checkpoint integration tests, six state-tool tests, the export-verifier test, type checking, formatting and the staging dry-run build. The separately recorded update preserves both legacy and checkpoint sessions, pending approvals, original text, memory and result delivery. It retains old checkpoints but rejects their restoration under the changed backend, creates a compatible new checkpoint and continues after another restart. The initial attempt encountered an internal runtime error during severe disk pressure; the record preserves that limitation and the subsequent successful run without backend changes.
+
+No paid inference or hosted deployment was used for these local observations. The 0.1.0 hosted model and recovery records below remain version-specific; this patch does not repeat the model-quality trial or qualify cross-build checkpoint restoration. See the release's validation record for distribution and any separate hosted update check.
+
 ## Focused checks
 
-`npm test` contains **34 tests** covering:
+`npm test` contains **35 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
+- Public OptChat task-failure projection preserved across a native preparation fault and object reset, with no provider call.
 - A saved admission job interrupted before OptChat receives the input.
 - Identity isolation, hosted configuration failing closed, and cross-origin rejection.
 - Real JWT signature verification plus wrong issuer, wrong audience, expired and tampered tokens using a local signing fixture.
@@ -64,7 +73,7 @@ The [upgrade evidence](./local-upgrade-validation.json) records an actual **0.1.
 
 `npm run test:upgrade` creates conversations and both a completed action and a pending approval on the old runtime. After graceful shutdown, ordinary restore refuses the changed runtime. The explicit reviewed route copies the complete state into a new directory. The new runtime preserves history, memory view, request/task identities, completed action data, the exact pending approval and original retrieval. Two independently approved occurrences create one note and one delivery receipt for that action. Another target restart retains those receipts and accepts a new conversation turn. The source backup remains checksum-identical.
 
-CI runs this cross-release application flow instead of repeating the same-runtime application flow. The file/route checks still cover ordinary restore. The runner makes no downloads or paid calls; a source archive can be supplied if the baseline Git history is absent. See [the guide](./local-upgrades.md) for the exact route and commands.
+CI runs this cross-release application flow instead of repeating the same-runtime application flow. The file/route checks still cover ordinary restore. The historical unchanged-dependency runs reused the installed dependency graph. The current runner installs the baseline graph separately when it differs; cached packages plus npm offline mode avoid downloads. A source archive can be supplied if the baseline Git history is absent, and neither mode calls a paid model. See [the guide](./local-upgrades.md) for the exact route and commands.
 
 The recorded Git revision identifies the checkout base at validation time and may precede uncommitted changes; the source/configuration/dependency fingerprints and verification-script hashes identify the tested contents. This evidence covers macOS/arm64 with Node 22; CI independently exercises Linux/x64 with Node 22. It does not qualify changed dependency graphs, downgrades, external connectors or hosted deployment.
 
@@ -74,7 +83,7 @@ The [dev.2 → dev.3 evidence](./local-upgrade-dev3-validation.json) qualifies t
 
 The [dev.3 → dev.4 evidence](./local-upgrade-dev4-validation.json) qualifies the release adding persisted model profiles and call allowances, starting at published dev.3 commit `fe540ad25246961b9cd047eeb20696d8fc91b56e`. The existing demo conversation retains its model, memory, completed action and exact pending approval. The dependency graph, SQL schema and connector remain unchanged. This historical route remains retained. This demo fixture does not establish a cross-release update of a legacy real-model session.
 
-The [dev.4 → dev.5 evidence](./local-upgrade-dev5-validation.json) qualifies the release adding a separate checkpoint namespace and recovery interface, starting at published dev.4 commit `90815ac513714a3227c4b3d82dbe06a928b2c590`. Existing session URLs retain their original namespace, connector bytes and exact pending approval. The test also proves original retrieval, one destination effect, one result delivery and continued conversation after another target restart. `npm run test:upgrade` now exercises this route. New checkpoint sessions have separate native integration and browser evidence; this update fixture does not convert old sessions or qualify cross-build checkpoint restoration.
+The [dev.4 → dev.5 evidence](./local-upgrade-dev5-validation.json) qualifies the release adding a separate checkpoint namespace and recovery interface, starting at published dev.4 commit `90815ac513714a3227c4b3d82dbe06a928b2c590`. Existing session URLs retain their original namespace, connector bytes and exact pending approval. The test also proves original retrieval, one destination effect, one result delivery and continued conversation after another target restart. The runner exercised that exact route when recorded. New checkpoint sessions have separate native integration and browser evidence; this update fixture does not convert old sessions or qualify cross-build checkpoint restoration.
 
 The [provider-outcome update evidence](./local-upgrade-model-outcomes-validation.json) repeats the dev.4 → dev.5 route for the earlier provider guard, wake scheduling and source-map configuration. The legacy connector, stored schemas and dependency graph remain unchanged; the prior checkpoint-preview route and evidence are retained. This is a local demo update, not cross-build checkpoint restoration.
 

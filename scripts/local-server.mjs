@@ -67,9 +67,9 @@ export async function startLocalServer(state, directory, root = projectRoot) {
     child.once("exit", (code) => resolve(code));
   });
   const handle = {
-    async call(path, body) {
+    async call(path, body, namespace = "sessions") {
       const response = await fetch(
-        `${base}/api/sessions/recovery-proof/${path}`,
+        `${base}/api/${namespace}/recovery-proof/${path}`,
         body
           ? {
               method: "POST",
@@ -79,7 +79,10 @@ export async function startLocalServer(state, directory, root = projectRoot) {
           : {},
       );
       const value = await response.json();
-      assert.ok(response.ok, JSON.stringify(value));
+      assert.ok(
+        response.ok,
+        `${JSON.stringify(value)}\nRecent local runtime output:\n${output}`,
+      );
       return value;
     },
     async stop() {

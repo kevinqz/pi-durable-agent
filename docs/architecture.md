@@ -2,6 +2,8 @@
 
 [README](../README.md) · [Roadmap](./roadmap.md)
 
+See the [upstream composition decisions](./upstream-composition.md) for existing native capabilities, removed duplication and the contracts behind retained adapters.
+
 ## Composition
 
 `AgentSession` extends the platform's Durable Object and installs the official `Lifecycle` and `PiHarness`. Its public harness factory receives Cloudflare's prefixed SQLite storage. It calls `optchat.prepare(storage)` **before** `Harness.open`, installs both extensions, applies OptChat's settings, and attaches the controller to a dedicated root conversation. No private host method is called or replaced. Pi owns tasks, transcript and scheduling; OptChat owns its memory tree and frozen request view.
