@@ -153,9 +153,16 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
   private arm(
     generation: SessionGeneration,
     time = Date.now() + LIMITS.heartbeatMs,
+    mode: "earliest" | "replace" = "earliest",
   ) {
+    const id = `generation:${generation.epoch}`;
+    const existing = this.lifecycle.jobs.get(id);
+    // Polling and child notifications may advance a wake, never postpone it.
+    // Only the alarm callback replaces its own lease while/after driving work.
+    if (mode === "earliest" && existing && existing.time <= time)
+      return Promise.resolve(existing);
     return this.lifecycle.jobs.push({
-      id: `generation:${generation.epoch}`,
+      id,
       fn: "generation",
       time,
       payload: generation,
@@ -398,7 +405,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
         catalog.active.facet !== generation.facet
       )
         return;
-      await this.arm(generation);
+      await this.arm(generation, Date.now() + LIMITS.heartbeatMs, "replace");
       const child = this.child(generation);
       await child.drive(attempt);
       const background = child.waitBackground();
@@ -409,7 +416,8 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
       // new intent after the child has committed all dispatched queue mutations.
       if (next === undefined)
         await this.lifecycle.jobs.cancel(`generation:${generation.epoch}`);
-      else await this.arm(generation, Math.max(Date.now() + 10, next));
+      else
+        await this.arm(generation, Math.max(Date.now() + 10, next), "replace");
     });
   }
 }

@@ -87,6 +87,7 @@ O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separad
 - [Checkpoints e restauração da sessão](./docs/coordinated-recovery.md)
 - [Atualização local entre versões](./docs/local-upgrades.md)
 - [Atualização hospedada e reinício da demonstração](./docs/hosted-recovery.md)
+- [Profiling nativo de CPU e alocações](./docs/profiling.md)
 - [Verificações e limites](./docs/validation.md)
 - [Roadmap](./docs/roadmap.md)
 

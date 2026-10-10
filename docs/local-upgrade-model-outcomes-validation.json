@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-10T02:21:25.599Z",
+  "kind": "local-cross-release-upgrade",
+  "shutdown": "graceful",
+  "crossRelease": true,
+  "targetRuntime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.5",
+    "revision": "da227207db04047c4cdd0efd5ca14a38500ef443",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "4977aba13d8061f6ea7f5acb781a034f0fa40ed471194bb96ec7f6bb9bed3437",
+    "buildFingerprint": "a84ca318775344b83268e5608bf2de760e04695995b62050cd6fc18bb0c8ec16",
+    "fingerprint": "78713f971641756bf86ee4c812dd538718369e226a14e63363181cc07479c973"
+  },
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.4",
+    "revision": null,
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "36fe7fc5249572f2f3956e446f4246609d293d6551261048d7b833296ca92605",
+    "buildFingerprint": "48d480f280a7b7757744b035c0e6940ba54e80bbbd18d14e56c65bf34e9a5836",
+    "fingerprint": "4c4a80d91763ec889bd29400779f765aa5db0af493951fe465e1ab304b665fa3"
+  },
+  "snapshot": {
+    "files": 31,
+    "bytes": 5836274,
+    "sha256": "cf8c9cdb64d8dd347ea0a40efd4fa4b40649b267b5d1b34d33e3ad5480ec667d"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true,
+    "ordinaryRestoreRefusedRuntimeChange": true,
+    "completedActionPreserved": true,
+    "connectorV1BytesPreserved": true,
+    "restartedTargetWithoutDuplicateDelivery": true,
+    "newConversationTurnCompleted": true
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "baselineCommit": "90815ac513714a3227c4b3d82dbe06a928b2c590",
+  "limits": [
+    "Legacy demo session namespace; no model calls or hosted update",
+    "No cross-build checkpoint restoration or arbitrary dependency change"
+  ],
+  "sourceIdentification": "Guard, alarm scheduling and source-map configuration reviewed. targetRuntime.revision is the checkout base; content fingerprints identify the exact tested uncommitted target."
+}

@@ -10,7 +10,7 @@ The top-level Wrangler environment is disabled. `npm run build` only bundles the
 
 ## Staging prerequisites
 
-A private demo staging instance has passed the authenticated application flow, the dev.1 → dev.2 backend update and a bounded forced session reset. Coordinated hosted backup/restore and broader operational qualification remain open; see the [recovery evidence and limits](./hosted-recovery.md). Follow the [staging walkthrough](./staging.md) for the exact provisioning order and private configuration. The complete application requires a Cloudflare account with **Workers Paid**, a protected hostname and a Cloudflare Access application. Dynamic Workers (the `LOADER` binding used by Code Mode) require that paid plan even when model replies are simulated. As checked on 2026-10-09, Workers Paid starts at **US$5 per account per month**, with additional usage charges. The base price is not a spending ceiling. See [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/) and [Dynamic Workers pricing](https://developers.cloudflare.com/dynamic-workers/pricing/).
+A private demo staging instance has passed the authenticated application flow, the dev.1 → dev.2 backend update and a bounded forced session reset. Coordinated hosted demo backup/restore and three native interruption boundaries have also passed; real inference, a second authenticated identity and release promotion remain open; see the [recovery evidence and limits](./hosted-recovery.md). Follow the [staging walkthrough](./staging.md) for the exact provisioning order and private configuration. The complete application requires a Cloudflare account with **Workers Paid**, a protected hostname and a Cloudflare Access application. Dynamic Workers (the `LOADER` binding used by Code Mode) require that paid plan even when model replies are simulated. As checked on 2026-10-09, Workers Paid starts at **US$5 per account per month**, with additional usage charges. The base price is not a spending ceiling. See [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/) and [Dynamic Workers pricing](https://developers.cloudflare.com/dynamic-workers/pricing/).
 
 The subscription enables the isolated code execution used by Code Mode. Durable Objects supply persistent state, and Access supplies authentication; Dynamic Workers alone do not provide either guarantee. Our integration composes these services with Pi and OptChat. The included demo connector only creates session-local notes: paying for hosting does not install email, calendar or other external integrations. Real model inference is configured and billed separately from ChatGPT/Claude subscriptions. Review [Durable Objects pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/) and [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) for the chosen workload.
 
@@ -35,6 +35,12 @@ The host caps both provider streaming entry points at 2,048 output tokens and re
 
 ## Observe and recover
 
+Use [native on-demand profiling](./profiling.md) to investigate CPU and
+allocation costs in the hosted Worker or a specific Durable Object. The
+tracked configuration uploads source maps; existing private copies need the
+same setting before their next deployment. Profiling complements the session
+counters and recovery receipts.
+
 The authenticated session state reports active tasks, scheduled wakes, oldest pending age, pending approvals, unknown actions, retained output bytes and Pi's usage accounting. These are functional local counters, not a complete cost dashboard. Failures log categories rather than credentials or raw model payloads.
 
 - **Disconnected:** reload the same session URL. Accepted work is addressed by durable IDs.
@@ -50,4 +56,4 @@ Use the [local backup/restore commands](./local-recovery.md) with Wrangler stopp
 
 Do not rewind only Pi or only the Code Mode runtime after an effect: the other system and destination may already have advanced. The coordinated protocol fences new-session work while copying and retains effects and consumption outside the restored subtree. Stop Wrangler for offline file backups. Neither mechanism advertises portable cloud recovery from root deletion, agent self-update, automatic rollback or destructive retention.
 
-For a local update, follow the [reviewed release route](./local-upgrades.md). For a hosted update: review the lockfile diff, preserve old connector implementations, run the focused regression checks, test paused approvals and result delivery against a staging copy, then deploy. Rollback changes code; it does not undo external effects. The exact dev.1 → dev.2 hosted route is observed in the [recovery evidence](./hosted-recovery-validation.json). Changed dependencies/connectors, coordinated restore and operational release promotion remain separate gates.
+For a local update, follow the [reviewed release route](./local-upgrades.md). For a hosted update: review the lockfile diff, preserve old connector implementations, run the focused regression checks, test paused approvals and result delivery against a staging copy, then deploy. Rollback changes code; it does not undo external effects. The exact dev.1 → dev.2 hosted route is observed in the [recovery evidence](./hosted-recovery-validation.json). Changed dependencies/connectors, restoration across backend builds and operational release promotion remain separate gates.

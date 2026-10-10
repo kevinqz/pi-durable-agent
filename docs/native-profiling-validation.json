@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-10T02:15:35.926246+00:00",
+  "kind": "native-profiling-availability",
+  "sourceCommit": "cfe0aa14ebeecceaa72b5e3c2175c08936cf5da9",
+  "deploymentVersion": "77315ad1-ae6b-4cc5-9f53-86f3f2c3db4f",
+  "target": "outer HTTP Worker, not an exact Durable Object instance",
+  "profileType": "cpu",
+  "requestedDurationMs": 5000,
+  "observed": {
+    "captureCompleted": true,
+    "profileDownloaded": true,
+    "samples": 1,
+    "sampledTimeMs": 1,
+    "frames": ["(root)", "(idle)"],
+    "continuousWorkerLogsEnabled": false,
+    "additionalModelCalls": 0
+  },
+  "artifact": {
+    "bytes": 101,
+    "sha256": "c9f5285f5315275594557f6a5d4b2676337606932de07553e05436723f73cd5c",
+    "retained": "private; not committed"
+  },
+  "limits": [
+    "No application function samples; insufficient coverage for performance conclusions",
+    "Does not qualify the session facet, Code Mode isolate, allocations, provider latency or cache efficiency",
+    "Capture predates source-map uploads"
+  ]
+}

@@ -82,6 +82,8 @@ Each authenticated identity and session name maps to a separate Durable Object. 
 
 Code Mode 0.5.3 does not expose an execute-or-attach idempotency key. This app records admission before dispatch, uses one named runtime per action, and never silently starts another execution after an ambiguous dispatch. **Unknown** means inspection or operator reconciliation is required. This is not an exactly-once guarantee for arbitrary external services.
 
+The operator can use [native CPU/allocation profiling](./docs/profiling.md) to diagnose the hosted runtime without adding an agent tool or changing OptChat.
+
 ## Develop
 
 ```sh
