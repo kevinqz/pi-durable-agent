@@ -3,6 +3,7 @@
 ## Unreleased — Coordinated session checkpoints
 
 - Reject empty model completions as failures while preserving usage and charged attempts; do not silently retry them.
+- Keep an already scheduled session wake when the interface polls; only the alarm callback replaces its lease. This prevents pending actions from being postponed by an open page.
 - Enable source-map uploads and document native Cloudflare CPU/allocation profiling, its scope and its separation from model and memory-quality evidence.
 
 - Run new sessions in native facets with root-owned alarms, consumption records and destination receipts; preserve existing session URLs and connector contracts.

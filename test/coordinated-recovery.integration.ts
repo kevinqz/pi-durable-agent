@@ -74,6 +74,34 @@ async function recover(
   return status;
 }
 
+test("polling does not postpone scheduled work or starve an action", async () => {
+  const stub = session();
+  await call(stub, "POST", "configuration", { mode: "demo" });
+  await call(stub, "GET", "state");
+  // A future deadline isolates polling from an alarm legitimately advancing it.
+  const due = Date.now() + 5000;
+  await runInDurableObject(stub, (object) =>
+    object.lifecycle.jobs.reschedule("generation:0", due),
+  );
+  for (let read = 0; read < 3; read++) {
+    await call(stub, "GET", "state");
+    const next = await runInDurableObject(
+      stub,
+      (object) => object.lifecycle.jobs.get("generation:0")!.time,
+    );
+    expect(next).toBeLessThanOrEqual(due);
+  }
+  await call(stub, "POST", "actions", {
+    id: "polling-note",
+    label: "Polling fixture",
+    code: 'async () => await notes.create({key:"polling",text:"Fixture"})',
+  });
+  // Use the admitted alarm as-is: forcing its timestamp would hide starvation.
+  await runDurableObjectAlarm(stub);
+  const state = await call(stub, "GET", "state");
+  expect(state.actions[0].status).toBe("pending");
+});
+
 test("full session checkpoint restores native Pi and Code Mode while destination effects remain outside the rewind", async () => {
   let stub = session();
   await call(stub, "POST", "configuration", { mode: "demo" });

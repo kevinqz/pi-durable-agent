@@ -1,20 +1,20 @@
 {
-  "date": "2026-10-10T02:14:25.661Z",
+  "date": "2026-10-10T02:21:25.599Z",
   "kind": "local-cross-release-upgrade",
   "shutdown": "graceful",
   "crossRelease": true,
   "targetRuntime": {
     "application": "pi-durable-agent",
     "version": "0.1.0-dev.5",
-    "revision": "d6fb1ff977ed570e0c04d15a993523ee1d9b51df",
+    "revision": "da227207db04047c4cdd0efd5ca14a38500ef443",
     "environment": {
       "platform": "darwin",
       "architecture": "arm64",
       "nodeMajor": "22"
     },
     "lockfileSha256": "4977aba13d8061f6ea7f5acb781a034f0fa40ed471194bb96ec7f6bb9bed3437",
-    "buildFingerprint": "1aff41a6ed450f46380d6baa5407a27bdb2558573113856f1b3b9cd71062a416",
-    "fingerprint": "c9c42a0fb069d7bdb4701e0e1c9d98171bc82c1e1b76d3893c39c4401cbe74fe"
+    "buildFingerprint": "a84ca318775344b83268e5608bf2de760e04695995b62050cd6fc18bb0c8ec16",
+    "fingerprint": "78713f971641756bf86ee4c812dd538718369e226a14e63363181cc07479c973"
   },
   "runtime": {
     "application": "pi-durable-agent",
@@ -31,8 +31,8 @@
   },
   "snapshot": {
     "files": 31,
-    "bytes": 5828034,
-    "sha256": "ae746248938561233348438302fa0731e5e11abcb1d7cc5a0214b11684b35728"
+    "bytes": 5836274,
+    "sha256": "cf8c9cdb64d8dd347ea0a40efd4fa4b40649b267b5d1b34d33e3ad5480ec667d"
   },
   "observed": {
     "liveBackupRefused": true,
@@ -60,5 +60,5 @@
     "Legacy demo session namespace; no model calls or hosted update",
     "No cross-build checkpoint restoration or arbitrary dependency change"
   ],
-  "sourceIdentification": "Provider outcome guard and source-map configuration reviewed; source/dependency/configuration fingerprints identify the exact tested target."
+  "sourceIdentification": "Guard, alarm scheduling and source-map configuration reviewed. targetRuntime.revision is the checkout base; content fingerprints identify the exact tested uncommitted target."
 }

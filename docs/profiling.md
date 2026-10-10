@@ -68,6 +68,8 @@ Compare equivalent operations and versions before proposing an optimization.
 Do not add model calls just to keep a profile busy. Changes to memory or
 checkpoint algorithms still need their existing correctness checks.
 
-This guide documents the native integration; it does not claim a captured
-production profile or a measured performance improvement. See also
+A [five-second staging capture](./native-profiling-validation.json) confirmed
+that the account could capture and download a native profile with continuous
+Worker logs disabled. It contained only one idle sample: no performance
+conclusion or optimization benefit is established. See also
 [source-map configuration](https://developers.cloudflare.com/workers/observability/source-maps/).
