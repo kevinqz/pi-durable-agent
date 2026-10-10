@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-10",
+  "kind": "hosted-warm-facet-code-update",
+  "status": "passed",
+  "deployment": "2701d984-7bab-4a5a-b76c-ab1afb10f97a",
+  "beforeBackend": "6016ec0ec3c54961441398fbfdd60e0981335460dbda4a0812f612915d65d48e",
+  "afterBackend": "9c9ce03fdbc73a6b1633d87ed6bd65b94c88a07f45e93f3c95266ec2f61c3cdf",
+  "afterBackendMatchedLocalCandidate": true,
+  "sameSession": true,
+  "reservedCallsBefore": 9,
+  "reservedCallsAfter": 9,
+  "retainedChecks": {
+    "history": true,
+    "memory": true,
+    "usage": true,
+    "actions": true,
+    "requestIdentityAndOutcome": true,
+    "retainedOutputs": true
+  },
+  "privateExportPayloadSha256": {
+    "before": "b9cf17210b7852e1efe1bd04e35e1f3719f2b4c2d11260af2d2e26c17ceec98d",
+    "after": "bb0f6297f1fd36005d2147aad09613461107bf45e7d41746567301851b3cc149"
+  },
+  "localRegression": {
+    "nativeIntegrationChecks": 5,
+    "previousWarmClassFixture": true,
+    "busyAdmissionAndCheckpointDenied": true,
+    "idleNativeAbortAndGet": true,
+    "samePendingApprovalPreserved": true,
+    "oneDestinationNoteAfterApproval": true
+  },
+  "limits": [
+    "The hosted session had no pending action; pending-approval retention across code reload is covered by the local native fixture.",
+    "The candidate included a temporary response-shape probe and an unproven complete-response override; both were removed before publication.",
+    "This is a storage-preserving code reload with unchanged dependencies and schemas, not arbitrary schema migration or cross-build checkpoint restoration."
+  ]
+}

@@ -9,6 +9,8 @@ import type { RecoveryEnv } from "../src/session-supervisor.js";
 import type { Principal } from "../src/env.js";
 import { SessionStore } from "../src/store.js";
 import worker from "../src/worker.js";
+import build from "../src/generated/checkpoint-build.json";
+import type { PriorSessionFacet } from "./fixtures/recovery-worker.js";
 
 const bindings = env as unknown as RecoveryEnv;
 const session = () => bindings.RECOVERY_SESSIONS.getByName(crypto.randomUUID());
@@ -100,6 +102,87 @@ test("polling does not postpone scheduled work or starve an action", async () =>
   await runDurableObjectAlarm(stub);
   const state = await call(stub, "GET", "state");
   expect(state.actions[0].status).toBe("pending");
+});
+
+test("a warm previous-build facet drains before a native code reload preserves its pending approval", async () => {
+  const stub = session();
+  await call(stub, "POST", "messages", {
+    id: "update-source",
+    text: "Remember runtime update 853.",
+  });
+  await idle(stub);
+  await call(stub, "POST", "actions", {
+    id: "update-note",
+    label: "Pending across a code update",
+    code: 'async () => await notes.create({key:"update",text:"Runtime update 853"})',
+  });
+  await drive(stub);
+  const before = await call(stub, "GET", "state");
+  expect(before.actions[0].status).toBe("pending");
+  await runInDurableObject(stub, async (object, ctx) => {
+    const generation = object.checkpoints.status().active;
+    ctx.facets.abort(generation.facet, new Error("Install prior-code fixture"));
+    const exports = ctx.exports as unknown as {
+      PriorSessionFacet(options: {
+        props: unknown;
+      }): DurableObjectClass<PriorSessionFacet>;
+    };
+    const prior = ctx.facets.get<PriorSessionFacet>(generation.facet, () => ({
+      class: exports.PriorSessionFacet({
+        props: {
+          rootId: ctx.id.toString(),
+          generation,
+          profile: before.model,
+        },
+      }),
+    }));
+    await prior.setBusyForUpdateTest(true);
+    // Emulate the root's fresh in-memory cache after deployment, without changing
+    // any persisted application data or patching a framework implementation.
+    (
+      object as unknown as { verifiedRuntimes: Set<string> }
+    ).verifiedRuntimes.clear();
+  });
+  const busy = await call(stub, "GET", "state");
+  expect(busy.runtime.codeUpdatePending).toBe(true);
+  expect(
+    (await call(stub, "POST", "cancel", { id: "update-source" })).status,
+  ).toBe("completed");
+  await expect(
+    call(stub, "POST", "messages", { id: "blocked", text: "Do not admit" }),
+  ).rejects.toMatchObject({ status: 409 });
+  await expect(
+    call(stub, "POST", "checkpoints/create", { id: "blocked-checkpoint" }),
+  ).rejects.toMatchObject({ status: 409 });
+  await runInDurableObject(stub, async (object, ctx) => {
+    const old = ctx.facets.get<PriorSessionFacet>(
+      object.checkpoints.status().active.facet,
+      () => {
+        throw new Error("Expected the old warm facet");
+      },
+    );
+    await old.setBusyForUpdateTest(false);
+  });
+  const after = await call(stub, "GET", "state");
+  expect(after.runtime).toMatchObject({
+    backend: build.sha256,
+    expectedBackend: build.sha256,
+    codeUpdatePending: false,
+  });
+  expect(after.history).toEqual(before.history);
+  expect(after.memory).toEqual(before.memory);
+  expect(after.actions).toEqual(before.actions);
+  expect(after.requests.some((r: any) => r.id === "blocked")).toBe(false);
+  await call(stub, "POST", "actions/decide", {
+    id: "update-note",
+    decision: "approve",
+    fingerprint: after.actions[0].fingerprint,
+  });
+  const done = await idle(stub);
+  expect(done.actions[0].status).toBe("completed");
+  expect(await stub.notes({ facet: "session-initial", epoch: 0 })).toHaveLength(
+    1,
+  );
 });
 
 test("full session checkpoint restores native Pi and Code Mode while destination effects remain outside the rewind", async () => {

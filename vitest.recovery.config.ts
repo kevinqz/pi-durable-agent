@@ -9,6 +9,7 @@ export default defineConfig({
       additionalExports: {
         CodemodeRuntime: "DurableObject",
         SessionFacet: "DurableObject",
+        PriorSessionFacet: "DurableObject",
       },
     }),
   ],

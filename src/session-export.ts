@@ -12,7 +12,7 @@ const size = (value: unknown) =>
 type Snapshot = {
   mode: string;
   schema: number;
-  runtime: { release: string };
+  runtime: { release: string; backend?: string };
   memory: unknown;
   history: Awaited<ReturnType<OptChatController["history"]>>;
   requests: RequestRow[];
@@ -39,6 +39,7 @@ function retainedState(state: Snapshot) {
     application: {
       name: "pi-durable-agent",
       version: state.runtime.release,
+      backendRuntime: state.runtime.backend,
       modelMode: state.mode,
       schema: state.schema,
     },
@@ -56,6 +57,7 @@ export async function createSessionExport(
   snapshot: () => Promise<Snapshot>,
   history: OptChatController["history"],
   archive: (id: string) => string | undefined,
+  diagnostics?: () => Promise<unknown>,
 ) {
   const startedAt = new Date().toISOString();
   const before = retainedState(await snapshot());
@@ -126,6 +128,8 @@ export async function createSessionExport(
     account(output);
     outputs.push(output);
   }
+  const modelDiagnostics = await diagnostics?.();
+  if (modelDiagnostics !== undefined) account(modelDiagnostics);
   const after = retainedState(await snapshot());
   if ((await digest(JSON.stringify(after))) !== revision)
     throw new HttpError(
@@ -145,11 +149,18 @@ export async function createSessionExport(
     ...data,
     history: { complete: true, messageCount: items.length, items },
     retainedOutputs: outputs,
+    ...(modelDiagnostics === undefined ? {} : { modelDiagnostics }),
     coverage: {
       history:
         "all retained messages normalized by the public OptChat history API",
       memory: "current memory view and counters",
       actions: "application records and retained executor output",
+      ...(modelDiagnostics === undefined
+        ? {}
+        : {
+            modelDiagnostics:
+              "provider outcomes within the newest 100 Pi entries; no raw prompts or response text",
+          }),
       runtimeCheckpoint: false,
       approvalAuthority: false,
     },

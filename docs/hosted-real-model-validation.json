@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-10",
+  "kind": "bounded-hosted-real-model-trial",
+  "status": "partial",
+  "model": "@cf/meta/llama-4-scout-17b-16e-instruct",
+  "budget": {
+    "sessions": 1,
+    "callLimit": 12,
+    "reservedCallsObserved": 10,
+    "summariesAndFailedAttemptsIncluded": true,
+    "reportedTokenCostUsd": 0.0033393,
+    "reportedTokenCostIsAccountInvoice": false
+  },
+  "observed": {
+    "realReply": true,
+    "longLeafSummary": true,
+    "originalSourceRetrieval": true,
+    "sameBuildCheckpointRestore": true,
+    "callCountUnchangedByRestore": true,
+    "modelDirectedActionAdmitted": false,
+    "modelDirectedActionCount": 0
+  },
+  "attempts": [
+    {
+      "deployment": "77315ad1-ae6b-4cc5-9f53-86f3f2c3db4f",
+      "phase": "reply and summary",
+      "result": "Aurora-731 recorded; original synthetic input retained",
+      "cumulativeReservedCalls": 2
+    },
+    {
+      "deployment": "77315ad1-ae6b-4cc5-9f53-86f3f2c3db4f",
+      "phase": "model-directed tool",
+      "result": "empty completion; zero actions",
+      "cumulativeReservedCalls": 3
+    },
+    {
+      "uploadedDeployment": "112a3234-5ce1-4b00-b115-88b11e22e91a",
+      "phase": "model-directed tool during deferred code-update window",
+      "sessionTargetRuntimeConfirmed": false,
+      "result": "empty completion; zero actions; another summary",
+      "cumulativeReservedCalls": 5
+    },
+    {
+      "uploadedDeployment": "112a3234-5ce1-4b00-b115-88b11e22e91a",
+      "phase": "guarded model-directed tool",
+      "sessionTargetRuntimeConfirmedBeforeCall": false,
+      "result": "saved model error: no text or tool call; zero actions",
+      "cumulativeReservedCalls": 6
+    },
+    {
+      "uploadedDeployment": "5267d1c5-0250-4dac-b761-1ea537c638bf",
+      "phase": "complete-response candidate without prior child-runtime verification",
+      "sessionTargetRuntimeConfirmedBeforeCall": false,
+      "result": "saved model error: no text or tool call; zero actions",
+      "cumulativeReservedCalls": 7
+    },
+    {
+      "uploadedDeployment": "cb1ee134-e99d-4be7-8b51-c74aeda14919",
+      "phase": "warm previous-build child; tool-directed text and summary",
+      "exportedChildBackend": "6016ec0ec3c54961441398fbfdd60e0981335460dbda4a0812f612915d65d48e",
+      "result": "ordinary text resembling a codemode call; zero actions",
+      "cumulativeReservedCalls": 9
+    },
+    {
+      "deployment": "2701d984-7bab-4a5a-b76c-ab1afb10f97a",
+      "phase": "tool-directed turn after verified native idle code reload",
+      "sessionTargetRuntimeConfirmedBeforeCall": true,
+      "backend": "9c9ce03fdbc73a6b1633d87ed6bd65b94c88a07f45e93f3c95266ec2f61c3cdf",
+      "result": "ordinary text resembling a codemode call; zero actions",
+      "cumulativeReservedCalls": 10
+    }
+  ],
+  "privateExportPayloadSha256": "b2acd48c63247c917307917b1724a63497e7f677ce5d9887180604fed92c1e40",
+  "limits": [
+    "The provider tool/approval/result flow remains unqualified. No code was executed from ordinary assistant text.",
+    "Some attempts followed an upload before the warm child reached that code. Upload IDs alone do not identify the code used for an inference.",
+    "The final candidate was verified before its call and still did not produce a structured tool call. The complete-response experiment was removed because it did not qualify this flow.",
+    "Saved Pi outcomes are available, but no raw provider-body capture established whether the model, platform or adapter caused the earlier empty outcomes.",
+    "The trial stopped at 10/12 reserved calls. A second model/session requires separate authorization.",
+    "These synthetic observations do not establish model quality, cache efficiency, account billing or arbitrary failure recovery."
+  ],
+  "finalArchive": {
+    "messages": 10,
+    "summarizedMessages": 10,
+    "memoryViewBytes": 1743,
+    "actions": 0,
+    "retainedOutputs": 0,
+    "offlineIntegrityVerified": true,
+    "inputTokens": 11055,
+    "outputTokens": 417
+  }
+}

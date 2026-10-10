@@ -2,7 +2,7 @@
 
 [README](../README.md) · [Roadmap](./roadmap.md)
 
-Local validation on **2026-10-09** uses the installed release artifact of OptChat, the official Cloudflare test plugin and its Workers runtime. No paid model calls or remote Cloudflare resources are involved.
+Local validation through **2026-10-10** uses the installed release artifact of OptChat, the official Cloudflare test plugin and its Workers runtime. No paid model calls or remote Cloudflare resources are involved.
 
 | Component                | Pinned version                                     |
 | ------------------------ | -------------------------------------------------- |
@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **32 tests** covering:
+`npm test` contains **33 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -36,7 +36,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 - Empty streamed model outcomes fail without retry or lost usage; native tool-only responses survive the asynchronous admission guard on both streaming entry points.
 - Both streaming entry points of the official Workers AI adapter using a simulated binding, bounded output, context checks and rejection before provider dispatch.
 
-Five of these tests cover session export: public history pagination, owner isolation, a real pending/completed Code Mode output, data integrity, concurrent changes and bounded failure behavior. `npm run test:export` checks the separate offline verifier. See the [export scope](./session-export.md#validation-scope).
+Six of these tests cover session export: public history pagination, owner isolation, a real pending/completed Code Mode output, data integrity, concurrent changes and bounded failure behavior. `npm run test:export` checks the separate offline verifier. See the [export scope](./session-export.md#validation-scope).
 
 The original runtime-reset tests use Cloudflare's `abortAllDurableObjects` test helper and obtains fresh stubs afterward. It resets in-memory instances while retaining storage. The effect-before-checkpoint and delivery-before-ack windows are **seeded durable states**; they are not evidence of a real external service being killed at that exact instruction. The one qualified mutation is the local notes destination.
 
@@ -46,7 +46,7 @@ Type checking, formatting and the staging **dry-run** bundle are the other relea
 
 ## Local backup/restore increment
 
-The new [coordinated-recovery composition](./coordinated-recovery.md) has seven journal/evidence checks within `npm test` and four native application integration checks in `npm run test:checkpoints`. A fifth model-control check verifies that asynchronous supervisor authorization precedes either provider stream. The [dev.5 product integration record](./product-checkpoints-local-validation.json) records the current local checks and exact source hashes. The integration suite also prevents polling from postponing an admitted wake, executes a newly admitted action without forcing its job timestamp, exercises the actual HTTP router and rejects an approval submitted from the previous generation. The [local browser record](./checkpoint-ui-local-validation.json) covers the new controls and post-restore search. These are local synthetic checks. The narrower [hosted facet probe](./hosted-facet-checkpoint-validation.json) establishes the native copying primitive only; it does not close the production recovery gate.
+The new [coordinated-recovery composition](./coordinated-recovery.md) has seven journal/evidence checks within `npm test` and five native application integration checks in `npm run test:checkpoints`. A fifth model-control check verifies that asynchronous supervisor authorization precedes either provider stream. The [dev.5 product integration record](./product-checkpoints-local-validation.json) records that earlier increment's local checks and exact source hashes. The integration suite also prevents polling from postponing an admitted wake, executes a newly admitted action without forcing its job timestamp, exercises the actual HTTP router and rejects an approval submitted from the previous generation. The [local browser record](./checkpoint-ui-local-validation.json) covers the new controls and post-restore search. These are local synthetic checks. The narrower [hosted facet probe](./hosted-facet-checkpoint-validation.json) establishes the native copying primitive only; it does not close the production recovery gate.
 
 The [hosted interruption fixture](./hosted-journal-interruptions-validation.json) exercises three native root-abort boundaries using the unchanged application source in a private subclass. Alarm-driven recovery retained the exact pending approval, with one destination row and one delivery receipt counted after reapproval. The [independent installation record](./independent-archive-install-validation.json) covers fresh dependencies from the local cache, an archive without Git, a demo conversation and a validated checkpoint. Neither record qualifies real inference or a second Access identity.
 
@@ -76,7 +76,9 @@ The [dev.3 → dev.4 evidence](./local-upgrade-dev4-validation.json) qualifies t
 
 The [dev.4 → dev.5 evidence](./local-upgrade-dev5-validation.json) qualifies the release adding a separate checkpoint namespace and recovery interface, starting at published dev.4 commit `90815ac513714a3227c4b3d82dbe06a928b2c590`. Existing session URLs retain their original namespace, connector bytes and exact pending approval. The test also proves original retrieval, one destination effect, one result delivery and continued conversation after another target restart. `npm run test:upgrade` now exercises this route. New checkpoint sessions have separate native integration and browser evidence; this update fixture does not convert old sessions or qualify cross-build checkpoint restoration.
 
-The [provider-outcome update evidence](./local-upgrade-model-outcomes-validation.json) repeats the dev.4 → dev.5 route for the current provider guard, wake scheduling and source-map configuration. The legacy connector, stored schemas and dependency graph remain unchanged; the prior checkpoint-preview route and evidence are retained. This is a local demo update, not cross-build checkpoint restoration.
+The [provider-outcome update evidence](./local-upgrade-model-outcomes-validation.json) repeats the dev.4 → dev.5 route for the earlier provider guard, wake scheduling and source-map configuration. The legacy connector, stored schemas and dependency graph remain unchanged; the prior checkpoint-preview route and evidence are retained. This is a local demo update, not cross-build checkpoint restoration.
+
+The [session-runtime update evidence](./local-upgrade-session-runtime-validation.json) repeats the same legacy route for warm-facet code verification and private model diagnostics. History, memory, the exact pending approval, V1 connector bytes, one destination note and one delivery receipt survived; a further target restart and new conversation turn passed. The source snapshot remained checksum-identical. The exact target content fingerprint is recorded separately from the checkout base commit.
 
 ## Model selection increment
 
@@ -114,10 +116,17 @@ The [dev.3 evidence](./session-export-validation.json) records the protected bac
 
 The same evidence records a failed isolated native-checkpoint prototype: the unchanged PiHarness/Lifecycle cannot start inside a facet that lacks a physical alarm. Clone and restore were not reached. See the [composition findings](./hosted-recovery.md#native-facet-checkpoint-investigation--2026-10-09).
 
+## Hosted identity and real-model trial
+
+[Second-identity isolation](./hosted-identity-isolation-validation.json) passed through the authenticated product UI. The same session URL opened separate history, model profile, approvals and checkpoints. A synthetic second-user note did not alter the owner's archive. Temporary membership was removed and the owner logged back in. This is a bounded application check, not a penetration or load test.
+
+The [real-model trial](./hosted-real-model-validation.json) reserved 10/12 calls with synthetic data. Text replies, long-message summarization, original retrieval and a same-build checkpoint/restore passed. Pi reported US$0.0033393 in token costs; this is model usage accounting, not an account invoice. No structured action was admitted. Blank completions now fail with retained usage; text resembling code remains ordinary text.
+
+The trial also identified a warm-facet update gap. The application now checks the child's backend fingerprint, lets already-admitted work finish and reloads an idle mismatched facet through native `facets.abort/get`, preserving storage. New messages, new actions and checkpoints wait while old code is busy; inspection, cancellation and decisions on existing work remain available. Five native integration checks include a warm prior-code fixture with a pending approval, refusal of new admissions while busy, preserved history/memory/approval and one note after updating. The hosted session also reached the expected backend with its recorded usage unchanged. This is code reloading, not an arbitrary schema migration or cross-build checkpoint restore.
+
 ## Not yet established
 
-- Hosted isolation using a second authenticated identity has not been exercised; the current Access policy intentionally admits only its owner. Signed-token and identity-isolation tests run locally.
-- No real Workers AI inference or arbitrary external mutation has been qualified.
+- The real-model tool/approval/result flow remains unqualified: the Scout trial produced empty outcomes or ordinary text resembling a tool call, with zero admitted actions. This is not evidence of a successful tool execution. No arbitrary external mutation is qualified.
 - Hosted checkpoint evidence covers a protected demo restore and three private native root-abort boundaries: after source quiescence, after candidate validation and after activation before journal completion. Arbitrary abrupt-failure windows, real-provider interruptions, hibernation billing behavior, root/namespace/account loss and cross-build checkpoint restoration remain unqualified. See the [exact recovery scope](./coordinated-recovery.md#hosted-evidence-and-remaining-work).
 - No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. Hosted update evidence covers dev.1 → dev.2, dev.2 → dev.3 and the [legacy-session dev.3 → dev.5 flow](./hosted-product-checkpoints-dev5-validation.json), with unchanged dependencies. That legacy update passed even though the same record's initial checkpoint-restoration flow failed; the corrected restore has its own [evidence](./hosted-checkpoint-restore-validation.json).
 - The independently installed archive is a development candidate. Verification and publication of the final operational release artifact remain open.

@@ -2,7 +2,7 @@
 
 Aplicação independente e aberta que reúne **Pi Durable**, a memória do **OptChat Durable** e ferramentas do **Cloudflare Code Mode**.
 
-**Prévia de desenvolvimento.** A demonstração usa runtimes reais com respostas de modelo simuladas; o único conector implementado cria notas da sessão. Novas sessões têm [checkpoints e restauração](./docs/coordinated-recovery.md), verificados localmente e em um fluxo protegido na Cloudflare. A instalação local completa também tem um [backup offline](./docs/local-recovery.md). Três interrupções controladas do coordenador hospedado também passaram em um ambiente privado de teste. Ainda faltam o fluxo com modelo real, uma segunda identidade autenticada e a publicação da versão operacional. Veja as [evidências e limitações](./docs/validation.md).
+**Prévia de desenvolvimento.** A demonstração padrão usa runtimes reais com respostas simuladas; o único conector cria notas da sessão. [Checkpoints e restauração](./docs/coordinated-recovery.md), interrupções controladas na Cloudflare e isolamento entre duas identidades autenticadas foram verificados. Um [teste com modelo real](./docs/hosted-real-model-validation.json) passou por resposta textual, resumo de memória, busca do original e restauração na mesma versão, mas não produziu uma chamada estruturada de ferramenta. Ainda faltam o fluxo de aprovação e resultado dirigido pelo modelo e a publicação da versão operacional. Veja as [evidências e limitações](./docs/validation.md).
 
 ## Começar do zero
 
