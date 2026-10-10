@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The demo uses real runtimes and simulated model replies; only the session notes connector is implemented. New sessions have [checkpoint and restore controls](./docs/coordinated-recovery.md), verified locally and in a protected hosted demo flow. A complete stopped local installation also has an [offline backup workflow](./docs/local-recovery.md). Real model calls, hosted coordinator fault injection, a second authenticated identity and the operational release remain pending. See the [evidence and limits](./docs/validation.md).
+**Development preview.** The demo uses real runtimes and simulated model replies; only the session notes connector is implemented. New sessions have [checkpoint and restore controls](./docs/coordinated-recovery.md), verified locally and in a protected hosted demo flow. A complete stopped local installation also has an [offline backup workflow](./docs/local-recovery.md). Bounded hosted interruption checks also passed in a private fixture. Real model calls, a second authenticated identity and the operational release remain pending. See the [evidence and limits](./docs/validation.md).
 
 ## Try it locally
 

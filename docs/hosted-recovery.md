@@ -8,7 +8,7 @@ This qualifies that specific backend change with unchanged dependencies, storage
 
 ## Repeat the bounded check
 
-This historical reset procedure applies to legacy session URLs (`#<id>`). New `#c1:<id>` sessions use the separate [checkpoint interface](./coordinated-recovery.md), whose full hosted qualification remains pending.
+This historical reset procedure applies to legacy session URLs (`#<id>`). New `#c1:<id>` sessions use the separate [checkpoint interface](./coordinated-recovery.md), which now has a hosted demo restore and three private journal-interruption checks. Real inference, a second authenticated identity and the operational release remain pending.
 
 Use a separate synthetic legacy session in your Access-protected **demo** staging environment.
 
@@ -50,7 +50,7 @@ A local, isolated prototype tried placing the unchanged dev.2 `AgentSession` ins
 
 This is narrower than saying facet cloning is unavailable: `ctx.facets.clone` is exposed in the pinned stable Workers types. The obstruction is composing this PiHarness/Lifecycle instance inside a facet. Cloudflare's [sub-agent documentation](https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/docs/agents/runtime/execution/sub-agents.mdx) explains that the root owns the physical alarm; the Agents scheduler routes sub-agent work through that root. The pinned Lifecycle configuration does not expose an alarm-delegation adapter for nesting this application unchanged. Adopting such a layout would require a supported integration and its own recovery proof, not a private-method patch.
 
-The public Code Mode 0.5.3 API also provides no transferable execution checkpoint/import contract. Its internal runtime accessor and private facet naming are not integration points for this application. Future work must establish a supported coordinated boundary, preserve pending operation identities and destination reconciliation, and qualify restoration into a separate target. These observations do not prove that all possible architectures are impossible.
+The public Code Mode 0.5.3 API also provides no transferable execution checkpoint/import contract. Its internal runtime accessor and private facet naming are not integration points for this application. At that stage, a separate coordinated boundary was still needed to preserve pending operation identities and destination reconciliation. The later [checkpoint composition](./coordinated-recovery.md) supplies that boundary through native same-parent subtree cloning. These observations do not prove that all possible architectures are impossible.
 
 The separately implemented [session data export](./session-export.md) gives users a readable copy now. It deliberately records `restorable: false` and leaves the coordinated hosted recovery gate open.
 

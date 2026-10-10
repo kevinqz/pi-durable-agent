@@ -52,4 +52,4 @@ Runtime reconciliation can update request timestamps after reopening. It must pr
 
 ## Hosted recovery remains a separate gate
 
-Protected demo staging is available. A4 still requires hosted qualification of the new [coordinated checkpoint composition](./coordinated-recovery.md), which restores the conversation and nested executor facets while retaining supervisor effects and consumption. Restoring only one database can invalidate execution receipts. The [local cross-release route](./local-upgrades.md) has its own evidence; it does not qualify arbitrary hosted restores or dependency changes.
+Protected demo staging is available. The new [coordinated checkpoint composition](./coordinated-recovery.md) has hosted demo-restore and bounded native interruption evidence. It restores the conversation and nested executor facets while retaining supervisor effects and consumption; real-model, second-identity and operational-release qualification remain pending. Restoring only one database can invalidate execution receipts. The [local cross-release route](./local-upgrades.md) has its own evidence; it does not qualify arbitrary hosted restores or dependency changes.
