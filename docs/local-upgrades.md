@@ -8,13 +8,15 @@ The current supported local route is **0.1.0-dev.4 → 0.1.0-dev.5**. Earlier ro
 
 Stop the old local server with **Ctrl+C**, and retain its source directory and session URL. Install the new release in a different directory:
 
+**The dev.5 target is currently unreleased.** The commands below use the current development branch. A published release should be installed from its exact tag or named source archive and used with its included guide; do not assume that a development branch is a fixed release.
+
 ```sh
-git clone --branch v0.1.0-dev.5 https://github.com/kevinqz/pi-durable-agent.git pi-agent-new
+git clone https://github.com/kevinqz/pi-durable-agent.git pi-agent-new
 cd pi-agent-new
 npm ci
 ```
 
-An extracted release source archive works too; the state commands do not require Git. Run the following commands **from the new installation**. Replace the old installation path with its actual absolute path:
+An [extracted release source archive](./installation.md) works too; the state commands do not require Git. Run the following commands **from the new installation**. Replace the old installation path with its actual absolute path:
 
 ```sh
 PI_AGENT_OLD_RELEASE=/absolute/path/to/pi-durable-agent-0.1.0-dev.4
