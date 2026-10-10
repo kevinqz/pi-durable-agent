@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Coordinated session checkpoints
+
+- Run new sessions in native facets with root-owned alarms, consumption records and destination receipts; preserve existing session URLs and connector contracts.
+- Add checkpoint creation, confirmed restoration, retained operation receipts, generation fencing and bounded retry/cancellation controls.
+- Verify each copied subtree before publishing a checkpoint or activating a restore; report bounded component diagnostics without retaining their private contents.
+- Use simple facet names after the hosted runtime reopened colon-named copies empty. Preserve earlier pre-release sessions and refuse new checkpoint admission for that layout.
+- Record local integration and legacy upgrade evidence; keep hosted qualification and the operational release gate explicit.
+
 ## 0.1.0-dev.4 — Model choice and durable inference allowances
 
 - Choose the configured Workers AI model for a new session without replacing existing demo conversations. Persist the model and allowance before opening Pi.

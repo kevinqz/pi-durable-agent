@@ -102,7 +102,7 @@ test("full session checkpoint restores native Pi and Code Mode while destination
     fingerprint: before.actions[0].fingerprint,
   });
   await idle(stub);
-  expect(await stub.notes({ facet: "session:initial", epoch: 0 })).toHaveLength(
+  expect(await stub.notes({ facet: "session-initial", epoch: 0 })).toHaveLength(
     1,
   );
   const restored = await recover(stub, "restore", {
@@ -124,7 +124,7 @@ test("full session checkpoint restores native Pi and Code Mode while destination
     }),
   ).rejects.toMatchObject({ status: 409 });
   expect(
-    await stub.isGenerationActive({ facet: "session:initial", epoch: 0 }),
+    await stub.isGenerationActive({ facet: "session-initial", epoch: 0 }),
   ).toBe(false);
   await abortAllDurableObjects();
   stub = bindings.RECOVERY_SESSIONS.get(stub.id);
@@ -142,7 +142,7 @@ test("full session checkpoint restores native Pi and Code Mode while destination
     completed.requests.filter((r: any) => r.id === "result-note"),
   ).toHaveLength(1);
   expect(
-    await stub.notes({ facet: "session:restored:restore", epoch: 1 }),
+    await stub.notes({ facet: "session-restored-restore", epoch: 1 }),
   ).toHaveLength(1);
   expect(
     JSON.stringify(

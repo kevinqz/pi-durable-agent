@@ -1,5 +1,6 @@
 import { HttpError, identifier, textField } from "./http.js";
 import { SerialGate } from "./store.js";
+import { CheckpointMismatch } from "./checkpoint-proof.js";
 
 export type SessionGeneration = { facet: string; epoch: number };
 export type Checkpoint = {
@@ -26,6 +27,10 @@ export type CheckpointOperation = {
   proof?: string;
   createdAt: number;
   failures: number;
+  lastFailure?: {
+    code: "state-mismatch" | "runtime-failure";
+    parts?: string[];
+  };
 };
 type Catalog = {
   version: 1;
@@ -74,7 +79,7 @@ export class CheckpointCoordinator {
     if (!storage.kv.get(CATALOG))
       storage.kv.put<Catalog>(CATALOG, {
         version: 1,
-        active: { facet: "session:initial", epoch: 0 },
+        active: { facet: "session-initial", epoch: 0 },
         operations: 0,
         restores: 0,
       });
@@ -96,6 +101,12 @@ export class CheckpointCoordinator {
 
   status() {
     return this.catalog();
+  }
+  backupUnavailableReason() {
+    // The hosted clone path did not preserve ':' names, although local workerd
+    // accepted them. Keep existing addresses intact; never redirect stored data.
+    if (!/^[a-zA-Z0-9_-]+$/.test(this.catalog().active.facet))
+      return "Checkpoints are unavailable for this pre-release session. Export or keep it, then start a new session.";
   }
   operation(id: string) {
     return this.storage.kv.get<CheckpointOperation>(
@@ -143,6 +154,10 @@ export class CheckpointCoordinator {
     const catalog = this.catalog();
     if (catalog.busy)
       throw new HttpError(409, "Another recovery operation is pending");
+    if (kind === "backup") {
+      const unavailable = this.backupUnavailableReason();
+      if (unavailable) throw new HttpError(409, unavailable);
+    }
     if (catalog.operations >= 24)
       throw new HttpError(429, "Recovery operation allowance exhausted");
     if (kind === "backup" && this.checkpoints().length >= 3)
@@ -173,7 +188,7 @@ export class CheckpointCoordinator {
         kind,
         checkpointId,
         source: catalog.active,
-        target: kind === "backup" ? `snapshot:${id}` : `session:restored:${id}`,
+        target: kind === "backup" ? `snapshot-${id}` : `session-restored-${id}`,
         phase: "quiescing",
         createdAt: Date.now(),
         failures: 0,
@@ -236,8 +251,18 @@ export class CheckpointCoordinator {
               ? operation.source.facet
               : this.snapshot(operation.checkpointId).facet;
           this.driver.clone(source, operation.target);
-          operation.phase =
-            operation.kind === "backup" ? "activating" : "validating";
+          operation.phase = "validating";
+          this.save(operation);
+        }
+        if (operation.phase === "validating") {
+          const proof =
+            operation.kind === "backup"
+              ? operation.proof!
+              : this.snapshot(operation.checkpointId).proof;
+          // A clone call returning is not evidence of a usable checkpoint.
+          // Inspect both backups and restore candidates before publishing them.
+          await this.driver.validate(operation.target, proof);
+          this.driver.abort(operation.target);
           this.storage.transactionSync(() => {
             if (operation.kind === "backup")
               this.storage.kv.put<Checkpoint>(
@@ -250,21 +275,15 @@ export class CheckpointCoordinator {
                   createdAt: Date.now(),
                 },
               );
-            this.save(operation);
-          });
-        }
-        if (operation.phase === "validating") {
-          const snapshot = this.snapshot(operation.checkpointId);
-          await this.driver.validate(operation.target, snapshot.proof);
-          this.driver.abort(operation.target);
-          this.storage.transactionSync(() => {
-            const catalog = this.catalog();
-            catalog.active = {
-              facet: operation.target,
-              epoch: operation.source.epoch + 1,
-            };
+            else {
+              const catalog = this.catalog();
+              catalog.active = {
+                facet: operation.target,
+                epoch: operation.source.epoch + 1,
+              };
+              this.storage.kv.put(CATALOG, catalog);
+            }
             operation.phase = "activating";
-            this.storage.kv.put(CATALOG, catalog);
             this.save(operation);
           });
         }
@@ -283,6 +302,10 @@ export class CheckpointCoordinator {
         // A failed/uncertain copy is never advertised as a usable generation.
         // Persist the exact phase; the host reports a category, not raw payloads.
         operation.failures++;
+        operation.lastFailure =
+          error instanceof CheckpointMismatch
+            ? { code: "state-mismatch", parts: error.parts }
+            : { code: "runtime-failure" };
         this.save(operation);
         throw error;
       }

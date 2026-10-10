@@ -1,0 +1,66 @@
+{
+  "format": "pi-durable-agent/hosted-product-checkpoints-v1",
+  "at": "2026-10-10T00:02:18.003271+00:00",
+  "sourceCommit": "0f0c9d97c8775a1c53fa00d1ee9a115c3a0697a0",
+  "cloudflareVersion": "3cc22d66-f4a9-4f6b-a06f-07c04d3f2e46",
+  "privateConfigSha256": "3592467a45d06c0bad5d7cabe69d513c013449fe2dd751dad8306a8112351ac7",
+  "paidModelCalls": 0,
+  "result": "failed-restore-validation; operational qualification remains open",
+  "legacyUpdate": {
+    "from": "0.1.0-dev.3",
+    "to": "0.1.0-dev.5",
+    "fixture": "qualify-dev5-legacy-6b917f2e",
+    "oldActivation": "d0866832-48a5-4648-8aff-594134047a68",
+    "newActivation": "2ec47614-eeb5-4349-a8fd-c86c6dbe4ff2",
+    "forcedReset": "native ctx.abort through the existing owner-authorized demo control; recovered receipt observed",
+    "pendingExecution": "exec_0001791589690981_04637253-1e31-44b8-a5a9-40df40c6b266",
+    "preserved": [
+      "history",
+      "memory view",
+      "exact code, operation, contract and expiry"
+    ],
+    "after": [
+      "same operation approved on dev.5",
+      "completed result and one visible follow-up",
+      "original Aurora hosted ticket 527 found through source search"
+    ]
+  },
+  "checkpointFlow": {
+    "fixture": "qualify-dev5-checkpoint-97b3e415",
+    "contract": "supervisor-notes-v1/schema-1/policy-1/codemode-0.5.3",
+    "pendingExecution": "exec_0001791590017530_bb1b1892-ebdc-4242-b88f-3c7f8c9ba1b5",
+    "actionId": "dcb47f0d54f334f0d8e8a4c5104e3239356a877ebee1dae5d56bc89edf628e79",
+    "observed": [
+      "conversation completed",
+      "native checkpoint saved with pending approval",
+      "source approval completed with retained note result",
+      "confirmed restore reached validating phase",
+      "three automatic attempts failed; restored copy was not promoted",
+      "explicit cancellation completed; original eight-message history and result remained available"
+    ],
+    "failureCause": "The subsequent diagnostic and isolated name probe reproduced empty copies for colon-containing facet names. See hosted-facet-name-validation.json. This records the failing build, not the correction."
+  },
+  "limits": [
+    "No successful hosted product restore",
+    "No independently counted hosted destination rows",
+    "No real provider, second authenticated identity or qualified operational release"
+  ],
+  "diagnosticFollowup": {
+    "sourceCommit": "1c501ee",
+    "cloudflareVersion": "078f4137-916d-4a74-b517-35a6ec3dc47f",
+    "fixture": "proof-diagnostics-4cf928d1",
+    "result": "Proof mismatch; three automatic attempts; cancelled; current six-message session retained",
+    "parts": [
+      "retained.memory",
+      "retained.requests",
+      "retained.actions",
+      "retained.usage",
+      "retained.history",
+      "retained.retainedOutputs",
+      "memory.memory",
+      "memory.requests",
+      "memory.usage",
+      "executions"
+    ]
+  }
+}

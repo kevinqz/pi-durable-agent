@@ -1,0 +1,369 @@
+{
+  "at": "2026-10-10T00:16:39.265Z",
+  "paidModelCalls": 0,
+  "requests": 12,
+  "sourceSha256": "05933a039b4802e7bf9babca8941dffb94c27b5d0072cc43f02ee4f94f436f4b",
+  "cases": [
+    {
+      "id": "b98f50e2-09b8-4ffa-b1b9-95123a10804b",
+      "options": {
+        "sync": true,
+        "materialize": true,
+        "colon": false,
+        "props": false
+      },
+      "results": [
+        {
+          "step": "seed",
+          "before": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": null
+          },
+          "materialized": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": null
+          }
+        },
+        {
+          "step": "mutate",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": null
+          }
+        },
+        {
+          "step": "restore",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": null
+          },
+          "snapshot": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": null
+          },
+          "restored": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": null
+          }
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "ab714c03-5630-4e19-acfa-b5168bb931f4",
+      "options": {
+        "sync": true,
+        "materialize": true,
+        "colon": true,
+        "props": false
+      },
+      "results": [
+        {
+          "step": "seed",
+          "before": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": null
+          },
+          "materialized": {
+            "own": {
+              "kv": null,
+              "sql": null
+            },
+            "nested": {
+              "kv": null,
+              "sql": null
+            },
+            "label": null
+          }
+        },
+        {
+          "step": "mutate",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": null
+          }
+        },
+        {
+          "step": "restore",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": null
+          },
+          "snapshot": {
+            "own": {
+              "kv": null,
+              "sql": null
+            },
+            "nested": {
+              "kv": null,
+              "sql": null
+            },
+            "label": null
+          },
+          "restored": {
+            "own": {
+              "kv": null,
+              "sql": null
+            },
+            "nested": {
+              "kv": null,
+              "sql": null
+            },
+            "label": null
+          }
+        }
+      ],
+      "passed": false
+    },
+    {
+      "id": "54ca13ed-5694-40ec-a79b-20a196812d10",
+      "options": {
+        "sync": true,
+        "materialize": true,
+        "colon": false,
+        "props": true
+      },
+      "results": [
+        {
+          "step": "seed",
+          "before": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": "source"
+          },
+          "materialized": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": "checkpoint"
+          }
+        },
+        {
+          "step": "mutate",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": "source"
+          }
+        },
+        {
+          "step": "restore",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": "source"
+          },
+          "snapshot": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": "checkpoint"
+          },
+          "restored": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": "restored"
+          }
+        }
+      ],
+      "passed": true
+    },
+    {
+      "id": "2de4349a-c525-4d19-a8bf-290ac5ea8d72",
+      "options": {
+        "sync": true,
+        "materialize": true,
+        "colon": true,
+        "props": true
+      },
+      "results": [
+        {
+          "step": "seed",
+          "before": {
+            "own": {
+              "kv": 17,
+              "sql": 17
+            },
+            "nested": {
+              "kv": 17,
+              "sql": 17
+            },
+            "label": "session:source"
+          },
+          "materialized": {
+            "own": {
+              "kv": null,
+              "sql": null
+            },
+            "nested": {
+              "kv": null,
+              "sql": null
+            },
+            "label": "snapshot:point"
+          }
+        },
+        {
+          "step": "mutate",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": "session:source"
+          }
+        },
+        {
+          "step": "restore",
+          "source": {
+            "own": {
+              "kv": 29,
+              "sql": 29
+            },
+            "nested": {
+              "kv": 29,
+              "sql": 29
+            },
+            "label": "session:source"
+          },
+          "snapshot": {
+            "own": {
+              "kv": null,
+              "sql": null
+            },
+            "nested": {
+              "kv": null,
+              "sql": null
+            },
+            "label": "snapshot:point"
+          },
+          "restored": {
+            "own": {
+              "kv": null,
+              "sql": null
+            },
+            "nested": {
+              "kv": null,
+              "sql": null
+            },
+            "label": "session:restored"
+          }
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "format": "pi-durable-agent/facet-name-clone-probe-v1",
+  "cloudflareVersion": "f9beaad1-216d-439f-9d6c-2303e9e12ab0",
+  "transport": "local Wrangler client with remote private service binding; workers.dev, preview URLs and routes disabled",
+  "artifacts": {
+    "worker.ts.txt": "05933a039b4802e7bf9babca8941dffb94c27b5d0072cc43f02ee4f94f436f4b",
+    "verify.mjs.txt": "d132269cdb5348cd710e0fa79fd55f29e1ec02d5c6014f78da67d26ddde5db56"
+  },
+  "conclusion": "Both colon-name cases reopened empty; both simple-name cases preserved parent and nested KV/SQL values. Props did not change this outcome.",
+  "limits": [
+    "Observed hosted naming difference, not a diagnosis of Cloudflare internals",
+    "Synthetic native primitive probe; full application qualification remains separate",
+    "No model calls, production data, account configuration or credentials included"
+  ]
+}

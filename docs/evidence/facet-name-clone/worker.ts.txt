@@ -1,0 +1,72 @@
+import { DurableObject } from 'cloudflare:workers';
+import original from '/private/tmp/pi-agent-facet-services-lab-20261009/worker.ts';
+export { Probe, MemoryFacet, CodemodeRuntime } from '/private/tmp/pi-agent-facet-services-lab-20261009/worker.ts';
+
+export class CloneLeaf extends DurableObject<any> {
+  constructor(ctx: DurableObjectState, env: any) {
+    super(ctx, env);
+    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS fixture_value (id INTEGER PRIMARY KEY, value INTEGER)');
+  }
+  async write(value: number, sync: boolean) {
+    this.ctx.storage.kv.put('value', value);
+    this.ctx.storage.sql.exec('INSERT OR REPLACE INTO fixture_value VALUES (1, ?)', value);
+    if (sync) await this.ctx.storage.sync();
+  }
+  read() { return {kv: this.ctx.storage.kv.get('value') ?? null, sql: this.ctx.storage.sql.exec<{value:number}>('SELECT value FROM fixture_value WHERE id=1').toArray()[0]?.value ?? null}; }
+}
+export class CloneFacet extends DurableObject<any> {
+  constructor(ctx: DurableObjectState, env: any) {
+    super(ctx, env);
+    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS fixture_value (id INTEGER PRIMARY KEY, value INTEGER)');
+  }
+  private child() { return this.ctx.facets.get<CloneLeaf>('nested', () => ({class: this.ctx.exports.CloneLeaf})); }
+  async write(value: number, sync: boolean) {
+    this.ctx.storage.kv.put('value', value);
+    this.ctx.storage.sql.exec('INSERT OR REPLACE INTO fixture_value VALUES (1, ?)', value);
+    await this.child().write(value, sync);
+    if (sync) await this.ctx.storage.sync();
+  }
+  async read() {
+    return {own: {kv:this.ctx.storage.kv.get('value') ?? null, sql:this.ctx.storage.sql.exec<{value:number}>('SELECT value FROM fixture_value WHERE id=1').toArray()[0]?.value ?? null}, nested: await this.child().read(), label: (this.ctx.props as any)?.label ?? null};
+  }
+}
+export class CloneProbe extends DurableObject<any> {
+  private child(name: string, props: boolean) { return this.ctx.facets.get<CloneFacet>(name, () => ({class: props ? this.ctx.exports.CloneFacet({props: {label: name}}) : this.ctx.exports.CloneFacet})); }
+  async step(step: string, options: {sync?: boolean; materialize?: boolean; colon?: boolean; props?: boolean}) {
+    const source=options.colon ? 'session:source' : 'source', snapshot=options.colon ? 'snapshot:point' : 'checkpoint', target=options.colon ? 'session:restored' : 'restored';
+    const sync=!!options.sync;
+    const props=!!options.props;
+    if (step==='seed') {
+      if (this.ctx.storage.kv.get('seeded')) throw new Error('Use a fresh fixture ID');
+      await this.child(source,props).write(17, sync);
+      const before = await this.child(source,props).read();
+      this.ctx.facets.abort(source, new Error('Quiescent synthetic source'));
+      this.ctx.facets.clone(source, snapshot);
+      this.ctx.storage.kv.put('seeded', true);
+      const materialized=options.materialize ? await this.child(snapshot,props).read() : null;
+      if (options.materialize) this.ctx.facets.abort(snapshot, new Error('Immutable fixture snapshot'));
+      if (sync) await this.ctx.storage.sync();
+      return {step, before, materialized};
+    }
+    if (!this.ctx.storage.kv.get('seeded')) throw new Error('Seed the fixture first');
+    if (step==='mutate') {
+      await this.child(source,props).write(29, sync);
+      return {step, source: await this.child(source,props).read()};
+    }
+    if (step==='restore') {
+      this.ctx.facets.abort(source, new Error('Quiescent restore fixture'));
+      this.ctx.facets.clone(snapshot, target);
+      return {step, source: await this.child(source,props).read(), snapshot: await this.child(snapshot,props).read(), restored: await this.child(target,props).read()};
+    }
+    throw new Error('Unsupported fixture step');
+  }
+}
+export default {
+  async fetch(request: Request, env: any) {
+    const match=/^\/clone-semantics\/([a-z0-9-]{1,80})\/(seed|mutate|restore)$/.exec(new URL(request.url).pathname);
+    if (!match) return original.fetch(request, env);
+    if (request.method!=='POST') return new Response('POST only', {status:405});
+    const options=await request.json();
+    return Response.json(await env.CLONE_PROBES.getByName(match[1]).step(match[2], options));
+  }
+};

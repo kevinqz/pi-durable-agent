@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **27 tests** covering:
+`npm test` contains **30 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -45,7 +45,9 @@ Type checking, formatting and the staging **dry-run** bundle are the other relea
 
 ## Local backup/restore increment
 
-The new [coordinated-recovery composition](./coordinated-recovery.md) has four journal/fence checks within `npm test` and three native application integration checks in `npm run test:checkpoints`. A fifth model-control check verifies that asynchronous supervisor authorization precedes either provider stream. The [dev.5 product integration record](./product-checkpoints-local-validation.json) records the current local checks and exact source hashes. The integration suite also exercises the actual HTTP router and rejects an approval submitted from the previous generation. The [local browser record](./checkpoint-ui-local-validation.json) covers the new controls and post-restore search. These are local synthetic checks. The narrower [hosted facet probe](./hosted-facet-checkpoint-validation.json) establishes the native copying primitive only; it does not close the production recovery gate.
+The new [coordinated-recovery composition](./coordinated-recovery.md) has seven journal/evidence checks within `npm test` and three native application integration checks in `npm run test:checkpoints`. A fifth model-control check verifies that asynchronous supervisor authorization precedes either provider stream. The [dev.5 product integration record](./product-checkpoints-local-validation.json) records the current local checks and exact source hashes. The integration suite also exercises the actual HTTP router and rejects an approval submitted from the previous generation. The [local browser record](./checkpoint-ui-local-validation.json) covers the new controls and post-restore search. These are local synthetic checks. The narrower [hosted facet probe](./hosted-facet-checkpoint-validation.json) establishes the native copying primitive only; it does not close the production recovery gate.
+
+The corrected hosted flow is recorded separately in [hosted checkpoint restoration](./hosted-checkpoint-restore-validation.json). It preserves the exact approval after source completion and returns the same note receipt on reapproval. The initial colon-name failure and its cancellation are retained in [the failing-build record](./hosted-product-checkpoints-dev5-validation.json); [the native comparison](./hosted-facet-name-validation.json) explains why the correction uses simple facet names and validates copies before announcing success. The current local upgrade record identifies the corrected backend.
 
 The [recovery evidence](./local-recovery-validation.json) records a separate same-runtime local application check using `npm run test:recovery`. The launcher refuses backup while the managed server is running. After a **graceful shutdown**, the tool copies and verifies the complete persistence directory and restores it into a fresh directory. The restored app retains the history, memory view, request/task identities, exact pending approval and original retrieval. Two separately approved calls with the same note key produce one destination note and one action-result delivery receipt. The original backup remains checksum-identical after the restored app runs.
 

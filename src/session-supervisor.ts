@@ -3,6 +3,7 @@ import { Lifecycle, type LifecycleJobContext } from "agents/lifecycle";
 import { ActionsStore, type Action } from "./actions-store.js";
 import { ROOT_NOTES_CONTRACT } from "./notes-root.js";
 import build from "./generated/checkpoint-build.json";
+import { compareCheckpointEvidence } from "./checkpoint-proof.js";
 import {
   CheckpointCoordinator,
   type SessionGeneration,
@@ -49,11 +50,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
           facet,
           epoch: this.checkpoints.status().active.epoch + 1,
         };
-        if ((await this.child(generation).freeze()) !== proof)
-          throw new HttpError(
-            409,
-            "Restored state did not match the checkpoint evidence",
-          );
+        compareCheckpointEvidence(proof, await this.child(generation).freeze());
       },
       activate: async (generation) => {
         await this.arm(generation);
@@ -354,6 +351,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
         })),
       operations: catalog.operations,
       restores: catalog.restores,
+      backupUnavailableReason: this.checkpoints.backupUnavailableReason(),
       scope: "same-object-facet-subtree",
       limits: { checkpoints: 3, restores: 8, operations: 24 },
     };

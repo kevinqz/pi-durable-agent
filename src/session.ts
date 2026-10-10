@@ -12,7 +12,7 @@ import {
   type OptChatController,
 } from "optchat-durable/extension";
 import { LIMITS, type Env, type Principal } from "./env.js";
-import { digest, HttpError, identifier, textField } from "./http.js";
+import { HttpError, identifier, textField } from "./http.js";
 import { configureModels } from "./models.js";
 import { SerialGate, SessionStore } from "./store.js";
 import { Actions } from "./actions.js";
@@ -22,6 +22,7 @@ import { RuntimeRecovery } from "./recovery.js";
 import { createSessionExport } from "./session-export.js";
 import { SessionModel } from "./session-model.js";
 import type { NotesDestination } from "./notes-root.js";
+import { checkpointEvidence } from "./checkpoint-proof.js";
 
 type SessionLifecycle = Pick<Lifecycle<Env>, "jobs" | "start" | "isStarted">;
 export type SessionHost = {
@@ -370,12 +371,17 @@ export class AgentSession extends DurableObject<Env> {
       (id) => this.actions.store.readArchive(id),
     );
     const { startedAt: _start, completedAt: _end, ...retained } = payload;
-    return digest(
-      JSON.stringify({
-        retained,
-        memory: state,
-        executions: await this.actions.checkpointEvidence(),
-      }),
-    );
+    return checkpointEvidence({
+      ...Object.fromEntries(
+        Object.entries(retained).map(([key, value]) => [
+          `retained.${key}`,
+          value,
+        ]),
+      ),
+      ...Object.fromEntries(
+        Object.entries(state).map(([key, value]) => [`memory.${key}`, value]),
+      ),
+      executions: await this.actions.checkpointEvidence(),
+    });
   }
 }

@@ -1,0 +1,24 @@
+import {writeFile, readFile} from 'node:fs/promises';
+import {createHash, randomUUID} from 'node:crypto';
+const evidence={at:new Date().toISOString(),paidModelCalls:0,requests:0,sourceSha256:createHash('sha256').update(await readFile('worker.ts')).digest('hex'),cases:[]};
+try {
+  for (const options of [
+    {sync:true,materialize:true,colon:false,props:false},
+    {sync:true,materialize:true,colon:true,props:false},
+    {sync:true,materialize:true,colon:false,props:true},
+    {sync:true,materialize:true,colon:true,props:true},
+  ]) {
+    const id=randomUUID(); const results=[]; const record={id,options,results,passed:false}; evidence.cases.push(record);
+    for (const step of ['seed','mutate','restore']) {
+      const response=await fetch(`http://127.0.0.1:8798/clone-semantics/${id}/${step}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(options),signal:AbortSignal.timeout(20000)});
+      evidence.requests++;
+      if(!response.ok)throw new Error(`Private fixture ${step} failed: ${response.status}`);
+      results.push(await response.json());
+    }
+    const restored=results.at(-1);
+    const matches=(state,value)=>['own','nested'].every(level=>['kv','sql'].every(storage=>state[level][storage]===value));
+    record.passed=matches(results[0].before,17)&&matches(results[0].materialized,17)&&matches(restored.source,29)&&matches(restored.snapshot,17)&&matches(restored.restored,17);
+  }
+} catch(error) { evidence.error=String(error); process.exitCode=1; }
+await writeFile('evidence-v2.json',JSON.stringify(evidence,null,2)+'\n');
+console.log(JSON.stringify(evidence,null,2));

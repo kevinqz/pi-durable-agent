@@ -1,20 +1,20 @@
 {
-  "date": "2026-10-09T23:38:50.451Z",
+  "date": "2026-10-10T00:22:29.533Z",
   "kind": "local-cross-release-upgrade",
   "shutdown": "graceful",
   "crossRelease": true,
   "targetRuntime": {
     "application": "pi-durable-agent",
     "version": "0.1.0-dev.5",
-    "revision": "7fab149898c597bcd903c6cf3f60edd177a6c0b0",
+    "revision": "ed2ba42f7867601bd2d9aab5c1786c931a2123ed",
     "environment": {
       "platform": "darwin",
       "architecture": "arm64",
       "nodeMajor": "22"
     },
     "lockfileSha256": "4977aba13d8061f6ea7f5acb781a034f0fa40ed471194bb96ec7f6bb9bed3437",
-    "buildFingerprint": "148e7b7bb6b068a4c7c9ac297c6f06908ea41f812808468c34d0ed996d4ab70f",
-    "fingerprint": "d69353daf316f5ca4105ea2321ecef0838ee5de2139c0f39a453f41fe57b95c7"
+    "buildFingerprint": "b3945cb93e7cee481b88a6a596d8a279c899c92ac4632a620b43f8260287e8db",
+    "fingerprint": "f22efff65dbf4fa0262bd7b79d93863fb161fcfb31171f9b79e5b365752e1af4"
   },
   "runtime": {
     "application": "pi-durable-agent",
@@ -31,8 +31,8 @@
   },
   "snapshot": {
     "files": 31,
-    "bytes": 5955754,
-    "sha256": "beffcb1b6ce590cf069e78c81b91f12181546c144f67664de3a2e0927ad336fb"
+    "bytes": 5922794,
+    "sha256": "878f05b6849aee728fb83af270dfa7d7b98c4995b6b60aa6f8856ffd50005d57"
   },
   "observed": {
     "liveBackupRefused": true,
@@ -56,7 +56,6 @@
     "paidModelCalls": 0
   },
   "baselineCommit": "90815ac513714a3227c4b3d82dbe06a928b2c590",
-  "sourceIdentification": "targetRuntime.revision is the checkout base; build fingerprints identify the exact tested uncommitted target.",
   "verificationScriptsSha256": {
     "scripts/verify-local-upgrade.mjs": "8a947a406333dc534a52f6ff9f09061ba80a6791a22e98bac7e6421dc02a4c17",
     "scripts/verify-local-recovery.mjs": "9023471dbea929f16e7a78df334f063d51b87e3218a0800579196daef83e7585",
@@ -66,5 +65,6 @@
   "limits": [
     "Legacy demo session namespace only; new checkpoint namespace is separately covered by native integration tests",
     "Graceful local update; no hosted deployment or arbitrary dependency change"
-  ]
+  ],
+  "sourceIdentification": "targetRuntime.revision identifies the corrected backend; content fingerprints include its generated identity. The compatibility route was updated and exercised in this run."
 }
