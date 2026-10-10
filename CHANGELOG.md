@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Explain disabled checkpoint controls, including full retention, the lifetime create/restore allowance, pending work, unknown action outcomes and session code updates. Show all three counters and explain why incompatible checkpoints remain retained after an update.
+- Preserve the 0.1.1 backend identity, storage, dependencies and published release artifacts. This interface change does not migrate or delete checkpoints.
+
 ## 0.1.1 — Shared request outcomes
 
 - Consume the published OptChat 0.4.1 package. Use its canonical native task outcome instead of duplicating Pi task inspection; reuse returned request records during polling.

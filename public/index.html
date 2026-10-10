@@ -83,9 +83,14 @@
             approvals. Restoring keeps completed notes and recorded model usage.
           </p>
           <p id="checkpoint-status" role="status"></p>
-          <button id="checkpoint-create" type="button">
+          <button
+            id="checkpoint-create"
+            type="button"
+            aria-describedby="checkpoint-create-reason"
+          >
             Create checkpoint
           </button>
+          <p id="checkpoint-create-reason" role="status"></p>
           <button id="checkpoint-resume" type="button" hidden>
             Resume recovery
           </button>
@@ -96,6 +101,8 @@
             Retry unconfirmed request
           </button>
           <p id="checkpoint-allowance"></p>
+          <p id="checkpoint-compatibility"></p>
+          <p id="checkpoint-restore-reason" role="status"></p>
           <div id="checkpoint-list"></div>
           <details>
             <summary>What this protects</summary>

@@ -15,6 +15,12 @@ Local validation through **2026-10-10** uses the installed release artifact of O
 | Vitest                   | 4.1.0                                              |
 | Local Node               | 22.23.1                                            |
 
+## Unreleased checkpoint interface update
+
+The checkpoint interface now explains disabled controls and all three capacity counters, distinguishes incompatible retained checkpoints and lists the newest copy first. `npm run test:ui` has six focused cases for full retention, exhausted create/restore admissions, exhausted restores, in-progress recovery, ordinary work, unknown effects, code updates and pending human approvals. The required `npm run check` passed these checks and the existing 47 runtime/state/export tests, formatting, type checking and dry-run build.
+
+An isolated local browser session created three native checkpoints. The full catalog disabled creation with its explicit explanation, while all compatible restore controls and ordinary conversation controls remained available. No existing user session was changed and no model was called. Backend source, lockfile and configuration are unchanged from 0.1.1: checkpoint identity remains `953cde57e30c34104a0dc89975e9bfb4d3c1e0fa601714e031fd33c16c1d5f33`. This UI-only work does not establish a new migration route or implement checkpoint deletion; the published 0.1.1 archive remains immutable.
+
 ## Maintenance update 0.1.1
 
 The [exact 0.1.0 → 0.1.1 update](./local-upgrade-v011-validation.json) changes only the OptChat package in the locked dependency graph, from 0.4.0 to 0.4.1. The old source runs with its own independently installed dependencies; the target uses its own lockfile. The application consumes OptChat's canonical task outcome and reuses request records during polling, reset readiness and checkpoint inspection.

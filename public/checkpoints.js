@@ -1,4 +1,11 @@
+import { checkpointAvailability } from "./checkpoint-availability.js";
+
 const $ = (id) => document.getElementById(id);
+function setText(id, value) {
+  const node = $(id);
+  // Repeated polling must not reannounce an unchanged live-region message.
+  if (node.textContent !== value) node.textContent = value;
+}
 const phases = {
   quiescing: "Checking saved work",
   copying: "Copying the session",
@@ -122,39 +129,44 @@ export function checkpointControls({ api, refresh, showError, generation }) {
                   "Create a checkpoint when messages and summaries have finished.");
       if ($("checkpoint-status").textContent !== status)
         $("checkpoint-status").textContent = status;
-      const idle =
-        !state.recovering &&
-        state.progress.activeTasks === 0 &&
-        state.requests.every((r) =>
-          ["completed", "failed", "cancelled"].includes(r.status),
-        ) &&
-        state.actions.every(
-          (a) =>
-            a.status === "pending" || (a.status !== "unknown" && a.delivered),
-        );
+      const { createReason, restoreReason } = checkpointAvailability(state);
       $("checkpoint-create").disabled =
-        submitting ||
-        !!pending ||
-        !!busy ||
-        !!recovery.backupUnavailableReason ||
-        !idle ||
-        recovery.checkpoints.length >= recovery.limits.checkpoints ||
-        recovery.operations >= recovery.limits.operations;
-      $("checkpoint-allowance").textContent =
-        `${recovery.checkpoints.length}/${recovery.limits.checkpoints} checkpoints retained · ${recovery.restores}/${recovery.limits.restores} restore admissions used`;
+        submitting || !!pending || !!createReason;
+      setText("checkpoint-create-reason", createReason ?? "");
+      setText(
+        "checkpoint-restore-reason",
+        restoreReason === createReason ? "" : (restoreReason ?? ""),
+      );
+      setText(
+        "checkpoint-allowance",
+        `${recovery.checkpoints.length}/${recovery.limits.checkpoints} checkpoints retained · ${recovery.restores}/${recovery.limits.restores} restore admissions used · ${recovery.operations}/${recovery.limits.operations} create/restore admissions used`,
+      );
+      const incompatible = recovery.checkpoints.filter(
+        (checkpoint) => !checkpoint.compatible,
+      ).length;
+      setText(
+        "checkpoint-compatibility",
+        incompatible
+          ? "Checkpoints from another server version stay stored and still occupy a slot. Updating the app does not convert them. When a slot is available, create a new checkpoint for the current version. A session-data export cannot restore checkpoints."
+          : "",
+      );
       const listKey = JSON.stringify([
         recovery.checkpoints,
         submitting,
         !!pending,
         !!busy,
-        idle,
+        restoreReason,
         recovery.restores,
         recovery.operations,
       ]);
       if (listKey === renderedList) return;
       renderedList = listKey;
+      const checkpoints = [...recovery.checkpoints].sort(
+        (left, right) =>
+          right.createdAt - left.createdAt || left.id.localeCompare(right.id),
+      );
       $("checkpoint-list").replaceChildren(
-        ...recovery.checkpoints.map((checkpoint) => {
+        ...checkpoints.map((checkpoint) => {
           const item = document.createElement("div");
           item.className = "checkpoint";
           const label = document.createElement("span");
@@ -163,15 +175,19 @@ export function checkpointControls({ api, refresh, showError, generation }) {
           restore.type = "button";
           restore.textContent = checkpoint.compatible
             ? "Restore…"
-            : "Requires its original runtime";
+            : "Original version required";
           restore.disabled =
             submitting ||
             !!pending ||
-            !!busy ||
-            !idle ||
-            !checkpoint.compatible ||
-            recovery.restores >= recovery.limits.restores ||
-            recovery.operations >= recovery.limits.operations;
+            !!restoreReason ||
+            !checkpoint.compatible;
+          restore.title = !checkpoint.compatible
+            ? "Saved by a different server version. This version cannot restore it."
+            : (restoreReason ?? "Return this conversation to the saved point.");
+          restore.setAttribute(
+            "aria-describedby",
+            "checkpoint-create-reason checkpoint-restore-reason checkpoint-compatibility",
+          );
           restore.onclick = () => {
             selected = { id: checkpoint.id, generation: generation() };
             $("checkpoint-target").textContent = label.textContent;
