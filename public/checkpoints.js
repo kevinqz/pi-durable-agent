@@ -147,7 +147,7 @@ export function checkpointControls({ api, refresh, showError, generation }) {
       setText(
         "checkpoint-compatibility",
         incompatible
-          ? `${incompatible} saved checkpoint(s) require their original server version. They remain stored and occupy a checkpoint slot. Updating the app does not convert them. When a slot is available, create a new checkpoint for the current version. A session-data export cannot restore checkpoints.`
+          ? "Checkpoints from another server version stay stored and still occupy a slot. Updating the app does not convert them. When a slot is available, create a new checkpoint for the current version. A session-data export cannot restore checkpoints."
           : "",
       );
       const listKey = JSON.stringify([
