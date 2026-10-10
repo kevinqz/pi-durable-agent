@@ -2,51 +2,35 @@
 
 [README](../README.md) · [Architecture](./architecture.md) · [Validation](./validation.md)
 
-Build a complete agent application that combines Pi Durable, OptChat Durable, Cloudflare
-hosting and Code Mode tools. It consumes a published OptChat release through the public SDK;
-it does not copy or reimplement the memory engine.
+Pi Durable Agent composes Pi Durable, the published OptChat Durable SDK, Cloudflare hosting and Code Mode. OptChat remains independently installable and versioned; this application does not reimplement its memory engine.
 
-This is the canonical roadmap for [kevinqz/pi-durable-agent](https://github.com/kevinqz/pi-durable-agent). OptChat remains a separate dependency with its own release and roadmap.
+## Current delivery — 0.1.0
 
-## Current status — 2026-10-10
+| Milestone | Qualified first-release scope                                                                                                                             | Later work                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| A1        | Official PiHarness/Lifecycle integration and published OptChat 0.4.0                                                                                      | New hosting adapters when needed                                                                         |
+| A2        | Session notes, stable admission, exact approvals, destination deduplication, retained completion and result delivery                                      | Every new external connector needs its own policy and failure qualification                              |
+| A3        | Local authorization and hosted Access, source retrieval, approval/result UI and second-identity isolation                                                 | Additional channels and connector interfaces                                                             |
+| A4        | GPT-OSS-120B tool/approval/follow-up flow; coordinated restoration; three supported hosted interruption boundaries; exact release install/update evidence | Broader failure coverage, performance/model-quality studies and richer account-level cost visibility     |
+| A5        | Versioned contracts and reviewed dev.4 → 0.1.0 local update; earlier published routes retained                                                            | Changed dependencies/connectors, cross-build checkpoint migration and any justified Executor integration |
 
-| Milestone | Current delivery                                                                                                                                                            | Remaining gate                                                                                    |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| A1        | Implemented and locally qualified with official PiHarness, Lifecycle and published OptChat 0.4.0                                                                            | Deployed recovery is tracked under A4                                                             |
-| A2        | Local notes connector, stable admission, approvals, destination deduplication, result archive and delivery; ambiguous dispatch is explicit `unknown`                        | Each new external connector needs its own qualification; no generic exactly-once claim            |
-| A3        | Local authorization checks plus hosted Access login, conversation, source retrieval, approval and result delivery                                                           | Second-identity isolation passed; each future connector needs qualification                       |
-| A4        | Local recovery, checkpoint UI and reviewed legacy upgrade; model selection/call limits; authenticated demo staging with a successful dev.5 checkpoint restore               | Real-model tool/approval/result flow and operational release; broader failures remain unqualified |
-| A5        | Schema checks, retained V1 contracts, sequential local dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → dev.5 routes and hosted dev.1 → dev.2 → dev.3 and dev.3 → dev.5 observations | New dependency/connector routes; any justified connector/channel expansion                        |
+The [first operational release](https://github.com/kevinqz/pi-durable-agent/releases/tag/v0.1.0) supports one deliberately bounded workflow: conversations with OptChat memory and approved session-local note actions. It does not imply arbitrary-failure recovery, generic exactly-once effects or completion of future integrations.
 
-This is a **development preview**, not completion of the entire roadmap. The hosted demo flow, exact dev.1 → dev.2 backend update and a forced parent reset while a demo approval is paused have been observed. A corrected dev.5 checkpoint flow has also restored the exact pending approval after the source completed its note. A separate second-identity check passed and its temporary access was removed. Real replies, summaries and same-build restoration passed; model-directed tools remain unqualified. No arbitrary-failure, changed-dependency or production guarantee is implied. See [validation](./validation.md) for the exact local and staging evidence and their limits.
+## First operational acceptance evidence
 
-The [local recovery increment](./local-recovery.md) preserves the complete stopped Wrangler state, including Pi memory and Code Mode facets. A synthetic application flow proves original retrieval, the same pending approval and one deduplicated note/result after an isolated restore. The subsequent [local upgrade route](./local-upgrades.md) exercises the published preview against the next runtime while retaining the original connector implementation. These qualify local same-runtime and reviewed cross-release paths. The [hosted recovery increment](./hosted-recovery.md) adds exact backend-update and forced-parent-reset evidence. A4 real-model/release gates and A5 changed-dependency routes remain open. Account login and payment are deployment prerequisites, not blockers for this local work.
+1. **Real model and tools:** the [GPT-OSS trial](./hosted-gpt-oss-validation.json) passed a structured call, exact-operation approval, completion delivery, assistant follow-up and original retrieval. It stopped at 7/12 reserved calls, including summaries and an initial input-schema rejection. The earlier [Scout trial](./hosted-real-model-validation.json) remains separately recorded and unqualified for tools.
+2. **Coordinated restoration:** the [hosted demo flow](./hosted-checkpoint-restore-validation.json) restored an earlier pending approval after the source completed its note. The GPT-OSS trial also restored completed real-model state with history, memory, usage, actions, output and diagnostics unchanged. Checkpoints remain tied to the same object and backend build.
+3. **Supported interruptions:** [native root-abort checks](./hosted-journal-interruptions-validation.json) cover source quiescence, validated copying and activation before journal completion. Ambiguous external effects remain blocked for reconciliation.
+4. **Isolation and operation:** [second-identity isolation](./hosted-identity-isolation-validation.json), exact approvals, durable call reservations and [private outcome/runtime diagnostics](./session-export.md) have separate evidence. Temporary test access was removed. Warm facets must reach the reviewed backend before new work or checkpoints are admitted.
+5. **Install and update:** the [local dev.4 → 0.1.0 route](./local-upgrades.md) preserves existing state in a separate copy. The release's `release-validation.json` and `SHA256SUMS` identify its exact source archive, independent installation and final verification. [Archive onboarding](./installation.md) requires no Git or preinstalled Pi.
 
-The [session export increment](./session-export.md) provides all retained normalized history pages, current memory and action records with an offline integrity verifier. It does not close the backup gate. After unchanged nesting failed because facets cannot set alarms, a root-owned alarm composition [passed a native subtree probe on Cloudflare](./hosted-facet-checkpoint-validation.json). The [coordinated application composition](./coordinated-recovery.md) now has local tests for journal recovery, generation fencing, exact approval restoration and non-rewinding destination/consumption records. New sessions now use that composition through authenticated product routing and checkpoint controls. Local browser checks cover creation, restore confirmation, retained approvals, reload and original retrieval. Existing sessions retain their original namespace. The legacy dev.4 → dev.5 update route also passed locally. The corrected coordinator also completed a protected [hosted checkpoint flow](./hosted-checkpoint-restore-validation.json). Three [hosted journal interruption boundaries](./hosted-journal-interruptions-validation.json) and an [independent candidate installation](./independent-archive-install-validation.json) also passed. The [second-identity check](./hosted-identity-isolation-validation.json) passed. The [real-model trial](./hosted-real-model-validation.json) remains partial: text, summary, retrieval and same-build restore passed, but no structured tool call was produced. Final artifact qualification and publication remain open.
+## Next priorities
 
-## First operational release
-
-The immediate delivery is one installable application using the published OptChat package, a real Workers AI model and the existing notes connector. Completion requires a published release with verified evidence for:
-
-1. A real conversation, memory summary, original retrieval and model-directed approval/result flow on the protected deployment.
-2. Coordinated hosted backup and restore of conversation, memory, executor state, pending approvals and delivery records into an isolated recovery target.
-3. Recovery of the explicitly supported interruption windows, with uncertain external effects kept blocked for reconciliation.
-4. User isolation, exact-operation approvals, durable consumption limits and useful operational diagnostics.
-5. A reviewed update route preserving existing data, plus fresh-install, model-selection and recovery instructions verified against the release artifact.
-
-The [model controls](./models.md) now persist a session's choice and allowance and have local runtime/browser evidence. Actual provider inference now has partial hosted evidence; the model-directed tool/approval/result path remains unqualified. Existing local backup and update evidence remains valid within its stated scope; it does not replace coordinated hosted recovery.
-
-Remaining work, in order:
-
-1. Qualify a real model that produces a structured Code Mode call, then observe the exact human approval, retained result and assistant follow-up within an approved allowance. The Scout trial stopped at 10/12 reserved calls with zero admitted actions; ordinary text resembling a tool call must never be executed.
-2. Preserve the exact backend identity in session diagnostics and verify that warm facets reach the reviewed code before qualifying an update or creating a checkpoint. The native idle-reload correction has local pending-approval and hosted retained-session evidence.
-3. Build the final release artifact, verify its install/update instructions against its exact contents, publish the operational release and record its hashes and supported recovery scope. The independently installed development candidate is earlier evidence, not publication.
-
-Hosted second-identity isolation is complete for the tested route. The temporary membership was removed and the owner signed back in; no further account change is needed for that gate.
-
-The supported native interruption evidence covers root abort after source quiescence, after copy validation and after activation before journal completion. It does not imply arbitrary provider, external-effect, OOM or platform-outage recovery.
-
-Extensive memory-quality/cache benchmarks, new connectors or channels, Executor integration and agent-initiated updates remain later work. They do not expand the first operational release's acceptance gate.
+- Keep the supported runtime and provider path healthy with focused regressions when upstream APIs change. A generic memory defect belongs in OptChat first; a transport or hosting defect belongs here.
+- Add a connector or channel only for a concrete need, retaining explicit approval, output and uncertain-effect contracts. No email, calendar or arbitrary network connector is implied by this release.
+- Qualify changed dependencies and cross-build checkpoint migration before advertising those upgrade paths. Source rollback is not data restoration.
+- Extend observability and run memory-quality, cache-efficiency or load studies only as separate work with explicit budgets. Native profiling is an operator diagnostic, not evidence of model quality.
+- Evaluate Executor and other integrations against the boundaries below; they are outside this first operational delivery.
 
 ## Ownership and sequencing
 

@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-10",
+  "kind": "bounded-hosted-model-tool-and-restore-trial",
+  "status": "passed-with-documented-scope",
+  "model": "@cf/openai/gpt-oss-120b",
+  "qualifiedSourceCommit": "79d052c1f995dfb6b99e7469d9e0c3cdb42f34b6",
+  "deployment": "d0fbee99-5271-480f-8f01-73c1e7a35e6e",
+  "backend": "d6719dcded914e7a71e10e2c2f7c265e67ec6e0876a4b7bb0aee5827d38a16ee",
+  "applicationVersionDuringTrial": "0.1.0-dev.5",
+  "budget": {
+    "sessions": 1,
+    "callLimit": 12,
+    "reservedCallsObserved": 7,
+    "summariesAndFailedAttemptsIncluded": true,
+    "reportedTokenCostUsd": 0.0036048,
+    "combinedWithEarlierScoutReportedCostUsd": 0.0069441,
+    "reportedTokenCostIsAccountInvoice": false,
+    "inputTokens": 6678,
+    "outputTokens": 1690
+  },
+  "initialFailure": {
+    "reservedCalls": 1,
+    "kind": "provider-input-schema-rejection",
+    "textPartsArrayRejected": true,
+    "modelReportedTokens": 0,
+    "silentlyRetried": false
+  },
+  "correction": {
+    "publicApi": "Pi onPayload callback on both official Cloudflare provider entry points",
+    "scope": "concatenate text-only message parts for GPT-OSS-120B only",
+    "dependencyInternalsPatched": false,
+    "storedOptChatViewChanged": false,
+    "runtimeConfirmedBeforeRetry": true,
+    "localProviderChecksPassed": 8
+  },
+  "observed": {
+    "structuredToolCall": true,
+    "exactCodeAndArgumentsReviewed": true,
+    "pendingHumanApproval": true,
+    "noSuccessClaimBeforeApproval": true,
+    "approvalThroughProductUi": true,
+    "completedActions": 1,
+    "retainedExecutorOutputs": 1,
+    "recordedResultDelivery": true,
+    "assistantFollowUp": true,
+    "originalSearchBeforeAndAfterRestore": true,
+    "memorySettled": true,
+    "memoryError": null,
+    "messages": 7,
+    "summarizedMessages": 7,
+    "memoryViewBytes": 1534,
+    "checkpointSaved": true,
+    "sameBuildRestore": true,
+    "restoreAdmissions": 1,
+    "callsBeforeAndAfterRestore": 7,
+    "newInferenceDuringRestore": false
+  },
+  "privateArchivePayloadSha256": {
+    "beforeInference": "c0069798ac85965d3098d94af5adeb816396d8ef905dc01bbaaf7899170cd3e5",
+    "firstFailure": "3deb443f8043cd22b2319b66615d8221823e491eb5a9d4ed6ce1f07dda51fd5d",
+    "pendingApproval": "9013d5cc8bd973bb7b3f69c8605955b67a1834519d5ea602fd58866303c37de9",
+    "completedBeforeRestore": "fa3eca64f1181dab4b128348e5febb4be8aa23d8dfbdd60a890a0d9a38c69809",
+    "completedAfterRestore": "060f336205229a0d10e377460726a3bcd38ba099d9b0945daf585b48f4cc7656"
+  },
+  "restoreComparison": {
+    "offlineIntegrityVerified": true,
+    "identical": [
+      "history",
+      "memory",
+      "usage",
+      "actions",
+      "retainedOutputs",
+      "modelDiagnostics"
+    ]
+  },
+  "limits": [
+    "One fictional-data session and one approved notes action; not a model-quality, cache-efficiency or load benchmark.",
+    "The generated script awaited note creation without returning its value. The retained executor output is an empty logs array; completed status and the assistant follow-up were retained. This UI observation does not independently count destination rows.",
+    "The checkpoint captured a completed action. Restoring an earlier pending approval after its source completed is covered by the separate hosted demo record and local integration tests.",
+    "Checkpoint restoration is within the same object and backend build. Root deletion, arbitrary outages, changed dependencies and cross-build checkpoint restoration remain outside this result.",
+    "This trial qualified the implementation before release metadata promotion. The release validation record identifies the final artifact and any subsequent checks."
+  ]
+}

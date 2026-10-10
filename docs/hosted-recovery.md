@@ -8,7 +8,7 @@ This qualifies that specific backend change with unchanged dependencies, storage
 
 ## Repeat the bounded check
 
-This historical reset procedure applies to legacy session URLs (`#<id>`). New `#c1:<id>` sessions use the separate [checkpoint interface](./coordinated-recovery.md), which now has a hosted demo restore and three private journal-interruption checks. Real inference, a second authenticated identity and the operational release remain pending.
+This historical reset procedure applies to legacy session URLs (`#<id>`). New `#c1:<id>` sessions use the [checkpoint interface](./coordinated-recovery.md), with protected hosted demo and real-model restoration, three native interruption checks and separate second-identity evidence. See [current qualification](./validation.md).
 
 Use a separate synthetic legacy session in your Access-protected **demo** staging environment.
 
@@ -42,7 +42,7 @@ The application has state in the parent Durable Object and in Code Mode facets. 
 
 The legacy root-session layout has no qualified application-wide restore path. The `snapshot()` and snapshot-object restore methods in the reviewed [workerd source](https://github.com/cloudflare/workerd/blob/main/src/workerd/api/actor-state.h) are gated by `workerdExperimental`; they are not part of this pinned stable storage interface. A separate native-facet composition has now demonstrated a supported platform copy primitive, described below. The application does not enable that experimental flag, reach into Code Mode's private facet internals or present a transcript export as a restorable backup.
 
-The remaining gate is a supported coordinated checkpoint/export for the parent and every owned facet, a restore into a separate destination, and an observed approval/result flow after restoration. It must preserve authorization and reconcile external effects without replaying them blindly. Until that is demonstrated, use the qualified [offline local backup](./local-recovery.md) for local installations and treat hosted deployment as a development preview. A code rollback is not a data restore.
+The later [coordinated checkpoint composition](./coordinated-recovery.md) supplies the same-object recovery boundary that was missing from this historical reset increment. It clones the session and nested executor state, validates a separate target and retains root-owned effects and consumption. It has exact pending-approval restoration evidence, while arbitrary failure windows and root/account loss remain outside scope. A code rollback is not a data restore.
 
 ### Native facet checkpoint investigation — 2026-10-09
 
@@ -52,10 +52,10 @@ This is narrower than saying facet cloning is unavailable: `ctx.facets.clone` is
 
 The public Code Mode 0.5.3 API also provides no transferable execution checkpoint/import contract. Its internal runtime accessor and private facet naming are not integration points for this application. At that stage, a separate coordinated boundary was still needed to preserve pending operation identities and destination reconciliation. The later [checkpoint composition](./coordinated-recovery.md) supplies that boundary through native same-parent subtree cloning. These observations do not prove that all possible architectures are impossible.
 
-The separately implemented [session data export](./session-export.md) gives users a readable copy now. It deliberately records `restorable: false` and leaves the coordinated hosted recovery gate open.
+The separately implemented [session data export](./session-export.md) gives users a readable copy now. It deliberately records `restorable: false`; the later checkpoint composition supplies a separate same-object restore path.
 
 ### Root-owned alarms and a successful native subtree probe
 
 A subsequent composition supplied PiHarness's exported Lifecycle service contract while leaving the actual Lifecycle alarm in the root object. This avoided the facet alarm limitation without modifying SDK source. A private hosted fixture then cloned a quiescent Pi/OptChat session with a nested Code Mode executor, preserving history, memory, request identities and a pending approval. A forced restart of the copied subtree retained its next approval step; two approved occurrences with the same key produced one fixture note. The original source remained unchanged.
 
-The [hosted evidence](./hosted-facet-checkpoint-validation.json) records 14 requests, zero paid model calls and its exact scope. It does not validate a production backup service. The [application integration](./coordinated-recovery.md) adds a durable recovery journal, generation fencing and root-owned budget/effect records and has separate local runtime evidence. Hosted application qualification and the release gate remain open.
+The [hosted evidence](./hosted-facet-checkpoint-validation.json) records 14 requests, zero paid model calls and its exact scope. It does not validate a production backup service. The [application integration](./coordinated-recovery.md) adds a durable recovery journal, generation fencing and root-owned budget/effect records and has separate local runtime evidence. The subsequent [application evidence](./coordinated-recovery.md#hosted-evidence-and-remaining-work) records the broader protected workflow and its remaining limits.

@@ -76,7 +76,7 @@ npx wrangler deploy --config wrangler.staging.local.jsonc --env staging --dry-ru
 npx wrangler deploy --config wrangler.staging.local.jsonc --env staging
 ```
 
-Use these same explicit configuration arguments for later deployments. The original `npm run deploy:staging` command still uses the closed bootstrap configuration. Review and reapply configuration changes from future releases to your private copy; it does not automatically inherit edits to `wrangler.jsonc`. For dev.5, retain `SESSIONS`, add `RECOVERY_SESSIONS` → `SessionSupervisor`, append the tracked `v2` migration and keep the `build` command that generates the checkpoint runtime identity. Preserve Access values, hostname protections and the previous model default. Compare your compatibility date/flags with the tracked file used by that identity generator.
+Use these same explicit configuration arguments for later deployments. The original `npm run deploy:staging` command still uses the closed bootstrap configuration. Review and reapply configuration changes from future releases to your private copy; it does not automatically inherit edits to `wrangler.jsonc`. For 0.1.0, retain `SESSIONS`, add `RECOVERY_SESSIONS` → `SessionSupervisor`, append the tracked `v2` migration and keep the `build` command that generates the checkpoint runtime identity. Preserve Access values, hostname protections and the previous model default. Compare your compatibility date/flags with the tracked file used by that identity generator.
 
 ## Wait for session code to update
 
