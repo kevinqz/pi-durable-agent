@@ -93,7 +93,7 @@ npm run build
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Hosted coordinator qualification is still pending.
+`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Separate [hosted evidence](./docs/coordinated-recovery.md#hosted-evidence-and-remaining-work) covers a protected demo restore and three native root-abort boundaries. Real inference, a second authenticated identity and the operational release remain pending.
 
 | Directory                                                                              | Responsibility                                                                     |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
