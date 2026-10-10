@@ -114,7 +114,7 @@ export class AgentSession extends DurableObject<Env> {
       async () => {
         const state = await this.chat.status();
         for (const request of state.requests)
-          await this.refreshRequest(request.id);
+          this.recordRequest(request.id, request);
         return (
           state.tasks === 0 &&
           this.store
@@ -294,33 +294,28 @@ export class AgentSession extends DurableObject<Env> {
 
   private async refreshRequest(id: string) {
     const request = await this.chat.request(id);
-    if (!request) return;
-    const task = request.task
-      ? await this.chat.harness.getTask(request.task, BG)
-      : undefined;
-    const outcome =
-      task?.state.status === "terminal" ? task.state.outcome : undefined;
-    const status =
-      outcome?.status === "faulted"
-        ? "failed"
-        : request.status === "done"
-          ? "completed"
-          : request.status;
-    const error =
-      outcome?.status === "faulted"
-        ? outcome.error.message
-        : (request.error ?? null);
+    if (request) this.recordRequest(id, request);
+  }
+
+  private recordRequest(
+    id: string,
+    request: Pick<
+      NonNullable<Awaited<ReturnType<OptChatController["request"]>>>,
+      "status" | "task" | "error"
+    >,
+  ) {
     this.store.update(
       id,
-      status,
+      request.status === "done" ? "completed" : request.status,
       request.task ? Number(request.task) : undefined,
-      error,
+      request.error ?? null,
     );
   }
 
   private async snapshot() {
     const state = await this.chat.status();
-    for (const request of state.requests) await this.refreshRequest(request.id);
+    for (const request of state.requests)
+      this.recordRequest(request.id, request);
     const rows = this.store.list();
     return {
       mode: this.sessionModel.profile().mode,
@@ -360,7 +355,8 @@ export class AgentSession extends DurableObject<Env> {
   async checkpointProof(): Promise<string> {
     await this.lifecycle.start();
     const state = await this.chat.status();
-    for (const request of state.requests) await this.refreshRequest(request.id);
+    for (const request of state.requests)
+      this.recordRequest(request.id, request);
     if (
       state.tasks ||
       this.store

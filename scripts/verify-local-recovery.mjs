@@ -22,6 +22,34 @@ const source = join(directory, "source");
 const backup = join(directory, "backup");
 const restored = join(directory, "restored");
 let server;
+let checkpointBefore;
+let checkpointPending;
+const checkpointAction = {
+  id: "checkpoint-pending",
+  label: "Retain a root-owned note approval across the update",
+  code: 'async () => await notes.create({key:"upgrade",text:"Checkpoint upgrade 417"})',
+};
+const checkpointCall = (path, body) =>
+  server.call(
+    path,
+    body ? { expectedGeneration: 0, ...body } : undefined,
+    "checkpoint-sessions",
+  );
+const checkpointSettled = (id) =>
+  until(
+    () => checkpointCall("state"),
+    (s) =>
+      s.requests.some((r) => r.id === id && r.status === "completed") &&
+      s.progress.activeTasks === 0,
+  );
+async function saveCheckpoint(id) {
+  await checkpointCall("checkpoints/create", { id });
+  const saved = await until(
+    () => checkpointCall("checkpoints"),
+    (s) => s.latest?.phase === "done" && !s.busy,
+  );
+  assert.equal(saved.checkpoints.find((c) => c.id === id)?.compatible, true);
+}
 
 try {
   server = await startLocalServer(source, directory, sourceRoot);
@@ -71,6 +99,20 @@ try {
     (a) => a.status === "pending",
   );
   const before = await initialCall("state");
+  if (crossRelease) {
+    await checkpointCall("messages", {
+      id: "checkpoint-before",
+      text: "Checkpoint upgrade 417: retain this exact original.",
+    });
+    await checkpointSettled("checkpoint-before");
+    await checkpointCall("actions", checkpointAction);
+    checkpointPending = await until(
+      () => checkpointCall("actions/inspect", { id: checkpointAction.id }),
+      (a) => a.status === "pending",
+    );
+    await saveCheckpoint("before-upgrade");
+    checkpointBefore = await checkpointCall("state");
+  }
   await assert.rejects(
     createBackup(source, join(directory, "live-refusal"), sourceRoot),
     /Local state is locked|open files/,
@@ -94,6 +136,53 @@ try {
   const identities = (rows) =>
     rows.map(({ updated_at, ...identity }) => identity);
   assert.deepEqual(identities(after.requests), identities(before.requests));
+  if (crossRelease) {
+    const current = await checkpointCall("state");
+    assert.deepEqual(current.history, checkpointBefore.history);
+    assert.deepEqual(current.model, checkpointBefore.model);
+    assert.deepEqual(current.usage, checkpointBefore.usage);
+    assert.equal(current.memory.view, checkpointBefore.memory.view);
+    assert.equal(current.recovery.generation, 0);
+    assert.deepEqual(
+      identities(current.requests),
+      identities(checkpointBefore.requests),
+    );
+    const pending = await checkpointCall("actions/inspect", {
+      id: checkpointAction.id,
+    });
+    assert.equal(pending.fingerprint, checkpointPending.fingerprint);
+    assert.deepEqual(pending.pending, checkpointPending.pending);
+    assert.equal(pending.contract, checkpointPending.contract);
+    const catalog = await checkpointCall("checkpoints");
+    assert.equal(catalog.checkpoints.length, 1);
+    assert.equal(catalog.checkpoints[0].id, "before-upgrade");
+    assert.equal(catalog.checkpoints[0].compatible, false);
+    await assert.rejects(
+      checkpointCall("checkpoints/restore", {
+        id: "refuse-old-build",
+        checkpointId: "before-upgrade",
+      }),
+      /matching runtime/,
+    );
+    assert.match(
+      JSON.stringify(
+        await checkpointCall("memory/search", {
+          query: "Checkpoint upgrade 417",
+        }),
+      ),
+      /retain this exact original/,
+    );
+    await checkpointCall("actions/decide", {
+      id: checkpointAction.id,
+      decision: "approve",
+      fingerprint: pending.fingerprint,
+    });
+    await checkpointSettled(`result-${checkpointAction.id}`);
+    const completed = await checkpointCall("actions", checkpointAction);
+    assert.equal(completed.status, "completed");
+    assert.equal(completed.result.text, "Checkpoint upgrade 417");
+    await saveCheckpoint("after-upgrade");
+  }
   let current = await call("actions/inspect", { id: action.id });
   assert.equal(current.fingerprint, pending.fingerprint);
   assert.deepEqual(current.pending, pending.pending);
@@ -173,6 +262,33 @@ try {
         s.requests.find((r) => r.id === "after-upgrade")?.status ===
           "completed" && s.progress.activeTasks === 0,
     );
+    const reopenedCheckpoint = await checkpointCall("state");
+    assert.equal(
+      reopenedCheckpoint.requests.filter(
+        (r) => r.id === `result-${checkpointAction.id}`,
+      ).length,
+      1,
+    );
+    assert.equal(
+      (await checkpointCall("actions/inspect", { id: checkpointAction.id }))
+        .status,
+      "completed",
+    );
+    const retainedCheckpoints = (await checkpointCall("checkpoints"))
+      .checkpoints;
+    assert.equal(
+      retainedCheckpoints.find((c) => c.id === "before-upgrade")?.compatible,
+      false,
+    );
+    assert.equal(
+      retainedCheckpoints.find((c) => c.id === "after-upgrade")?.compatible,
+      true,
+    );
+    await checkpointCall("messages", {
+      id: "checkpoint-after",
+      text: "Continue after the update: recall checkpoint upgrade 417.",
+    });
+    await checkpointSettled("checkpoint-after");
     await server.stop();
     server = undefined;
   }
@@ -205,6 +321,15 @@ try {
             connectorV1BytesPreserved: true,
             restartedTargetWithoutDuplicateDelivery: true,
             newConversationTurnCompleted: true,
+            checkpointSession: {
+              historyMemoryRequestsModelAndUsagePreserved: true,
+              exactPendingApprovalPreserved: true,
+              originalRetrieved: true,
+              oldCheckpointRetainedAndRestoreRefused: true,
+              approvedActionCompletedAndDelivered: true,
+              newCheckpointCompatible: true,
+              restartRetainedOneDeliveryAndContinuedConversation: true,
+            },
           }
         : {}),
     },

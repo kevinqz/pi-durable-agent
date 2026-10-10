@@ -4,7 +4,7 @@
 
 Pi Durable Agent composes Pi Durable, the published OptChat Durable SDK, Cloudflare hosting and Code Mode. OptChat remains independently installable and versioned; this application does not reimplement its memory engine.
 
-## Current delivery — 0.1.0
+## Operational foundation — 0.1.0
 
 | Milestone | Qualified first-release scope                                                                                                                             | Later work                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
@@ -24,11 +24,15 @@ The [first operational release](https://github.com/kevinqz/pi-durable-agent/rele
 4. **Isolation and operation:** [second-identity isolation](./hosted-identity-isolation-validation.json), exact approvals, durable call reservations and [private outcome/runtime diagnostics](./session-export.md) have separate evidence. Temporary test access was removed. Warm facets must reach the reviewed backend before new work or checkpoints are admitted.
 5. **Install and update:** the [local dev.4 → 0.1.0 route](./local-upgrades.md) preserves existing state in a separate copy. The release's `release-validation.json` and `SHA256SUMS` identify its exact source archive, independent installation and final verification. [Archive onboarding](./installation.md) requires no Git or preinstalled Pi.
 
+## Current delivery — 0.1.1: reduce duplicate ownership
+
+The [upstream composition review](./upstream-composition.md) is the coordinated attack plan. OptChat [0.4.1](https://github.com/kevinqz/optchat-durable/releases/tag/v0.4.1) owns canonical request-outcome inspection; this application consumes its published artifact and removes duplicate interpretation and repeated polling reads. The [exact local update](./local-upgrade-v011-validation.json) uses independently installed old/new runtimes and a separate state copy, covering legacy and checkpoint sessions. The review records why the facet bridge, admission ledger and action outbox remain, and the upstream capabilities required to replace them.
+
 ## Next priorities
 
 - Keep the supported runtime and provider path healthy with focused regressions when upstream APIs change. A generic memory defect belongs in OptChat first; a transport or hosting defect belongs here.
 - Add a connector or channel only for a concrete need, retaining explicit approval, output and uncertain-effect contracts. No email, calendar or arbitrary network connector is implied by this release.
-- Qualify changed dependencies and cross-build checkpoint migration before advertising those upgrade paths. Source rollback is not data restoration.
+- Qualify each further dependency change and cross-build checkpoint migration before advertising those upgrade paths. Source rollback is not data restoration.
 - Extend observability and run memory-quality, cache-efficiency or load studies only as separate work with explicit budgets. Native profiling is an operator diagnostic, not evidence of model quality.
 - Evaluate Executor and other integrations against the boundaries below; they are outside this first operational delivery.
 

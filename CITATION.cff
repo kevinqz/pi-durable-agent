@@ -8,7 +8,7 @@ authors:
     affiliation: Independent maintainer
 repository-code: "https://github.com/kevinqz/pi-durable-agent"
 license: MIT
-version: 0.1.0
+version: 0.1.1
 references:
   - type: software
     title: "OptChat / UniiChat memory design"
@@ -30,7 +30,7 @@ references:
       - family-names: Saltarelli
         given-names: Kevin
     repository-code: "https://github.com/kevinqz/optchat-durable"
-    version: 0.4.0
+    version: 0.4.1
   - type: software
     title: "Cloudflare Agents and Code Mode"
     authors:

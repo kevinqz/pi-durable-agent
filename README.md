@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**0.1.0 — first operational release.** Start with a credential-free local demo, or configure **GPT-OSS-120B on Workers AI** for a real conversation with approved session-note actions. The [hosted model check](./docs/hosted-gpt-oss-validation.json) covers a structured tool call, exact-operation approval, retained completion, assistant follow-up, source retrieval and same-build restoration. Coordinated checkpoints, bounded interruptions and isolation between two authenticated identities also have evidence. The supported connector creates session-local notes; see [verified scope and limits](./docs/validation.md).
+**0.1.1 — maintenance update to the first operational release.** Start with a credential-free local demo, or configure **GPT-OSS-120B on Workers AI** for a real conversation with approved session-note actions. The 0.1.0 [hosted model check](./docs/hosted-gpt-oss-validation.json) covers a structured tool call, exact-operation approval, retained completion, assistant follow-up, source retrieval and same-build restoration. Coordinated checkpoints, bounded interruptions and isolation between two authenticated identities also have evidence. The supported connector creates session-local notes; see [verified scope and limits](./docs/validation.md).
 
 ## Try it locally
 
@@ -15,7 +15,7 @@ You need **Node.js 22.19+** and npm. You do **not** need Pi installed, a customi
 **With Git, using the released version:**
 
 ```sh
-git clone --branch v0.1.0 https://github.com/kevinqz/pi-durable-agent.git
+git clone --branch v0.1.1 https://github.com/kevinqz/pi-durable-agent.git
 cd pi-durable-agent
 npm ci
 npm run dev
@@ -45,7 +45,7 @@ npm run dev -- --persist-to .local-restores/demo
 
 Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
-**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.4 → 0.1.0** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → 0.1.0.
+**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0 → 0.1.1** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → 0.1.0 → 0.1.1.
 
 **Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [private staging walkthrough](./docs/staging.md) and [deployment and cost guide](./docs/deployment.md) when ready.
 
@@ -55,7 +55,7 @@ Choose what you need:
 
 | Need                                                                        | Install                                                                     |
 | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| OptChat memory in your existing Pi coding agent                             | `pi install https://github.com/kevinqz/optchat-durable@v0.4.0`              |
+| OptChat memory in your existing Pi coding agent                             | `pi install git:github.com/kevinqz/optchat-durable@v0.4.1`                  |
 | OptChat memory in your own Pi Durable host                                  | The [OptChat public SDK](https://github.com/kevinqz/optchat-durable#readme) |
 | A separate web app with Cloudflare lifecycle and approved Code Mode actions | This repository, with `npm ci` and `npm run dev`                            |
 
@@ -82,11 +82,13 @@ flowchart LR
   Outbox --> Memory
 ```
 
-Each authenticated identity and session name maps to a separate Durable Object. New sessions keep their conversation and nested Code Mode runtimes in a facet subtree, with consumption and destination records outside the restorable copy. Existing sessions retain their original namespace and connector contract. All conversational input, including completed-action follow-ups, goes through OptChat's controller. The application uses its published **0.4.0** package; it does not fork the memory engine or patch Pi/Cloudflare internals.
+Each authenticated identity and session name maps to a separate Durable Object. New sessions keep their conversation and nested Code Mode runtimes in a facet subtree, with consumption and destination records outside the restorable copy. Existing sessions retain their original namespace and connector contract. All conversational input, including completed-action follow-ups, goes through OptChat's controller. The application uses its published **0.4.1** package; it does not fork the memory engine or patch Pi/Cloudflare internals.
 
 Code Mode 0.5.3 does not expose an execute-or-attach idempotency key. This app records admission before dispatch, uses one named runtime per action, and never silently starts another execution after an ambiguous dispatch. **Unknown** means inspection or operator reconciliation is required. This is not an exactly-once guarantee for arbitrary external services.
 
 The operator can use [native CPU/allocation profiling](./docs/profiling.md) to diagnose the hosted runtime without adding an agent tool or changing OptChat.
+
+The [upstream composition review](./docs/upstream-composition.md) records which responsibilities remain in Pi/Cloudflare, which belong to this application and the coordinated simplification work with OptChat.
 
 ## Develop
 

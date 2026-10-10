@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-10T14:14:15.735Z",
+  "kind": "local-cross-release-upgrade",
+  "shutdown": "graceful",
+  "crossRelease": true,
+  "targetRuntime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.1",
+    "revision": "4d37077154cb2d43bc5874082de93d78eb1a6cea",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "78b987f305634ebb4fc91e930333a0acf9c9c3c3d76d1ae623172b55a07760c3",
+    "buildFingerprint": "fd850923ba3b955550e76ec62c40ce773b6d0f65f579b470993e1b3e410063fe",
+    "fingerprint": "0516efdbe551ed071d3271353e26c0a0d09b538ace121fcfaf4a0909ee577692"
+  },
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0",
+    "revision": null,
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "d330242c4ca7566ab778ccf843330e0e986f2c05c7e342a17b868b148fa5174e",
+    "buildFingerprint": "6750f09601d2809756a8df67c831b2597968c6aa8b3b306d22ee0737901d589e",
+    "fingerprint": "fbe0a1aff19d4a5a60d8bb0c78ce4b82b287f602d01cedec8f562e2006a9215d"
+  },
+  "snapshot": {
+    "files": 44,
+    "bytes": 9781044,
+    "sha256": "bcf1aa35b63d15959948817b176c2aedcff2b037f25d1138426a9ae4d2b43c9e"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true,
+    "ordinaryRestoreRefusedRuntimeChange": true,
+    "completedActionPreserved": true,
+    "connectorV1BytesPreserved": true,
+    "restartedTargetWithoutDuplicateDelivery": true,
+    "newConversationTurnCompleted": true,
+    "checkpointSession": {
+      "historyMemoryRequestsModelAndUsagePreserved": true,
+      "exactPendingApprovalPreserved": true,
+      "originalRetrieved": true,
+      "oldCheckpointRetainedAndRestoreRefused": true,
+      "approvedActionCompletedAndDelivered": true,
+      "newCheckpointCompatible": true,
+      "restartRetainedOneDeliveryAndContinuedConversation": true
+    }
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "dependencyQualification": {
+    "baselineInstalledSeparately": true,
+    "installation": "npm ci with npm offline and existing cache",
+    "fromOptChat": "0.4.0",
+    "toOptChat": "0.4.1",
+    "changedLockfilePackages": ["node_modules/optchat-durable"],
+    "sourceArchiveWithoutGit": true
+  },
+  "sourceRevisionNote": "Checkout base before patch changes were committed; exact source/configuration/dependency fingerprints identify the tested contents.",
+  "verifierSha256": "3c6928cdf85f0d7d3ae810738bcca827df5ade7db80098ba68f02ac4a671843c",
+  "launcherSha256": "7a27c49b1a909cca6455902835a60a96c790e2e2177d779742bef95765dd6346",
+  "attempts": {
+    "first": "Native runtime internal error during severe local disk pressure; subsequent file writes also failed with ENOSPC. Fixture retained privately.",
+    "qualified": "After releasing inactive generated dependencies, the complete fixture passed with the same backend and independently installed baseline. Only failure logging in the test helper changed. No runtime retry or relaxed assertion was added."
+  }
+}
