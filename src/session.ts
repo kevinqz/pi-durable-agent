@@ -12,7 +12,7 @@ import {
   type OptChatController,
 } from "optchat-durable/extension";
 import { LIMITS, type Env, type Principal } from "./env.js";
-import { digest, HttpError, identifier, textField } from "./http.js";
+import { HttpError, identifier, textField } from "./http.js";
 import { configureModels } from "./models.js";
 import { SerialGate, SessionStore } from "./store.js";
 import { Actions } from "./actions.js";

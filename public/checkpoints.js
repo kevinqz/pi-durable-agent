@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const phases = {
   quiescing: "Checking saved work",
   copying: "Copying the session",
-  validating: "Checking the restored copy",
+  validating: "Verifying the saved copy",
   activating: "Reopening the session",
 };
 
@@ -110,13 +110,16 @@ export function checkpointControls({ api, refresh, showError, generation }) {
         ? "The last request was not confirmed. Retry it with the saved request ID."
         : busy
           ? `${phases[busy.phase] ?? "Recovery in progress"}. Messages and approvals are paused.${busy.failures ? ` ${busy.failures} failed attempt(s). ${recovery.nextAttemptAt ? "A retry is scheduled." : "Review, then resume or cancel."}` : ""}${busy.lastFailure?.code === "state-mismatch" ? ` Saved state differs in: ${busy.lastFailure.parts.join(", ")}.` : ""}`
-          : recovery.latest?.phase === "done"
-            ? recovery.latest.kind === "backup"
-              ? "Checkpoint saved."
-              : "Session restored. Review pending approvals before continuing."
-            : recovery.latest?.phase === "cancelled"
-              ? "Recovery cancelled. The current session was retained."
-              : "Create a checkpoint when messages and summaries have finished.";
+          : recovery.backupUnavailableReason
+            ? recovery.backupUnavailableReason
+            : recovery.latest?.phase === "done"
+              ? recovery.latest.kind === "backup"
+                ? "Checkpoint saved."
+                : "Session restored. Review pending approvals before continuing."
+              : recovery.latest?.phase === "cancelled"
+                ? "Recovery cancelled. The current session was retained."
+                : (recovery.backupUnavailableReason ??
+                  "Create a checkpoint when messages and summaries have finished.");
       if ($("checkpoint-status").textContent !== status)
         $("checkpoint-status").textContent = status;
       const idle =
@@ -133,6 +136,7 @@ export function checkpointControls({ api, refresh, showError, generation }) {
         submitting ||
         !!pending ||
         !!busy ||
+        !!recovery.backupUnavailableReason ||
         !idle ||
         recovery.checkpoints.length >= recovery.limits.checkpoints ||
         recovery.operations >= recovery.limits.operations;

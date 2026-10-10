@@ -12,7 +12,7 @@ export async function checkpointEvidence(parts: Record<string, unknown>) {
 
 export class CheckpointMismatch extends HttpError {
   constructor(readonly parts: string[]) {
-    super(409, "Restored state did not match the checkpoint evidence");
+    super(409, "Copied state did not match the checkpoint evidence");
   }
 }
 

@@ -38,11 +38,29 @@
       "three automatic attempts failed; restored copy was not promoted",
       "explicit cancellation completed; original eight-message history and result remained available"
     ],
-    "failureCause": "Not yet established. Existing UI did not distinguish proof mismatch from a runtime exception. Diagnostic increment is in progress."
+    "failureCause": "The subsequent diagnostic and isolated name probe reproduced empty copies for colon-containing facet names. See hosted-facet-name-validation.json. This records the failing build, not the correction."
   },
   "limits": [
     "No successful hosted product restore",
     "No independently counted hosted destination rows",
     "No real provider, second authenticated identity or qualified operational release"
-  ]
+  ],
+  "diagnosticFollowup": {
+    "sourceCommit": "1c501ee",
+    "cloudflareVersion": "078f4137-916d-4a74-b517-35a6ec3dc47f",
+    "fixture": "proof-diagnostics-4cf928d1",
+    "result": "Proof mismatch; three automatic attempts; cancelled; current six-message session retained",
+    "parts": [
+      "retained.memory",
+      "retained.requests",
+      "retained.actions",
+      "retained.usage",
+      "retained.history",
+      "retained.retainedOutputs",
+      "memory.memory",
+      "memory.requests",
+      "memory.usage",
+      "executions"
+    ]
+  }
 }

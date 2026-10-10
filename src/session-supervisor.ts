@@ -351,6 +351,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
         })),
       operations: catalog.operations,
       restores: catalog.restores,
+      backupUnavailableReason: this.checkpoints.backupUnavailableReason(),
       scope: "same-object-facet-subtree",
       limits: { checkpoints: 3, restores: 8, operations: 24 },
     };

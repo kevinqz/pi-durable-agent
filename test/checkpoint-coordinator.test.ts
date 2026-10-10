@@ -15,7 +15,7 @@ import {
 
 const bindings = env as unknown as Env;
 const session = () => bindings.SESSIONS.getByName(crypto.randomUUID());
-const initial = { facet: "session:initial", epoch: 0 };
+const initial = { facet: "session-initial", epoch: 0 };
 const runtime = "fixture-runtime-v1";
 
 test("checkpoint evidence rejects a changed approval without retaining private content in its diagnostic", async () => {
@@ -72,7 +72,7 @@ function driver(storage: DurableObjectStorage): CheckpointDriver {
   };
 }
 const seed = (storage: DurableObjectStorage) =>
-  storage.kv.put("fixture:facet:session:initial", {
+  storage.kv.put("fixture:facet:session-initial", {
     memory: "Aurora",
     pending: { id: "same-execution", sequence: 1, expiresAt: 123 },
   });
@@ -98,8 +98,8 @@ test("backup freezes admission; a lost copy acknowledgement retries only its ina
       failures: 1,
     });
     expect(recovery.checkpoints()).toEqual([]);
-    expect(ctx.storage.kv.get("fixture:facet:snapshot:one")).toEqual(
-      ctx.storage.kv.get("fixture:facet:session:initial"),
+    expect(ctx.storage.kv.get("fixture:facet:snapshot-one")).toEqual(
+      ctx.storage.kv.get("fixture:facet:session-initial"),
     );
   });
   await abortAllDurableObjects();
@@ -128,11 +128,11 @@ test("failed validation never promotes a candidate, and cancellation preserves b
     const recovery = new CheckpointCoordinator(ctx.storage, runtime, platform);
     recovery.beginBackup("before");
     await recovery.advance("before");
-    const checkpoint = ctx.storage.kv.get("fixture:facet:snapshot:before");
-    ctx.storage.kv.put("fixture:facet:session:initial", {
+    const checkpoint = ctx.storage.kv.get("fixture:facet:snapshot-before");
+    ctx.storage.kv.put("fixture:facet:session-initial", {
       memory: "Newer conversation",
     });
-    const source = ctx.storage.kv.get("fixture:facet:session:initial");
+    const source = ctx.storage.kv.get("fixture:facet:session-initial");
     recovery.beginRestore("restore", "before");
     const validate = platform.validate;
     platform.validate = async () => {
@@ -148,10 +148,10 @@ test("failed validation never promotes a candidate, and cancellation preserves b
     await recovery.cancel("restore");
     expect(recovery.status().active).toEqual(initial);
     expect(() => recovery.assertActive(initial)).not.toThrow();
-    expect(ctx.storage.kv.get("fixture:facet:snapshot:before")).toEqual(
+    expect(ctx.storage.kv.get("fixture:facet:snapshot-before")).toEqual(
       checkpoint,
     );
-    expect(ctx.storage.kv.get("fixture:facet:session:initial")).toEqual(source);
+    expect(ctx.storage.kv.get("fixture:facet:session-initial")).toEqual(source);
     platform.validate = validate;
     recovery.beginRestore("retry-with-new-id", "before");
     await recovery.advance("retry-with-new-id");
@@ -162,6 +162,76 @@ test("failed validation never promotes a candidate, and cancellation preserves b
       checkpoint,
     );
     expect(() => recovery.assertActive(active)).not.toThrow();
+  });
+});
+
+test("an empty native copy is never advertised as a saved checkpoint; retry validates before publication", async () => {
+  let stub = session();
+  await runInDurableObject(stub, async (_object, ctx) => {
+    seed(ctx.storage);
+    const platform = driver(ctx.storage);
+    // Reproduce the observed hosted failure: clone returns but copies no state.
+    platform.clone = () => {};
+    const recovery = new CheckpointCoordinator(ctx.storage, runtime, platform);
+    recovery.beginBackup("empty");
+    await expect(recovery.advance("empty")).rejects.toThrow("integrity");
+    expect(recovery.checkpoints()).toEqual([]);
+    expect(recovery.operation("empty")?.phase).toBe("validating");
+    expect(recovery.status().active).toEqual(initial);
+    await recovery.cancel("empty");
+    expect(() => recovery.assertActive(initial)).not.toThrow();
+
+    const working = new CheckpointCoordinator(
+      ctx.storage,
+      runtime,
+      driver(ctx.storage),
+    );
+    working.beginBackup("lost-validation-reply");
+    const native = driver(ctx.storage);
+    native.validate = async () => {
+      throw new Error("Lost validation reply");
+    };
+    const interrupted = new CheckpointCoordinator(ctx.storage, runtime, native);
+    await expect(interrupted.advance("lost-validation-reply")).rejects.toThrow(
+      "Lost validation reply",
+    );
+    expect(interrupted.checkpoints()).toEqual([]);
+  });
+  await abortAllDurableObjects();
+  stub = bindings.SESSIONS.get(stub.id);
+  await runInDurableObject(stub, async (_object, ctx) => {
+    const recovery = new CheckpointCoordinator(
+      ctx.storage,
+      runtime,
+      driver(ctx.storage),
+    );
+    await recovery.advance("lost-validation-reply");
+    expect(recovery.checkpoints()).toHaveLength(1);
+    expect(recovery.status().active).toEqual(initial);
+    expect(recovery.operation("lost-validation-reply")?.phase).toBe("done");
+  });
+});
+
+test("pre-release facet addresses are retained and refused before checkpoint admission", async () => {
+  await runInDurableObject(session(), async (_object, ctx) => {
+    const catalog = {
+      version: 1,
+      active: { facet: "session:initial", epoch: 0 },
+      operations: 0,
+      restores: 0,
+    };
+    ctx.storage.kv.put("checkpoint:catalog", catalog);
+    const recovery = new CheckpointCoordinator(
+      ctx.storage,
+      runtime,
+      driver(ctx.storage),
+    );
+    expect(() => recovery.beginBackup("unsafe-name")).toThrow(
+      "pre-release session",
+    );
+    expect(recovery.status()).toEqual(catalog);
+    expect(recovery.operation("unsafe-name")).toBeUndefined();
+    expect(() => recovery.assertActive(catalog.active)).not.toThrow();
   });
 });
 
@@ -201,7 +271,7 @@ test("lost activation acknowledgement keeps both generations fenced and resumes 
     );
     await recovery.advance("restore");
     expect(recovery.status().active).toEqual({
-      facet: "session:restored:restore",
+      facet: "session-restored-restore",
       epoch: 1,
     });
     expect(
