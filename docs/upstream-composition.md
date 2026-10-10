@@ -48,6 +48,19 @@ for an unused helper would make existing checkpoints incompatible without changi
 production request path. When adopting a later OptChat release, qualify the exact old/new
 runtime update and continue to reject checkpoints from a different backend build.
 
+### OptChat 0.5.0 preflight decision
+
+OptChat [0.5.0](https://github.com/kevinqz/optchat-durable/releases/tag/v0.5.0) adds optional
+SDK `check(storage)` for a read-only compatibility preview before `prepare` and `Harness.open`.
+It exposes the same validator already called by preparation; it does not add a migration,
+checkpoint restore, authentication or host wake protocol.
+
+This application's pre-open storage hook already calls `optchat.prepare(storage, {}, context)`.
+It therefore already rejects incompatible OptChat contracts before the harness opens. There is
+no separate setup-preview flow here that needs the new method, so retain 0.4.1 and the current
+backend fingerprint. Future onboarding or update tooling can adopt the public check alongside
+a qualified dependency update, while preserving the application's own checkpoint build gate.
+
 ## Alternatives and evidence limits
 
 Cloudflare Think already provides a complete harness with memory, compaction, search, durable submissions and recovery. It is a reasonable alternative for a generic hosted assistant. Choosing it here would require a distinct comparison of memory semantics and a reviewed migration, not running a second harness alongside Pi merely to reuse a transport. Current functional checks do not establish that OptChat is better than native Pi or Think in recall, cache efficiency, cost or latency.
