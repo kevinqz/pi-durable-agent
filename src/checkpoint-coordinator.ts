@@ -1,5 +1,6 @@
 import { HttpError, identifier, textField } from "./http.js";
 import { SerialGate } from "./store.js";
+import { CheckpointMismatch } from "./checkpoint-proof.js";
 
 export type SessionGeneration = { facet: string; epoch: number };
 export type Checkpoint = {
@@ -26,6 +27,10 @@ export type CheckpointOperation = {
   proof?: string;
   createdAt: number;
   failures: number;
+  lastFailure?: {
+    code: "state-mismatch" | "runtime-failure";
+    parts?: string[];
+  };
 };
 type Catalog = {
   version: 1;
@@ -283,6 +288,10 @@ export class CheckpointCoordinator {
         // A failed/uncertain copy is never advertised as a usable generation.
         // Persist the exact phase; the host reports a category, not raw payloads.
         operation.failures++;
+        operation.lastFailure =
+          error instanceof CheckpointMismatch
+            ? { code: "state-mismatch", parts: error.parts }
+            : { code: "runtime-failure" };
         this.save(operation);
         throw error;
       }

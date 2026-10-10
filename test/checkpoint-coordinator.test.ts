@@ -3,6 +3,11 @@ import { abortAllDurableObjects, runInDurableObject } from "cloudflare:test";
 import { expect, test } from "vitest";
 import type { Env } from "../src/env.js";
 import {
+  checkpointEvidence,
+  compareCheckpointEvidence,
+  CheckpointMismatch,
+} from "../src/checkpoint-proof.js";
+import {
   CheckpointCoordinator,
   type CheckpointDriver,
   type SessionGeneration,
@@ -12,6 +17,26 @@ const bindings = env as unknown as Env;
 const session = () => bindings.SESSIONS.getByName(crypto.randomUUID());
 const initial = { facet: "session:initial", epoch: 0 };
 const runtime = "fixture-runtime-v1";
+
+test("checkpoint evidence rejects a changed approval without retaining private content in its diagnostic", async () => {
+  const original = await checkpointEvidence({
+    history: "private conversation",
+    approvals: [{ id: "approval", expiresAt: 100 }],
+  });
+  const changed = await checkpointEvidence({
+    history: "private conversation",
+    approvals: [{ id: "approval", expiresAt: 101 }],
+  });
+  expect(original).not.toContain("private conversation");
+  expect(() => compareCheckpointEvidence(original, original)).not.toThrow();
+  try {
+    compareCheckpointEvidence(original, changed);
+    throw new Error("Changed authorization must be rejected");
+  } catch (error) {
+    expect(error).toBeInstanceOf(CheckpointMismatch);
+    expect((error as CheckpointMismatch).parts).toEqual(["approvals"]);
+  }
+});
 
 // Application-owned fixture data exercises journal/fence failures. The separate
 // native-facet probe qualifies actual Pi/Code Mode copying; this is not that proof.
@@ -111,9 +136,13 @@ test("failed validation never promotes a candidate, and cancellation preserves b
     recovery.beginRestore("restore", "before");
     const validate = platform.validate;
     platform.validate = async () => {
-      throw new Error("Unverified destination");
+      throw new CheckpointMismatch(["approvals"]);
     };
-    await expect(recovery.advance("restore")).rejects.toThrow("Unverified");
+    await expect(recovery.advance("restore")).rejects.toThrow("did not match");
+    expect(recovery.operation("restore")?.lastFailure).toEqual({
+      code: "state-mismatch",
+      parts: ["approvals"],
+    });
     expect(recovery.status().active).toEqual(initial);
     expect(() => recovery.assertActive(initial)).toThrow("frozen");
     await recovery.cancel("restore");

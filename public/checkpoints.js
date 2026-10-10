@@ -109,7 +109,7 @@ export function checkpointControls({ api, refresh, showError, generation }) {
       const status = uncertain
         ? "The last request was not confirmed. Retry it with the saved request ID."
         : busy
-          ? `${phases[busy.phase] ?? "Recovery in progress"}. Messages and approvals are paused.${busy.failures ? ` ${busy.failures} failed attempt(s). ${recovery.nextAttemptAt ? "A retry is scheduled." : "Review, then resume or cancel."}` : ""}`
+          ? `${phases[busy.phase] ?? "Recovery in progress"}. Messages and approvals are paused.${busy.failures ? ` ${busy.failures} failed attempt(s). ${recovery.nextAttemptAt ? "A retry is scheduled." : "Review, then resume or cancel."}` : ""}${busy.lastFailure?.code === "state-mismatch" ? ` Saved state differs in: ${busy.lastFailure.parts.join(", ")}.` : ""}`
           : recovery.latest?.phase === "done"
             ? recovery.latest.kind === "backup"
               ? "Checkpoint saved."
