@@ -6,6 +6,7 @@ import { configureModels } from "../src/models.js";
 import { SessionModel, modelProfile } from "../src/session-model.js";
 import { SessionStore } from "../src/store.js";
 import { RuntimeRecovery } from "../src/recovery.js";
+import type { TranscriptContext } from "@earendil-works/pi-ai";
 
 const bindings = env as unknown as Env;
 const modelId = "@cf/meta/llama-4-scout-17b-16e-instruct";
@@ -233,5 +234,79 @@ test("supervisor admission completes before either provider stream dispatches an
       errorMessage: expect.stringContaining("frozen"),
     });
   expect(dispatched).toBe(2);
+  expect(reservations).toBe(2);
+});
+
+test("empty provider completions fail without retrying or losing usage on either stream API", async () => {
+  let attempts = 0;
+  const ai = {
+    async run() {
+      return new Response(
+        'data: {"choices":[{"delta":{},"finish_reason":"stop"}]}\n\ndata: {"response":"","usage":{"prompt_tokens":10,"completion_tokens":0,"total_tokens":10}}\n\ndata: [DONE]\n\n',
+        { headers: { "content-type": "text/event-stream" } },
+      );
+    },
+  } as unknown as Ai;
+  const { models, model: ref } = configureModels(
+    { ...bindings, MODEL_MODE: "workers-ai", AI: ai, AI_MODEL: modelId },
+    () => {
+      attempts++;
+    },
+  );
+  const model = models.getModel(ref.provider, ref.modelId)!;
+  const context: TranscriptContext = {
+    messages: [
+      { role: "user", content: "Use the tool", timestamp: Date.now() },
+    ],
+  };
+  for (const method of ["stream", "streamSimple"] as const) {
+    const stream = models[method](model, context);
+    const events = [];
+    for await (const event of stream) events.push(event.type);
+    expect(events.at(-1)).toBe("error");
+    expect(events).not.toContain("done");
+    expect(await stream.result()).toMatchObject({
+      stopReason: "error",
+      errorMessage: "The model returned no text or tool call.",
+      usage: { input: 10, output: 0, totalTokens: 10 },
+    });
+  }
+  expect(attempts).toBe(2);
+});
+
+test("the official adapter retains native tool-only responses through the asynchronous guard", async () => {
+  const code = 'async () => await notes.create({key:"fixture",text:"Fixture"})';
+  const ai = {
+    async run() {
+      return new Response(
+        `data: ${JSON.stringify({ tool_calls: [{ name: "codemode", arguments: { code, label: "Fixture" } }] })}\n\ndata: [DONE]\n\n`,
+        { headers: { "content-type": "text/event-stream" } },
+      );
+    },
+  } as unknown as Ai;
+  let reservations = 0;
+  const { models, model: ref } = configureModels(
+    { ...bindings, MODEL_MODE: "workers-ai", AI: ai, AI_MODEL: modelId },
+    () => {},
+    async () => {
+      reservations++;
+    },
+  );
+  const model = models.getModel(ref.provider, ref.modelId)!;
+  for (const method of ["stream", "streamSimple"] as const) {
+    const result = await models[method](model, {
+      messages: [
+        { role: "user", content: "Create a note", timestamp: Date.now() },
+      ],
+    }).result();
+    expect(result.stopReason).toBe("toolUse");
+    expect(result.content).toEqual([
+      expect.objectContaining({
+        type: "toolCall",
+        name: "codemode",
+        arguments: { code, label: "Fixture" },
+      }),
+    ]);
+  }
   expect(reservations).toBe(2);
 });

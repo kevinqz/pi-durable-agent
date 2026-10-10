@@ -2,6 +2,9 @@
 
 ## Unreleased — Coordinated session checkpoints
 
+- Reject empty model completions as failures while preserving usage and charged attempts; do not silently retry them.
+- Enable source-map uploads and document native Cloudflare CPU/allocation profiling, its scope and its separation from model and memory-quality evidence.
+
 - Run new sessions in native facets with root-owned alarms, consumption records and destination receipts; preserve existing session URLs and connector contracts.
 - Add checkpoint creation, confirmed restoration, retained operation receipts, generation fencing and bounded retry/cancellation controls.
 - Verify each copied subtree before publishing a checkpoint or activating a restore; report bounded component diagnostics without retaining their private contents.

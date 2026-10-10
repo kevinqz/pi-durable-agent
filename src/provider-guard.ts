@@ -7,10 +7,10 @@ import type {
 } from "@earendil-works/pi-ai";
 import { createAssistantMessageEventStream } from "@earendil-works/pi-ai/utils/event-stream";
 
-/** Reserve at the supervisor before either streaming entry point can dispatch. */
+/** Admit each dispatch and reject terminal responses without usable output. */
 export function guardProvider(
   provider: Provider,
-  beforeCall: () => Promise<void>,
+  beforeCall?: () => Promise<void>,
 ): Provider {
   const forward = (
     model: Model<Api>,
@@ -21,9 +21,33 @@ export function guardProvider(
     void (async () => {
       try {
         if (signal?.aborted) throw new Error("Model request cancelled");
-        await beforeCall();
+        await beforeCall?.();
         if (signal?.aborted) throw new Error("Model request cancelled");
-        for await (const event of dispatch()) output.push(event);
+        for await (const event of dispatch()) {
+          if (
+            event.type === "done" &&
+            event.reason !== "deferred" &&
+            !event.message.content.some(
+              (part) =>
+                part.type === "toolCall" ||
+                (part.type === "text" && part.text.trim().length > 0),
+            )
+          ) {
+            // Preserve the provider's usage, identifiers and diagnostics. This
+            // attempt already spent its reservation; never silently retry it.
+            output.push({
+              type: "error",
+              reason: "error",
+              error: {
+                ...event.message,
+                stopReason: "error",
+                errorMessage: "The model returned no text or tool call.",
+              },
+            });
+            break;
+          }
+          output.push(event);
+        }
       } catch (error) {
         output.push({
           type: "error",

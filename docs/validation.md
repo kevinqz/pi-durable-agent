@@ -17,7 +17,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 
 ## Focused checks
 
-`npm test` contains **30 tests** covering:
+`npm test` contains **32 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -33,6 +33,7 @@ Local validation on **2026-10-09** uses the installed release artifact of OptCha
 - Demo recovery denial for wrong owners, expired authorization, stale activations, active work and disabled/production/real-model configurations.
 - Immutable, owner-bound model selection before Pi starts, atomic failed configuration and idempotent retries.
 - Durable call reservations after a reset, invalid model/allowance refusal and disabled demo reset for a real-model session.
+- Empty streamed model outcomes fail without retry or lost usage; native tool-only responses survive the asynchronous admission guard on both streaming entry points.
 - Both streaming entry points of the official Workers AI adapter using a simulated binding, bounded output, context checks and rejection before provider dispatch.
 
 Five of these tests cover session export: public history pagination, owner isolation, a real pending/completed Code Mode output, data integrity, concurrent changes and bounded failure behavior. `npm run test:export` checks the separate offline verifier. See the [export scope](./session-export.md#validation-scope).

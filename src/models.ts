@@ -25,9 +25,7 @@ export function configureModels(
     if (!env.AI || !env.AI_MODEL)
       throw new Error("Workers AI requires AI and AI_MODEL bindings");
     const ai = createAI({ binding: env.AI });
-    const transport = beforeCall
-      ? guardProvider(ai.provider, beforeCall)
-      : ai.provider;
+    const transport = guardProvider(ai.provider, beforeCall);
     const admit = (
       model: Model<Api>,
       context: TranscriptContext,
