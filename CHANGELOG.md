@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Coordinated session checkpoints
+## 0.1.0 — First operational release
 
 - Verify the running facet's backend before admitting new work or checkpoints. Reload idle old code through native facet APIs while preserving stored state and pending approvals; let already-admitted work drain.
 - Include committed model outcome diagnostics and exact backend provenance in private session exports; display saved request failures in the interface.
@@ -13,7 +13,9 @@
 - Add checkpoint creation, confirmed restoration, retained operation receipts, generation fencing and bounded retry/cancellation controls.
 - Verify each copied subtree before publishing a checkpoint or activating a restore; report bounded component diagnostics without retaining their private contents.
 - Use simple facet names after the hosted runtime reopened colon-named copies empty. Preserve earlier pre-release sessions and refuse new checkpoint admission for that layout.
-- Record local integration and legacy upgrade evidence, a protected hosted demo restore, and recovery after native root aborts at three coordinator boundaries. Record second-identity isolation and a partial real-model trial; keep the model-directed approval/result flow and operational release open.
+- Qualify the GPT-OSS-120B structured tool, approval, completion and assistant follow-up flow. Adapt text-part payloads through Pi’s public callback after observing a provider schema rejection; preserve native tool declarations and stored memory.
+- Record local legacy upgrade evidence, a protected hosted demo restore, a real-model same-build restore, native root aborts at three coordinator boundaries and second-identity isolation. Retain the unsuccessful Scout trial as separate historical evidence.
+- Publish archive-based onboarding, exact artifact hashes and independent installation/update evidence; retain prior releases and connector contracts.
 
 ## 0.1.0-dev.4 — Model choice and durable inference allowances
 
@@ -57,4 +59,4 @@
 - Provide a credential-free local browser demo, source retrieval, progress and approval inspection.
 - Include focused runtime checks, locked dependencies, upstream attribution and a deployment guide.
 
-Published versions are development previews. The unreleased checkpoint implementation also has protected hosted demo-restore and bounded interruption evidence. Real replies, summaries, source retrieval, same-build restoration and second-identity isolation have hosted evidence. The real-model tool/approval/result flow and operational release remain pending; arbitrary failure windows and cross-release recovery are not qualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).
+Earlier dev releases were development previews. Version 0.1.0 qualifies the bounded GPT-OSS/session-notes workflow, coordinated same-build restoration, supported interruption boundaries and reviewed update route described in [validation](./docs/validation.md). Arbitrary failure windows, external connectors and cross-build checkpoint restoration remain outside scope.

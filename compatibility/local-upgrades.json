@@ -91,6 +91,19 @@
         "version": "0.1.0-dev.5",
         "buildFingerprint": "7057af9df6d46c82556eea165d3327fab53e5a9bd3334f47e7a3454386bc41cc"
       }
+    },
+    {
+      "id": "0.1.0-dev.4-to-0.1.0",
+      "method": "unchanged-state-copy",
+      "from": {
+        "version": "0.1.0-dev.4",
+        "buildFingerprint": "48d480f280a7b7757744b035c0e6940ba54e80bbbd18d14e56c65bf34e9a5836",
+        "revision": "90815ac513714a3227c4b3d82dbe06a928b2c590"
+      },
+      "to": {
+        "version": "0.1.0",
+        "buildFingerprint": "6750f09601d2809756a8df67c831b2597968c6aa8b3b306d22ee0737901d589e"
+      }
     }
   ]
 }

@@ -23,7 +23,7 @@ private configuration, add:
 "vars": {
   "APP_ENV": "staging",
   "MODEL_MODE": "demo",
-  "AI_MODEL": "@cf/meta/llama-4-scout-17b-16e-instruct",
+  "AI_MODEL": "@cf/openai/gpt-oss-120b",
   "MODEL_CALL_LIMIT": "12"
   // Keep the existing ACCESS_TEAM_DOMAIN and ACCESS_AUD values here.
 }
@@ -39,13 +39,31 @@ model ID and allowance through later configuration changes and restarts.
 
 `AI_MODEL` must be a chat model in the pinned Pi catalog with at least 65,536
 context tokens. This accommodates the configured memory/input limits and
-OptChat's conservative context reserve. The Llama 4 Scout example has a 131,000
-token context and function calling in the [Cloudflare catalog](https://developers.cloudflare.com/workers-ai/models/llama-4-scout-17b-16e-instruct/).
-Catalog support is not a claim of a completed hosted application check.
+OptChat's conservative context reserve. The qualified GPT-OSS-120B model has a
+128,000-token context and function calling in the [Cloudflare catalog](https://developers.cloudflare.com/workers-ai/models/gpt-oss-120b/).
+The [hosted application evidence](./hosted-gpt-oss-validation.json) is separate
+from catalog support. The earlier Scout trial did not qualify tool execution.
 
 The binding uses Cloudflare's native inference service. No API key or Pi OAuth
 file is copied into the application. Main replies and summaries use the same
 model. ChatGPT and Claude subscriptions do not configure this binding.
+
+### GPT-OSS input compatibility
+
+The protected GPT-OSS-120B trial exposed an input-schema rejection before a
+response was generated: this endpoint rejected an array of text parts in a
+message. The host uses Pi's public `onPayload` callback to concatenate only
+text-only arrays for this exact model, preserving their text order and bytes.
+Other models, mixed content, roles, tool declarations and structured tool calls
+retain the official adapter's representation. The stored OptChat view and
+transcript are unchanged; this is a transport correction, not a memory change.
+
+A local regression check exercises both official provider entry points with
+the observed rejected shape, verifies the resulting tool declarations and
+structured response, and keeps call admission and output limits in place.
+It uses a simulated binding. A separate [hosted check](./hosted-gpt-oss-validation.json)
+then passed structured tool use, approval, completion and assistant follow-up
+within 7/12 reserved calls. No dependency internals are patched.
 
 ## Resource allowance
 

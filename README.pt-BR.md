@@ -2,7 +2,7 @@
 
 Aplicação independente e aberta que reúne **Pi Durable**, a memória do **OptChat Durable** e ferramentas do **Cloudflare Code Mode**.
 
-**Prévia de desenvolvimento.** A demonstração padrão usa runtimes reais com respostas simuladas; o único conector cria notas da sessão. [Checkpoints e restauração](./docs/coordinated-recovery.md), interrupções controladas na Cloudflare e isolamento entre duas identidades autenticadas foram verificados. Um [teste com modelo real](./docs/hosted-real-model-validation.json) passou por resposta textual, resumo de memória, busca do original e restauração na mesma versão, mas não produziu uma chamada estruturada de ferramenta. Ainda faltam o fluxo de aprovação e resultado dirigido pelo modelo e a publicação da versão operacional. Veja as [evidências e limitações](./docs/validation.md).
+**0.1.0 — primeira versão operacional.** Comece pela demonstração local sem credenciais ou configure **GPT-OSS-120B no Workers AI** para conversar com um modelo real e aprovar ações sobre notas da sessão. O [teste hospedado](./docs/hosted-gpt-oss-validation.json) verificou chamada estruturada de ferramenta, aprovação exata, conclusão registrada, resposta do agente, busca do original e restauração na mesma versão. Checkpoints coordenados, interrupções controladas e isolamento entre duas identidades também têm evidência. O conector disponível cria notas locais da sessão. Veja [alcance e limites](./docs/validation.md).
 
 ## Começar do zero
 
@@ -10,10 +10,10 @@ Instale Node.js **22.19 ou superior**, que inclui npm. Não é necessário ter P
 
 **Sem Git:** abra [Releases](https://github.com/kevinqz/pi-durable-agent/releases), baixe o arquivo `pi-durable-agent-<versão>.tgz` e extraia em uma pasta nova. Abra o terminal na pasta extraída que contém `package.json` e execute `npm ci` e `npm run dev`. Siga o README incluído no arquivo: uma prévia publicada pode ter menos recursos que a versão em desenvolvimento. Cada versão inclui `SHA256SUMS` e `release-validation.json` para identificar o conteúdo e o alcance das verificações. [Instalação e conferência do arquivo](./docs/installation.md).
 
-**Pelo Git, usando a versão atual em desenvolvimento:**
+**Pelo Git, usando a versão publicada:**
 
 ```sh
-git clone https://github.com/kevinqz/pi-durable-agent.git
+git clone --branch v0.1.0 https://github.com/kevinqz/pi-durable-agent.git
 cd pi-durable-agent
 npm ci
 npm run dev
@@ -60,7 +60,7 @@ Abra a mesma URL de sessão, incluindo o trecho depois de `#`. A cópia inclui a
 
 ## Atualizar sem perder a sessão
 
-A rota revisada **0.1.0-dev.4 → 0.1.0-dev.5** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → dev.5.
+A rota revisada **0.1.0-dev.4 → 0.1.0** usa uma cópia separada e mantém conversas, memória, ações concluídas e aprovações pendentes. Guarde a instalação antiga e siga o [guia de atualização local](./docs/local-upgrades.md). O comando confere o conteúdo exato das duas versões; não basta mudar o número da versão. Instalações anteriores seguem as rotas preservadas em sequência: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → 0.1.0.
 
 ## Quando hospedar na Cloudflare
 
@@ -80,7 +80,7 @@ pi install https://github.com/kevinqz/optchat-durable@v0.4.0
 
 O [OptChat Durable](https://github.com/kevinqz/optchat-durable) continua separado e também oferece o SDK para outros hosts. Este repositório é a aplicação web complementar. Ele não substitui seu Pi nem transfere seu login de ChatGPT ou Claude para a nuvem. Modelos hospedados exigem configuração própria.
 
-**Modelo real:** depois de configurar Workers AI, escolha o modelo em **Model for the next session** e selecione **New session**. As conversas de demonstração continuam disponíveis. Cada conversa guarda seu modelo e limite de chamadas, incluindo resumos de memória e tentativas que falhem; reiniciar não repõe esse limite. Consulte a [configuração e os limites de consumo](./docs/models.md). A integração hospedada com modelo real ainda precisa de verificação funcional.
+**Modelo real:** depois de configurar Workers AI, escolha o modelo em **Model for the next session** e selecione **New session**. As conversas de demonstração continuam disponíveis. Cada conversa guarda seu modelo e limite de chamadas, incluindo resumos de memória e tentativas que falhem; reiniciar não repõe esse limite. Consulte a [configuração e os limites de consumo](./docs/models.md). O modelo qualificado nesta versão é GPT-OSS-120B; suporte no catálogo de um provedor, por si só, não qualifica outros modelos.
 
 ## Documentação
 

@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The default demo uses real runtimes and simulated model replies; the only connector creates session notes. [Checkpoint and restore controls](./docs/coordinated-recovery.md), bounded hosted interruptions and isolation between two authenticated identities have been checked. A [real-model trial](./docs/hosted-real-model-validation.json) passed text replies, memory summaries, original retrieval and same-build restore, but did not produce a structured tool call. The model-directed approval/result flow and operational release remain pending. See the [evidence and limits](./docs/validation.md).
+**0.1.0 — first operational release.** Start with a credential-free local demo, or configure **GPT-OSS-120B on Workers AI** for a real conversation with approved session-note actions. The [hosted model check](./docs/hosted-gpt-oss-validation.json) covers a structured tool call, exact-operation approval, retained completion, assistant follow-up, source retrieval and same-build restoration. Coordinated checkpoints, bounded interruptions and isolation between two authenticated identities also have evidence. The supported connector creates session-local notes; see [verified scope and limits](./docs/validation.md).
 
 ## Try it locally
 
@@ -12,10 +12,10 @@ You need **Node.js 22.19+** and npm. You do **not** need Pi installed, a customi
 
 **Without Git:** open [Releases](https://github.com/kevinqz/pi-durable-agent/releases), download the named `pi-durable-agent-<version>.tgz` asset, and extract it into a new folder. Open a terminal in the extracted folder containing `package.json`, then run `npm ci` and `npm run dev`. Follow the README included in that archive: a published preview may have fewer features than the current development branch. Each release includes `SHA256SUMS` and `release-validation.json` to identify its exact contents and verified scope. See [installing and checking an archive](./docs/installation.md).
 
-**From the current development branch:**
+**With Git, using the released version:**
 
 ```sh
-git clone https://github.com/kevinqz/pi-durable-agent.git
+git clone --branch v0.1.0 https://github.com/kevinqz/pi-durable-agent.git
 cd pi-durable-agent
 npm ci
 npm run dev
@@ -45,7 +45,7 @@ npm run dev -- --persist-to .local-restores/demo
 
 Open the same session URL. This preserves the complete local runtime state and restores into a new directory; it does not overwrite the original. Backup/restore requires `lsof` on macOS/Linux. See [verification, compatibility and interrupted-operation recovery](./docs/local-recovery.md).
 
-**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.4 → 0.1.0-dev.5** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → dev.5.
+**Updating an existing installation?** Keep the old checkout and follow the [local upgrade guide](./docs/local-upgrades.md). The reviewed **0.1.0-dev.4 → 0.1.0** route opens a separate copy and retains memory, completed actions and pending approvals. Earlier installations follow the retained routes sequentially: dev.0 → dev.1 → dev.2 → dev.3 → dev.4 → 0.1.0.
 
 **Want it hosted?** Local development requires no account or payment. The complete hosted app needs **Cloudflare Workers Paid** for Dynamic Workers/Code Mode, starting at US$5 per account/month plus excess usage. Use your existing account; a custom domain is optional. Model inference is separate. Follow the [private staging walkthrough](./docs/staging.md) and [deployment and cost guide](./docs/deployment.md) when ready.
 
@@ -99,7 +99,7 @@ npm run build
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing, warm-session code updates and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Separate [hosted evidence](./docs/coordinated-recovery.md#hosted-evidence-and-remaining-work) covers protected restoration and three native root-abort boundaries. The real-model tool/approval/result flow and final operational release remain pending.
+`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing, warm-session code updates and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Separate [hosted evidence](./docs/coordinated-recovery.md#hosted-evidence-and-remaining-work) covers protected restoration and three native root-abort boundaries. The [GPT-OSS check](./docs/hosted-gpt-oss-validation.json) adds the real-model approval/result flow; release artifacts include their exact validation record.
 
 | Directory                                                                              | Responsibility                                                                     |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -110,7 +110,7 @@ The focused tests run locally in Cloudflare's Workers runtime with synthetic mod
 | `src/recovery.ts`                                                                      | Owner-authorized demo reset, activation identity and bounded restart receipts      |
 | `src/session-supervisor.ts`, `src/checkpoint-coordinator.ts`, `src/facet-lifecycle.ts` | Session recovery composition, generation journal and root-alarm bridge             |
 | `src/session-export.ts`                                                                | Bounded session data archive with public history pagination and integrity checks   |
-| `src/models.ts`, `src/session-model.ts`                                                | Model adapters, immutable session selection, durable call allowance and simulation |
+| `src/models.ts`, `src/session-model.ts`, `src/workers-ai-payload.ts`                   | Model adapters, immutable session selection, durable call allowance and simulation |
 | `public/`                                                                              | Small browser interface; no frontend framework or build step                       |
 | `test/`                                                                                | Focused runtime and authorization checks                                           |
 | `scripts/`                                                                             | Guarded local startup, offline snapshots and recovery qualification                |

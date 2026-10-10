@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-10T12:39:35.413Z",
+  "kind": "local-cross-release-upgrade",
+  "shutdown": "graceful",
+  "crossRelease": true,
+  "targetRuntime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0",
+    "revision": "79d052c1f995dfb6b99e7469d9e0c3cdb42f34b6",
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "d330242c4ca7566ab778ccf843330e0e986f2c05c7e342a17b868b148fa5174e",
+    "buildFingerprint": "6750f09601d2809756a8df67c831b2597968c6aa8b3b306d22ee0737901d589e",
+    "fingerprint": "fbe0a1aff19d4a5a60d8bb0c78ce4b82b287f602d01cedec8f562e2006a9215d"
+  },
+  "runtime": {
+    "application": "pi-durable-agent",
+    "version": "0.1.0-dev.4",
+    "revision": null,
+    "environment": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "nodeMajor": "22"
+    },
+    "lockfileSha256": "36fe7fc5249572f2f3956e446f4246609d293d6551261048d7b833296ca92605",
+    "buildFingerprint": "48d480f280a7b7757744b035c0e6940ba54e80bbbd18d14e56c65bf34e9a5836",
+    "fingerprint": "4c4a80d91763ec889bd29400779f765aa5db0af493951fe465e1ab304b665fa3"
+  },
+  "snapshot": {
+    "files": 31,
+    "bytes": 5885714,
+    "sha256": "dc945fdb98341dc1122c37fb55a7047888d8aa3113614575a15914cea14b566f"
+  },
+  "observed": {
+    "liveBackupRefused": true,
+    "historyPreserved": true,
+    "memoryViewPreserved": true,
+    "requestIdentitiesPreserved": true,
+    "pendingApprovalPreserved": true,
+    "originalRetrieved": true,
+    "approvalDecisions": 2,
+    "destinationNotes": 1,
+    "resultDeliveryReceipts": 1,
+    "immutableBackupVerifiedAfterRun": true,
+    "ordinaryRestoreRefusedRuntimeChange": true,
+    "completedActionPreserved": true,
+    "connectorV1BytesPreserved": true,
+    "restartedTargetWithoutDuplicateDelivery": true,
+    "newConversationTurnCompleted": true
+  },
+  "external": {
+    "cloudflareDeployment": false,
+    "paidModelCalls": 0
+  },
+  "verifierSha256": "9023471dbea929f16e7a78df334f063d51b87e3218a0800579196daef83e7585",
+  "sourceRevisionNote": "Checkout base before release metadata was committed; exact target source/configuration/dependency fingerprints identify the tested contents."
+}

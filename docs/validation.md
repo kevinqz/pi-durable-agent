@@ -17,7 +17,7 @@ Local validation through **2026-10-10** uses the installed release artifact of O
 
 ## Focused checks
 
-`npm test` contains **33 tests** covering:
+`npm test` contains **34 tests** covering:
 
 - Duplicate/conflicting request IDs, original-source retrieval, frozen context and memory after an abrupt local object reset.
 - A saved admission job interrupted before OptChat receives the input.
@@ -124,13 +124,17 @@ The [real-model trial](./hosted-real-model-validation.json) reserved 10/12 calls
 
 The trial also identified a warm-facet update gap. The application now checks the child's backend fingerprint, lets already-admitted work finish and reloads an idle mismatched facet through native `facets.abort/get`, preserving storage. New messages, new actions and checkpoints wait while old code is busy; inspection, cancellation and decisions on existing work remain available. Five native integration checks include a warm prior-code fixture with a pending approval, refusal of new admissions while busy, preserved history/memory/approval and one note after updating. The hosted session also reached the expected backend with its recorded usage unchanged. This is code reloading, not an arbitrary schema migration or cross-build checkpoint restore.
 
+The [GPT-OSS trial](./hosted-gpt-oss-validation.json) first recorded a text-part input-schema rejection, then verified the corrected backend before retrying. It passed a structured Code Mode call, exact-operation approval, completion delivery, assistant follow-up and original retrieval. A same-build checkpoint restore retained history, memory, usage, actions, executor output and model diagnostics unchanged in verified private exports. It stopped at 7/12 reserved calls; Pi reported US$0.0036048 for this trial, not an account invoice. The script returned no note value, so its retained executor output is an empty logs array; status delivery is verified separately from any independent destination-row count.
+
+The [0.1.0 update evidence](./local-upgrade-v010-validation.json) identifies the exact released runtime and its dev.4 baseline. Release assets carry final installation and publication evidence.
+
 ## Not yet established
 
-- The real-model tool/approval/result flow remains unqualified: the Scout trial produced empty outcomes or ordinary text resembling a tool call, with zero admitted actions. This is not evidence of a successful tool execution. No arbitrary external mutation is qualified.
+- Real-model qualification covers GPT-OSS-120B and one approved session-note action. The earlier Scout trial remains unqualified for tools. No arbitrary external mutation or another catalog model is qualified.
 - Hosted checkpoint evidence covers a protected demo restore and three private native root-abort boundaries: after source quiescence, after candidate validation and after activation before journal completion. Arbitrary abrupt-failure windows, real-provider interruptions, hibernation billing behavior, root/namespace/account loss and cross-build checkpoint restoration remain unqualified. See the [exact recovery scope](./coordinated-recovery.md#hosted-evidence-and-remaining-work).
 - No production billing estimate, cost dashboard, arbitrary dependency/connector upgrade or self-update path is claimed. Hosted update evidence covers dev.1 → dev.2, dev.2 → dev.3 and the [legacy-session dev.3 → dev.5 flow](./hosted-product-checkpoints-dev5-validation.json), with unchanged dependencies. That legacy update passed even though the same record's initial checkpoint-restoration flow failed; the corrected restore has its own [evidence](./hosted-checkpoint-restore-validation.json).
-- The independently installed archive is a development candidate. Verification and publication of the final operational release artifact remain open.
+- The earlier independently installed development candidate is historical evidence. The [0.1.0 release](https://github.com/kevinqz/pi-durable-agent/releases/tag/v0.1.0) carries `release-validation.json` and `SHA256SUMS` for its exact artifact, independent install and reviewed update checks.
 - Code Mode lacks a public idempotent execute-or-attach API in this version. Ambiguous dispatch is conservatively **unknown**, not transparently resumable.
 - Demo summaries are deterministic excerpts. They do not establish model quality, prompt-cache hit rate, token savings or long-run memory accuracy.
 
-These limits keep A4 and A5 open in the roadmap. A local preview is useful and installable without claiming the entire hosted product is finished.
+These limits bound the first operational release. New connectors, broader failures, changed dependencies and performance/model-quality studies remain later roadmap work.
