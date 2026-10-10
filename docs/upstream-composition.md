@@ -34,6 +34,20 @@ The decision for the other overlap candidates is **retain with a specific contra
 
 OptChat is usable without this application. Generic memory and controller defects are fixed and released there first. This repository pins its published artifact, never a source checkout or moving branch. Cloudflare configuration, ownership, action policy, session recovery and transport stay here. Each project links to the other's canonical plan instead of copying a second live delivery log.
 
+### OptChat 0.4.2 adoption decision
+
+OptChat [0.4.2](https://github.com/kevinqz/optchat-durable/releases/tag/v0.4.2) rejects SDK
+`wait(taskId)` calls for another conversation or an unrelated native task before enabling
+scheduling. This is a guard against mixed receipts in a shared harness, not authentication.
+The production path in `src/session.ts` uses `enqueue`, `request` and `status`; it does not
+call `wait` or `prompt`. Each authenticated identity/session has its own object and harness.
+
+Retain the qualified 0.4.1 dependency for this application until a justified runtime update.
+The locked dependency participates in the checkpoint build fingerprint; updating it solely
+for an unused helper would make existing checkpoints incompatible without changing the
+production request path. When adopting a later OptChat release, qualify the exact old/new
+runtime update and continue to reject checkpoints from a different backend build.
+
 ## Alternatives and evidence limits
 
 Cloudflare Think already provides a complete harness with memory, compaction, search, durable submissions and recovery. It is a reasonable alternative for a generic hosted assistant. Choosing it here would require a distinct comparison of memory semantics and a reviewed migration, not running a second harness alongside Pi merely to reuse a transport. Current functional checks do not establish that OptChat is better than native Pi or Think in recall, cache efficiency, cost or latency.

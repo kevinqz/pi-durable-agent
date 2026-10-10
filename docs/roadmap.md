@@ -30,6 +30,7 @@ The [upstream composition review](./upstream-composition.md) is the coordinated 
 
 ## Next priorities
 
+- **SDK maintenance:** OptChat 0.4.2 guards conversation-scoped `wait()` receipts. This application's production path uses `enqueue`, `request` and `status`; retain the qualified 0.4.1 dependency and current checkpoint build until a justified runtime update. See the [adoption decision](./upstream-composition.md#optchat-042-adoption-decision).
 - **Checkpoint capacity and update UX:** explain all retained-copy/admission limits and incompatible checkpoints without changing stored data. The current UI update preserves the 0.1.1 backend identity. Explicit deletion and cross-build checkpoint migration are separate capabilities; neither is implemented or implied by a disabled-button explanation.
 - Keep the supported runtime and provider path healthy with focused regressions when upstream APIs change. A generic memory defect belongs in OptChat first; a transport or hosting defect belongs here.
 - Add a connector or channel only for a concrete need, retaining explicit approval, output and uncertain-effect contracts. No email, calendar or arbitrary network connector is implied by this release.
