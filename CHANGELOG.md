@@ -2,6 +2,9 @@
 
 ## Unreleased — Coordinated session checkpoints
 
+- Verify the running facet's backend before admitting new work or checkpoints. Reload idle old code through native facet APIs while preserving stored state and pending approvals; let already-admitted work drain.
+- Include committed model outcome diagnostics and exact backend provenance in private session exports; display saved request failures in the interface.
+
 - Reject empty model completions as failures while preserving usage and charged attempts; do not silently retry them.
 - Keep an already scheduled session wake when the interface polls; only the alarm callback replaces its lease. This prevents pending actions from being postponed by an open page.
 - Enable source-map uploads and document native Cloudflare CPU/allocation profiling, its scope and its separation from model and memory-quality evidence.
@@ -10,7 +13,7 @@
 - Add checkpoint creation, confirmed restoration, retained operation receipts, generation fencing and bounded retry/cancellation controls.
 - Verify each copied subtree before publishing a checkpoint or activating a restore; report bounded component diagnostics without retaining their private contents.
 - Use simple facet names after the hosted runtime reopened colon-named copies empty. Preserve earlier pre-release sessions and refuse new checkpoint admission for that layout.
-- Record local integration and legacy upgrade evidence, a protected hosted demo restore, and recovery after native root aborts at three coordinator boundaries. Keep real-model, second-identity and operational-release qualification open.
+- Record local integration and legacy upgrade evidence, a protected hosted demo restore, and recovery after native root aborts at three coordinator boundaries. Record second-identity isolation and a partial real-model trial; keep the model-directed approval/result flow and operational release open.
 
 ## 0.1.0-dev.4 — Model choice and durable inference allowances
 
@@ -54,4 +57,4 @@
 - Provide a credential-free local browser demo, source retrieval, progress and approval inspection.
 - Include focused runtime checks, locked dependencies, upstream attribution and a deployment guide.
 
-Published versions are development previews. The unreleased checkpoint implementation also has protected hosted demo-restore and bounded interruption evidence. Real inference, a second authenticated identity and the operational release remain pending; arbitrary failure windows and cross-release recovery are not qualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).
+Published versions are development previews. The unreleased checkpoint implementation also has protected hosted demo-restore and bounded interruption evidence. Real replies, summaries, source retrieval, same-build restoration and second-identity isolation have hosted evidence. The real-model tool/approval/result flow and operational release remain pending; arbitrary failure windows and cross-release recovery are not qualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).

@@ -8,16 +8,17 @@ The file contains private conversation and action data in plain JSON. Store it p
 
 ## What is included
 
-| Part            | Coverage                                                                                                                          |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| History         | Every retained page returned by the public OptChat history API, ordered chronologically; more than the first page shown in the UI |
-| Memory          | Current view and counters, not the complete memory tree or frozen context of every request                                        |
-| Requests        | Application request records, including their saved statuses and identities                                                        |
-| Actions         | Public action records, code, contract, pending operation, status and recorded outcome                                             |
-| Retained output | Exact latest executor-output serialization for each action where available, with UTF-8 byte length and SHA-256                    |
-| Provenance      | Application version, schema, model mode, capture timestamps and an explicit coverage declaration                                  |
+| Part              | Coverage                                                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| History           | Every retained page returned by the public OptChat history API, ordered chronologically; more than the first page shown in the UI |
+| Memory            | Current view and counters, not the complete memory tree or frozen context of every request                                        |
+| Requests          | Application request records, including their saved statuses and identities                                                        |
+| Actions           | Public action records, code, contract, pending operation, status and recorded outcome                                             |
+| Retained output   | Exact latest executor-output serialization for each action where available, with UTF-8 byte length and SHA-256                    |
+| Provenance        | Application version, backend fingerprint, schema, model mode, capture timestamps and an explicit coverage declaration             |
+| Model diagnostics | Assistant outcomes within the newest 100 Pi entries: provider, model, stop reasons, bounded error text, content types and usage   |
 
-History uses OptChat's normalized text representation. It excludes hidden reasoning, internal Pi entries and raw non-text attachments; a placeholder may refer to content retained in a Pi entry. One entry can produce several normalized messages. The archive also excludes authentication credentials, the standalone notes database, execution journals, scheduler leases, database files and a coordinated parent/facet checkpoint. Completed-action output can contain note data, but this is not a complete destination database export.
+History uses OptChat's normalized text representation. It excludes hidden reasoning, complete internal Pi entries and raw non-text attachments; a placeholder may refer to content retained in a Pi entry. One entry can produce several normalized messages. Model diagnostics use public Pi entry pagination without requesting inference; they omit prompt/response content and headers. Error text is capped at 4,000 characters per outcome with an explicit truncation flag; the archive reports whether older entries were omitted. Provider error messages can themselves contain private data, so review the archive before sharing it. The archive also excludes authentication credentials, the standalone notes database, execution journals, scheduler leases, database files and a coordinated parent/facet checkpoint. Completed-action output can contain note data, but this is not a complete destination database export.
 
 An output's `statusAtExport` distinguishes a pause from a final outcome. If an output was retained before its reference was recorded, `recordedReferenceVerified` is `null`; its content still has a freshly calculated hash. A missing or corrupt output with an existing reference stops the export. Exports cannot recover results that were previously rejected by the application's retention limits.
 
@@ -43,6 +44,6 @@ At most **8,000,000 bytes** and **100 history pages** are allowed. The byte budg
 
 ## Validation scope
 
-Five focused Workers-runtime tests cover 107 normalized messages spanning multiple pages, chronological order, unchanged session data, owner isolation, a real Code Mode pause and completed result, UTF-8 integrity, active/changing state, corrupt/missing outputs, size limits and a non-advancing cursor. The multi-page fixture uses public Pi entry commits after one real demo turn; it does not make hundreds of model calls. A separate Node test checks the offline verifier's corruption and missing-output handling. All use synthetic data and no paid models.
+Six focused Workers-runtime tests cover 107 normalized messages spanning multiple pages, chronological order, unchanged session data, owner isolation, a real Code Mode pause and completed result, UTF-8 integrity, active/changing state, corrupt/missing outputs, size limits and a non-advancing cursor. They also verify committed provider diagnostics without including response content, altering usage or making inference requests. The multi-page fixture uses public Pi entry commits after one real demo turn; it does not make hundreds of model calls. A separate Node test checks the offline verifier's corruption and missing-output handling. All use synthetic data and no paid models.
 
 The [staging evidence](./session-export-validation.json) records browser downloads for an empty session, a preserved pending approval after dev.2 → dev.3, and the same action after completion. All three downloaded files passed the offline verifier. The completed archive contains eight normalized messages, one action, one retained output and one recorded result delivery. This inspects application records, not an independent count of destination database rows. Account/session identifiers and conversation contents are excluded from the public evidence.

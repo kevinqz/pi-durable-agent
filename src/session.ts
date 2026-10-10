@@ -23,6 +23,8 @@ import { createSessionExport } from "./session-export.js";
 import { SessionModel } from "./session-model.js";
 import type { NotesDestination } from "./notes-root.js";
 import { checkpointEvidence } from "./checkpoint-proof.js";
+import { sessionDiagnostics } from "./session-diagnostics.js";
+import build from "./generated/checkpoint-build.json";
 
 type SessionLifecycle = Pick<Lifecycle<Env>, "jobs" | "start" | "isStarted">;
 export type SessionHost = {
@@ -181,6 +183,7 @@ export class AgentSession extends DurableObject<Env> {
         () => this.snapshot(),
         (cursor) => this.chat.history(cursor),
         (id) => this.actions.store.readArchive(id),
+        () => sessionDiagnostics(this.chat.root, BG),
       );
     if (method === "POST" && path === "recovery/restart") {
       if (this.host)
@@ -324,7 +327,7 @@ export class AgentSession extends DurableObject<Env> {
       model: this.sessionModel.profile(),
       schema: 1,
       capabilities: { sessionDataExport: true },
-      runtime: this.recovery.describe(),
+      runtime: { ...this.recovery.describe(), backend: build.sha256 },
       memory: state.memory,
       history: await this.chat.history(),
       requests: rows,

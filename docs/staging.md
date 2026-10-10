@@ -78,6 +78,35 @@ npx wrangler deploy --config wrangler.staging.local.jsonc --env staging
 
 Use these same explicit configuration arguments for later deployments. The original `npm run deploy:staging` command still uses the closed bootstrap configuration. Review and reapply configuration changes from future releases to your private copy; it does not automatically inherit edits to `wrangler.jsonc`. For dev.5, retain `SESSIONS`, add `RECOVERY_SESSIONS` → `SessionSupervisor`, append the tracked `v2` migration and keep the `build` command that generates the checkpoint runtime identity. Preserve Access values, hostname protections and the previous model default. Compare your compatibility date/flags with the tracked file used by that identity generator.
 
+## Wait for session code to update
+
+A completed upload is not proof that an already-running session uses the new
+code. The pinned Wrangler 4.149.0 defaults to deferred Durable Object updates
+with a maximum delay of 300 seconds. The official [deployment controls](https://developers.cloudflare.com/workers/wrangler/commands/workers/#versions-deploy)
+allow `--durable-objects-code-update-mode immediate` or `deferred <duration>`.
+Use the normal deferred rollout unless a reviewed maintenance operation calls
+for an immediate restart; first allow active work to finish. Neither mode
+rewinds storage.
+
+Warm facets have a separate lifecycle: native [`facets.get()`](https://developers.cloudflare.com/dynamic-workers/usage/durable-object-facets/#get)
+reuses their existing class until they stop. The parent now checks the child's
+runtime before admitting new work or checkpoints. If the child is on old code,
+it waits for already-admitted work and result delivery to finish, then uses
+native `facets.abort()` followed by `get()` to load the deployed class without
+rewinding storage. Pending human approval is retained. Active or unknown effects
+prevent this automatic reload; inspection, cancellation and decisions on existing
+work remain available. A failed reload retains storage and refuses new admission.
+This mechanism does not establish compatibility for changed schemas or dependencies.
+
+Record the deployed version and confirm the session's actual target runtime
+before spending model calls on validation: **Export session data** reports
+`payload.application.backendRuntime`, which should match the reviewed
+`src/generated/checkpoint-build.json`. The [hosted observation](./hosted-session-code-update-validation.json)
+records an old warm class after upload and the corrected idle reload with
+unchanged history, memory and usage. **Requires its original runtime** only
+indicates the coordinator's checkpoint compatibility decision; it does not by
+itself identify the class running the conversation.
+
 ## 5. Verify the deployed application
 
 Open the printed `workers.dev` URL. Access should present the application's login page. With One-time PIN, request a code and enter it from your own mailbox. The administrative Cloudflare dashboard login and this application login are separate sessions.

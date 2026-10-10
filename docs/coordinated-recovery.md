@@ -4,7 +4,7 @@
 
 The recovery composition now runs the **existing application session** inside a native Cloudflare facet. Local integration checks preserve Pi history, OptChat memory, an exact pending Code Mode approval and its result-delivery identity through a subtree checkpoint and restore. Destination notes and consumption records stay in the parent, so restoring an older conversation does not erase an effect or refund recorded usage.
 
-New sessions use this composition through the application's authenticated API and browser interface. The current increment has local runtime evidence and a successful protected hosted demo flow; real inference, a second authenticated identity and final operational-release installation remain gates for the first operational release. Existing session URLs and the original `SESSIONS` namespace keep their previous layout. There is no automatic conversion of a legacy conversation into a checkpoint session.
+New sessions use this composition through the application's authenticated API and browser interface. The current increment has local runtime evidence and a successful protected hosted demo flow; real-model tool/approval/result qualification and final artifact installation/publication remain gates for the first operational release. Existing session URLs and the original `SESSIONS` namespace keep their previous layout. There is no automatic conversion of a legacy conversation into a checkpoint session.
 
 ## Use the interface
 
@@ -47,6 +47,16 @@ Bounds: three retained checkpoints, eight restore admissions, 24 total recovery 
 
 ## Routing, contracts and build identity
 
+Before new admissions or checkpoint creation, the supervisor verifies its active
+session facet's backend identity. Warm old code may finish admitted work; new
+messages, actions and checkpoints wait. Once the existing checkpoint preflight
+proves quiescence, the supervisor reloads that facet with native `abort/get` under
+the same gate used for child drives. No database is copied or rewound. A crash
+before or after abort leaves the same retained storage to reopen on the next wake.
+Inspection, cancellation and decisions on existing work remain available while
+draining. The [code-update evidence](./hosted-session-code-update-validation.json)
+distinguishes the hosted retained-session check from local pending-approval coverage.
+
 `/api/checkpoint-sessions/:id/*` uses the new `RECOVERY_SESSIONS` binding. `/api/sessions/:id/*` retains the original binding and ownership mapping. Authentication, origin checks and body limits apply to both. The appended `v2` migration creates only `SessionSupervisor`; `SessionFacet` and Code Mode use the platform's exported facet classes. Existing migrations are retained.
 
 New-session POST requests carry `expectedGeneration`, taken from `state.recovery.generation`. A mismatching generation returns 409 before dispatch, including when an old approval still has the same fingerprint after restoration. Configuration is only allowed before the session starts. Journal lookup, same-ID retries and explicit resume/cancel refer to the saved operation rather than admitting a new one. During recovery, `GET state` returns `recovering: true` with the journal and model fields; consumers must not expect ordinary conversation fields until completion.
@@ -80,7 +90,7 @@ The tests have no AI binding, remote binding or account requirement. The runtime
 
 The seven coordinator/evidence tests cover lost copy/validation/activation replies, empty copies, changed approval evidence, candidate validation failure, incompatible runtimes, retention conflicts and refusal of the earlier unsupported facet names. They use application-owned fixture data for the journal; they are not proof of SDK storage copying.
 
-The four integration checks use the **real Pi/OptChat/Code Mode composition**. They restore a pre-effect checkpoint after the source note has already been created, preserve the original approval through another abrupt runtime reset, approve the restored operation and verify one destination note and one delivery receipt. They also check original retrieval, a non-rewinding consumption-counter fixture, wrong-owner denial, admission fencing, a restart before checkpoint execution, refusal of a missing snapshot before a recovery job is allocated, stale-generation decisions, and separation of legacy/new HTTP routes. A separate regression check preserves a scheduled deadline across repeated reads and reaches the approval using the action's admitted alarm without forcing its job timestamp. The consumption-counter fixture is synthetic; it makes no claim of a paid model response.
+The five integration checks use the **real Pi/OptChat/Code Mode composition**. They restore a pre-effect checkpoint after the source note has already been created, preserve the original approval through another abrupt runtime reset, approve the restored operation and verify one destination note and one delivery receipt. They also check original retrieval, a non-rewinding consumption-counter fixture, wrong-owner denial, admission fencing, a restart before checkpoint execution, refusal of a missing snapshot before a recovery job is allocated, stale-generation decisions, and separation of legacy/new HTTP routes. A separate regression check preserves a scheduled deadline across repeated reads and reaches the approval using the action's admitted alarm without forcing its job timestamp. The consumption-counter fixture is synthetic; it makes no claim of a paid model response.
 
 The [browser observations](./checkpoint-ui-local-validation.json) cover checkpoint creation, source approval, confirmed restore, reapproval, reload and original-source search. They identify the pre-release source/assets that were observed; a visible single follow-up is not an independent destination-row count.
 
@@ -92,4 +102,4 @@ The first hosted application restore failed its integrity comparison and was can
 
 The corrected coordinator completed a [hosted browser flow](./hosted-checkpoint-restore-validation.json): a validated checkpoint retained an exact pending approval, the source completed its note, restoration returned the earlier state, and reapproval returned the same note receipt. Reload and original-source retrieval passed. The hosted destination row count was not independently inspected. A separate [private hosted fixture](./hosted-journal-interruptions-validation.json) then exercised native root aborts after quiescing, after candidate validation, and after activation before journal completion. The same source resumed each saved operation, retained the exact pending approval and original retrieval, and directly counted one destination note and one delivery receipt after reapproval. This uses a test subclass around application-owned driver callbacks; it does not expose fault controls in the product or qualify arbitrary failure instructions.
 
-Before operational release, qualify a real provider and a second authenticated identity, then verify and publish the final release artifact. The [independent candidate installation](./independent-archive-install-validation.json) already started without Git or account credentials and created a validated local checkpoint after a fresh install from the local package cache. Portable recovery from root deletion would require a separate supported storage/export mechanism and is not claimed by this checkpoint design.
+The [second-identity check](./hosted-identity-isolation-validation.json) passed. A [real-model trial](./hosted-real-model-validation.json) also passed text, summary, retrieval and same-build restoration, but not structured tools. Before operational release, complete the real-model approval/result flow, then verify and publish the final release artifact. The [independent candidate installation](./independent-archive-install-validation.json) already started without Git or account credentials and created a validated local checkpoint after a fresh install from the local package cache. Portable recovery from root deletion would require a separate supported storage/export mechanism and is not claimed by this checkpoint design.

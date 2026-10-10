@@ -57,7 +57,7 @@ async function refresh() {
   try {
     const state = await api("state");
     await checkpoints.render(state);
-    recoveryLocked = !!state.recovering;
+    recoveryLocked = !!state.recovering || !!state.runtime?.codeUpdatePending;
     if (state.recovering) {
       setText("connection", "Connected · recovery in progress");
       setSessionEnabled(false);
@@ -98,7 +98,12 @@ async function refresh() {
         ["scheduled", "aborting"].includes(runtime.lastRestart?.status) ||
         state.progress.activeTasks > 0;
     }
-    setText("connection", "Connected · saved state");
+    setText(
+      "connection",
+      state.runtime?.codeUpdatePending
+        ? "Connected · finishing active work before a code update"
+        : "Connected · saved state",
+    );
     $("mode").textContent = state.mode === "demo" ? "Demo model" : "Workers AI";
     $("demo-action").hidden = state.mode !== "demo";
     $("notice").textContent =
@@ -156,6 +161,8 @@ async function refresh() {
             `${r.text.slice(0, 45)} — ${r.status}`,
             "request",
           );
+          if (r.status === "failed" && r.error)
+            row.append(element("p", r.error));
           if (!["completed", "failed", "cancelled"].includes(r.status)) {
             const button = element("button", "Cancel");
             button.onclick = () =>
@@ -166,6 +173,12 @@ async function refresh() {
         }),
       );
     }
+    if (state.runtime?.codeUpdatePending)
+      document
+        .querySelectorAll("#composer button, #composer textarea, #demo-action")
+        .forEach((control) => {
+          control.disabled = true;
+        });
   } catch (error) {
     setText("connection", "Disconnected · reconnecting");
     showError(error);

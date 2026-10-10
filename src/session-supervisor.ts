@@ -34,6 +34,7 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
   private readonly store: SessionStore;
   private readonly model: SessionModel;
   private readonly destination: ActionsStore;
+  private readonly verifiedRuntimes = new Set<string>();
 
   constructor(ctx: DurableObjectState, env: RecoveryEnv) {
     super(ctx, env);
@@ -79,6 +80,30 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
     return this.ctx.facets.get<SessionFacet>(generation.facet, () => ({
       class: exports.SessionFacet({ props }),
     }));
+  }
+
+  /** Called only under the root gate, which also serializes all child drives. */
+  private async ensureChildRuntime(generation: SessionGeneration) {
+    if (this.verifiedRuntimes.has(generation.facet)) return true;
+    const prepared = await this.child(generation).prepareCheckpoint();
+    if (prepared.runtime !== build.sha256) {
+      // A warm facet keeps its original class even when its parent was updated.
+      // The existing checkpoint preflight proves no inference, running/unknown
+      // action or undelivered result is in flight; pending human approval is safe.
+      if (!prepared.ready) return false;
+      this.ctx.facets.abort(
+        generation.facet,
+        new Error("Reloading an idle session with the deployed code"),
+      );
+      const current = await this.child(generation).prepareCheckpoint();
+      if (current.runtime !== build.sha256)
+        throw new HttpError(
+          409,
+          "Session code has not reached the deployed version",
+        );
+    }
+    this.verifiedRuntimes.add(generation.facet);
+    return true;
   }
 
   isGenerationActive(generation: SessionGeneration) {
@@ -261,6 +286,11 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
                   this.checkExpectedGeneration(body.expectedGeneration);
                   const generation = this.checkpoints.status().active;
                   await this.arm(generation);
+                  if (!(await this.ensureChildRuntime(generation)))
+                    throw new HttpError(
+                      409,
+                      "Wait for active work to finish before updating session code",
+                    );
                   const prepared =
                     await this.child(generation).prepareCheckpoint();
                   if (!prepared.ready) throw new HttpError(409, prepared.error);
@@ -306,6 +336,16 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
               this.checkExpectedGeneration(body.expectedGeneration);
             this.checkpoints.assertActive(generation);
             await this.arm(generation);
+            const currentRuntime = await this.ensureChildRuntime(generation);
+            if (
+              !currentRuntime &&
+              method === "POST" &&
+              ["messages", "actions"].includes(path)
+            )
+              throw new HttpError(
+                409,
+                "Wait for active work to finish before updating session code",
+              );
             const result = await this.child(generation).dispatch(
               principal,
               method,
@@ -321,6 +361,8 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
                 this.store.meta("modelCalls") ?? 0,
               );
               value.runtime.restartEnabled = false;
+              value.runtime.expectedBackend = build.sha256;
+              value.runtime.codeUpdatePending = !currentRuntime;
             }
             return value;
           }),
@@ -406,6 +448,9 @@ export class SessionSupervisor extends DurableObject<RecoveryEnv> {
       )
         return;
       await this.arm(generation, Date.now() + LIMITS.heartbeatMs, "replace");
+      // Busy old code may finish its already-admitted work. New mutations and
+      // checkpoints wait; the next idle entry reloads it without rewinding data.
+      await this.ensureChildRuntime(generation);
       const child = this.child(generation);
       await child.drive(attempt);
       const background = child.waitBackground();
@@ -497,10 +542,14 @@ export class SessionFacet extends AgentSession {
     // request must not itself turn an otherwise healthy running turn into an error.
     try {
       await this.checkpointProof();
-      return { ready: true as const };
+      return { ready: true as const, runtime: build.sha256 };
     } catch (error) {
       if (error instanceof HttpError)
-        return { ready: false as const, error: error.message };
+        return {
+          ready: false as const,
+          error: error.message,
+          runtime: build.sha256,
+        };
       throw error;
     }
   }

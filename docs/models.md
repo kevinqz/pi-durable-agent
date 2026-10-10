@@ -86,5 +86,17 @@ Local checks exercise configuration isolation, restart persistence, immutable
 model/budget selection, and the official Workers AI adapter with a simulated
 binding response. They verify the output cap and rejection before dispatch
 when the budget or input bound is exceeded. They do not establish live model
-quality, hosted availability or billing. A bounded real-provider application
-flow remains part of the operational-release gate.
+quality, hosted availability or billing.
+
+The [bounded hosted Scout trial](./hosted-real-model-validation.json) reserved
+10 calls, including summaries and failed attempts. Real text, a long-message
+summary, original retrieval and same-build checkpoint restoration passed.
+Tool-directed turns yielded empty outcomes or text resembling a tool call;
+no action was admitted. The application never executes code extracted from
+ordinary assistant text. This model/tool combination is not operationally
+qualified. A model's documented function-calling support alone is insufficient.
+
+**Export session data** includes bounded diagnostics from committed Pi assistant
+outcomes and the session's backend fingerprint. Use those records before retrying;
+an uploaded Worker version does not prove that a warm session has adopted it.
+See [session code updates](./staging.md#wait-for-session-code-to-update).

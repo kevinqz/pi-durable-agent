@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-10T02:32:13.034209+00:00",
+  "kind": "hosted-second-identity-isolation",
+  "deploymentVersion": "77315ad1-ae6b-4cc5-9f53-86f3f2c3db4f",
+  "sourceCommit": "cfe0aa14ebeecceaa72b5e3c2175c08936cf5da9",
+  "scope": "Two explicitly authorized Cloudflare Access identities, normal authenticated product UI, same checkpoint-session URL",
+  "observed": {
+    "secondIdentity": {
+      "model": "demo",
+      "initialMessages": 0,
+      "initialActions": 0,
+      "initialCheckpoints": 0,
+      "ownerSourceSearchMatches": 0,
+      "approvedSyntheticNotes": 1,
+      "completedActions": 1,
+      "retainedOutputs": 1,
+      "finalMessages": 6,
+      "modelCalls": 0
+    },
+    "ownerReturn": {
+      "model": "workers-ai",
+      "messages": 3,
+      "actions": 0,
+      "checkpoints": 1,
+      "restoresUsed": 1,
+      "reservedCalls": 3,
+      "historyUnchanged": true,
+      "memoryUnchanged": true,
+      "usageUnchanged": true,
+      "actionsUnchanged": true,
+      "retainedOutputsUnchanged": true,
+      "requestIdsInputsStatusErrorsUnchanged": true,
+      "difference": "One request updated_at advanced during normal reconciliation; export timestamps changed"
+    },
+    "cleanup": {
+      "secondIdentityLoggedOut": true,
+      "temporaryAccessMembershipRemoved": true,
+      "originalSingleOwnerPolicyVerified": true,
+      "ownerLoggedBackIn": true
+    }
+  },
+  "exports": {
+    "ownerBeforePayloadSha256": "cc859e5913a29def4b48ee225e1bba81410d7c83ee2574d99f087eee4ecd6cde",
+    "secondIdentityPayloadSha256": "c6d47f598b010f00e408655d08bf12d68cce13ff6e9fcf1d9349ba9686111a40",
+    "ownerAfterPayloadSha256": "ef466f08286d02fdb7a85774812d129072c1ee6460a4add4884cc9aff68f0013",
+    "offlineVerifier": "passed for all three",
+    "storage": "private; payloads, account identifiers and login codes are not committed"
+  },
+  "limits": [
+    "This verifies the ordinary application route and separate notes, history, search, model profile, call count and checkpoint catalog for two identities.",
+    "It is not a penetration test, concurrent multi-user load test or qualification of future connectors.",
+    "One completed action/output was observed for the second identity; destination row deduplication is separately covered by local native tests."
+  ]
+}

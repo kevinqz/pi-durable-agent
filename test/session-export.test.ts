@@ -1,7 +1,8 @@
 import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { BACKGROUND_CONTEXT as BG } from "@earendil-works/chord/context";
-import { UserEntry } from "@earendil-works/pi-durable";
+import { AssistantEntry, UserEntry } from "@earendil-works/pi-durable";
+import { fauxAssistantMessage } from "@earendil-works/pi-ai";
 import { expect, test } from "vitest";
 import type { Env, Principal } from "../src/env.js";
 import { createSessionExport } from "../src/session-export.js";
@@ -131,6 +132,45 @@ test("retains pending and completed Code Mode output with exact bytes and refere
   ).toHaveLength(1);
   await runInDurableObject(stub, (instance) =>
     expect(instance.actions.store.notes()).toHaveLength(1),
+  );
+});
+
+test("exports committed model failures without another inference or copying response text into diagnostics", async () => {
+  const stub = session();
+  await call(stub, "state");
+  await runInDurableObject(stub, async (instance) => {
+    const pi = await instance.pi.pi();
+    const root = await pi.root(BG);
+    await root.commit(
+      (tx) =>
+        tx.appendEntry(AssistantEntry, root.id, {
+          model: [
+            fauxAssistantMessage("Private response text", {
+              stopReason: "error",
+              errorMessage: "Recorded provider failure",
+            }),
+          ],
+        }),
+      BG,
+    );
+  });
+  const before = await call(stub, "state");
+  const archive = await call(stub, "exports/session");
+  expect(archive.payload.application.backendRuntime).toMatch(/^[a-f0-9]{64}$/);
+  expect(archive.payload.modelDiagnostics.responses).toEqual([
+    expect.objectContaining({
+      stopReason: "error",
+      error: "Recorded provider failure",
+      contentTypes: ["text"],
+    }),
+  ]);
+  expect(JSON.stringify(archive.payload.modelDiagnostics)).not.toContain(
+    "Private response text",
+  );
+  expect(archive.payload.usage).toEqual(before.usage);
+  expect((await call(stub, "state")).history).toEqual(before.history);
+  expect(archive.integrity.sha256).toBe(
+    await digest(JSON.stringify(archive.payload)),
   );
 });
 

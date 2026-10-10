@@ -4,7 +4,7 @@ An independent, open-source agent application built with **Pi Durable**, **OptCh
 
 [Português](./README.pt-BR.md) · [Architecture](./docs/architecture.md) · [Deployment](./docs/deployment.md) · [Roadmap](./docs/roadmap.md) · [Credits](./CREDITS.md)
 
-**Development preview.** The demo uses real runtimes and simulated model replies; only the session notes connector is implemented. New sessions have [checkpoint and restore controls](./docs/coordinated-recovery.md), verified locally and in a protected hosted demo flow. A complete stopped local installation also has an [offline backup workflow](./docs/local-recovery.md). Bounded hosted interruption checks also passed in a private fixture. Real model calls, a second authenticated identity and the operational release remain pending. See the [evidence and limits](./docs/validation.md).
+**Development preview.** The default demo uses real runtimes and simulated model replies; the only connector creates session notes. [Checkpoint and restore controls](./docs/coordinated-recovery.md), bounded hosted interruptions and isolation between two authenticated identities have been checked. A [real-model trial](./docs/hosted-real-model-validation.json) passed text replies, memory summaries, original retrieval and same-build restore, but did not produce a structured tool call. The model-directed approval/result flow and operational release remain pending. See the [evidence and limits](./docs/validation.md).
 
 ## Try it locally
 
@@ -95,7 +95,7 @@ npm run build
 
 The focused tests run locally in Cloudflare's Workers runtime with synthetic models and a local connector. `build` is a dry run and does not deploy. `npm run check` also checks formatting. CI repeats those same checks; local development does not depend on GitHub being available after installation.
 
-`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Separate [hosted evidence](./docs/coordinated-recovery.md#hosted-evidence-and-remaining-work) covers a protected demo restore and three native root-abort boundaries. Real inference, a second authenticated identity and the operational release remain pending.
+`test:checkpoints` exercises native subtree restoration, destination deduplication, generation fencing, warm-session code updates and separation of the legacy/new HTTP routes. It runs an isolated fixture of the application composition. `npm run runtime:update` refreshes the reviewed backend identity after source changes; `npm run check` refuses a stale identity. Separate [hosted evidence](./docs/coordinated-recovery.md#hosted-evidence-and-remaining-work) covers protected restoration and three native root-abort boundaries. The real-model tool/approval/result flow and final operational release remain pending.
 
 | Directory                                                                              | Responsibility                                                                     |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
