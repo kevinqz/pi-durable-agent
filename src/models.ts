@@ -14,6 +14,7 @@ import {
 import { createAI } from "agents/models/pi-ai";
 import type { Env } from "./env.js";
 import { guardProvider } from "./provider-guard.js";
+import { workersAiPayloadHook } from "./workers-ai-payload.js";
 
 export function configureModels(
   env: Env,
@@ -49,6 +50,7 @@ export function configureModels(
       stream(model, context, options) {
         const boundedOptions = Object.assign({}, options, {
           maxTokens: admit(model, context, options?.maxTokens),
+          onPayload: workersAiPayloadHook(options?.onPayload),
         });
         return transport.stream(model, context, boundedOptions);
       },
@@ -56,6 +58,7 @@ export function configureModels(
         return transport.streamSimple(model, context, {
           ...options,
           maxTokens: admit(model, context, options?.maxTokens),
+          onPayload: workersAiPayloadHook(options?.onPayload),
         });
       },
     };

@@ -7,6 +7,7 @@ import { SessionModel, modelProfile } from "../src/session-model.js";
 import { SessionStore } from "../src/store.js";
 import { RuntimeRecovery } from "../src/recovery.js";
 import type { TranscriptContext } from "@earendil-works/pi-ai";
+import { workersAiPayloadHook } from "../src/workers-ai-payload.js";
 
 const bindings = env as unknown as Env;
 const modelId = "@cf/meta/llama-4-scout-17b-16e-instruct";
@@ -16,6 +17,136 @@ const owner: Principal = {
   authorizedUntil: Date.now() + 3600000,
 };
 const instance = () => bindings.SESSIONS.getByName(crypto.randomUUID());
+
+test("GPT-OSS receives exact flattened text and native tools through both official adapter entry points", async () => {
+  const dispatched: any[] = [];
+  const code = 'async () => await notes.create({key:"fixture",text:"Fixture"})';
+  const ai = {
+    async run(_model: string, input: any) {
+      dispatched.push(input);
+      if (input.messages.some((message: any) => Array.isArray(message.content)))
+        throw new Error("Bad input: content array not in string");
+      return Response.json({
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "",
+              tool_calls: [
+                {
+                  id: "native-call",
+                  type: "function",
+                  function: {
+                    name: "codemode",
+                    arguments: JSON.stringify({ code, label: "Fixture" }),
+                  },
+                },
+              ],
+            },
+            finish_reason: "tool_calls",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+      });
+    },
+  } as unknown as Ai;
+  let reservations = 0;
+  const { models, model: ref } = configureModels(
+    {
+      ...bindings,
+      MODEL_MODE: "workers-ai",
+      AI: ai,
+      AI_MODEL: "@cf/openai/gpt-oss-120b",
+    },
+    () => {},
+    async () => {
+      reservations++;
+    },
+  );
+  const model = models.getModel(ref.provider, ref.modelId)!;
+  const context: TranscriptContext = {
+    messages: [
+      {
+        role: "system",
+        content: "Keep instructions.",
+        timestamp: 0,
+        toolsAdded: [
+          {
+            name: "codemode",
+            description: "Request an approved action.",
+            parameters: {
+              type: "object",
+              properties: {
+                code: { type: "string" },
+                label: { type: "string" },
+              },
+              required: ["code", "label"],
+            },
+          },
+        ],
+      },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "<chat>\nAurora 🌱\n</chat>\n\n" },
+          { type: "text", text: "Create a note." },
+        ],
+        timestamp: 1,
+      },
+    ],
+  };
+  const before = structuredClone(context);
+  for (const method of ["stream", "streamSimple"] as const) {
+    const outcome = await models[method](model, context, {
+      maxTokens: 10_000,
+      onPayload: async (payload: any) => ({ ...payload, temperature: 0.2 }),
+    }).result();
+    expect(outcome.stopReason).toBe("toolUse");
+    expect(outcome.content).toContainEqual(
+      expect.objectContaining({
+        type: "toolCall",
+        name: "codemode",
+        arguments: { code, label: "Fixture" },
+      }),
+    );
+  }
+  expect(reservations).toBe(2);
+  expect(dispatched).toHaveLength(2);
+  for (const input of dispatched) {
+    expect(input.messages).toEqual([
+      { role: "system", content: "Keep instructions." },
+      { role: "user", content: "<chat>\nAurora 🌱\n</chat>\n\nCreate a note." },
+    ]);
+    expect(input.tools[0]).toMatchObject({
+      type: "function",
+      function: { name: "codemode" },
+    });
+    expect(input.max_tokens).toBe(2048);
+    expect(input.temperature).toBe(0.2);
+  }
+  expect(context).toEqual(before);
+  const mixed = {
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Keep" },
+          {
+            type: "image_url",
+            image_url: { url: "data:image/png;base64,AA==" },
+          },
+        ],
+      },
+    ],
+  };
+  expect(await workersAiPayloadHook()(mixed, model)).toEqual(mixed);
+  const scout = models.getModel("cloudflare", modelId)!;
+  const segmented = {
+    messages: [{ role: "user", content: [{ type: "text", text: "Keep" }] }],
+  };
+  expect(await workersAiPayloadHook()(segmented, scout)).toBe(segmented);
+});
 
 test("configuration is idempotent, owner-bound, immutable and does not initialize Pi on failure", async () => {
   let stub = instance();
