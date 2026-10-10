@@ -1,0 +1,74 @@
+{
+  "format": "pi-durable-agent/hosted-checkpoint-restore-v1",
+  "at": "2026-10-10T00:26:33.837869+00:00",
+  "sourceCommit": "ed2ba42f7867601bd2d9aab5c1786c931a2123ed",
+  "cloudflareVersion": "75ce1f2d-6384-474d-b066-9a3b6e44b6ba",
+  "privateConfigSha256": "3592467a45d06c0bad5d7cabe69d513c013449fe2dd751dad8306a8112351ac7",
+  "backendRuntime": {
+    "format": "pi-durable-agent/checkpoint-runtime-v1",
+    "sha256": "ba056fb305cac2ef897d0a6a7951893b571928d7f33c18bf031bc8048fc481ea"
+  },
+  "fixture": "checkpoint-fix-5c72d91a",
+  "paidModelCalls": 0,
+  "result": "passed-bounded-hosted-demo-flow",
+  "pending": {
+    "executionId": "exec_0001791591669766_fb0dad26-29a2-491c-8ac1-c7a14c2cdf79",
+    "sequence": 0,
+    "connector": "notes",
+    "method": "create",
+    "args": {
+      "key": "aurora",
+      "text": "Project Aurora"
+    },
+    "contract": "supervisor-notes-v1/schema-1/policy-1/codemode-0.5.3",
+    "expiryObserved": "2026-10-09 22:21:09 America/Sao_Paulo"
+  },
+  "actionId": "b9d17fbe7665a8c9d91721bc915689f06ddad33d4f11f5245f2b425eb1601b10",
+  "observed": [
+    "Original Aurora hosted recovery 862 conversation completed",
+    "Checkpoint published only after copied-subtree proof validation",
+    "Source approval completed before restore, with retained result",
+    "Confirmed restore completed and returned the six-message state and 857-byte memory view",
+    "Exact execution, sequence, args, code, contract and original expiry preserved",
+    "Reload retained the pending approval",
+    "New explicit approval completed the restored action with the identical actionId/key/text receipt",
+    "One visible result request and one assistant follow-up; eight messages and 1345-byte memory view",
+    "Original message retrieved through source search",
+    "Further reload retained the completed action and unchanged eight-message history"
+  ],
+  "localChecks": {
+    "typecheck": "passed",
+    "coordinatorAndEvidenceTests": 7,
+    "nativeApplicationIntegrationTests": 3,
+    "format": "passed",
+    "legacyDev4ToCorrectedDev5Upgrade": "passed; see local-upgrade-dev5-validation.json"
+  },
+  "limits": [
+    "Browser observations plus backend integrity comparison; no independent hosted destination-row count",
+    "No injected hosted coordinator failure window or second authenticated identity in this flow",
+    "Demo model only; no real-provider inference",
+    "Same-parent subtree recovery only; no root deletion, account loss, portable archive or cross-build checkpoint conversion"
+  ],
+  "sha256": {
+    "src/checkpoint-coordinator.ts": "608b3490d87c06ef41287081d07be68d147e71f946830df4948ed03895228097",
+    "src/checkpoint-proof.ts": "bef7e3f312bf93af3e4df3558cf274fd9d89b638b842532a687c936df578f83a",
+    "src/session-supervisor.ts": "17a0c55fcdb8c5b0688f629cefd24e2806362622e82915d29daa3a9f48e74e5f",
+    "src/session.ts": "5b802eb944ea7eefa2c35b39b0494aac38e7b6da59a9ff288ea7f3ff48422a12",
+    "src/generated/checkpoint-build.json": "705e597bb69facc0680f765075756a7b34c17c8f8e0ea0a3887d192c263de04b",
+    "public/checkpoints.js": "6a62df05ea8979424982e24036ec244028a36e042a8bcb69eb170ca618202ace",
+    "test/checkpoint-coordinator.test.ts": "d1084374a8be148527bfe7c75b7f6bd09935d154bbf97d9cc7ab7f98f28b6636",
+    "test/coordinated-recovery.integration.ts": "f95848f335228dd451c4d557d70bde8ed732769c28b50db8e6d168d4271fc88c"
+  },
+  "anonymousAccess": [
+    {
+      "path": "/",
+      "status": 302,
+      "redirectHost": "sal2.cloudflareaccess.com"
+    },
+    {
+      "path": "/api/checkpoint-sessions/checkpoint-fix-5c72d91a/state",
+      "status": 302,
+      "redirectHost": "sal2.cloudflareaccess.com"
+    }
+  ]
+}
