@@ -6,7 +6,7 @@
 - Add checkpoint creation, confirmed restoration, retained operation receipts, generation fencing and bounded retry/cancellation controls.
 - Verify each copied subtree before publishing a checkpoint or activating a restore; report bounded component diagnostics without retaining their private contents.
 - Use simple facet names after the hosted runtime reopened colon-named copies empty. Preserve earlier pre-release sessions and refuse new checkpoint admission for that layout.
-- Record local integration and legacy upgrade evidence; keep hosted qualification and the operational release gate explicit.
+- Record local integration and legacy upgrade evidence, a protected hosted demo restore, and recovery after native root aborts at three coordinator boundaries. Keep real-model, second-identity and operational-release qualification open.
 
 ## 0.1.0-dev.4 — Model choice and durable inference allowances
 
@@ -50,4 +50,4 @@
 - Provide a credential-free local browser demo, source retrieval, progress and approval inspection.
 - Include focused runtime checks, locked dependencies, upstream attribution and a deployment guide.
 
-These are development previews. Specific demo staging and release routes have evidence; live models, hosted coordinated restore and arbitrary cross-release recovery remain unqualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).
+Published versions are development previews. The unreleased checkpoint implementation also has protected hosted demo-restore and bounded interruption evidence. Real inference, a second authenticated identity and the operational release remain pending; arbitrary failure windows and cross-release recovery are not qualified. See [validation](./docs/validation.md) and [roadmap](./docs/roadmap.md).
